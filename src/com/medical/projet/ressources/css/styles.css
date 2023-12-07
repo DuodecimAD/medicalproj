@@ -1,0 +1,267 @@
+* {
+	/*
+		https://www.realtimecolors.com/dashboard?colors=dee7ed-3b4a5e-24447a-1c2c3f-66a8ff&fonts=Poppins-Poppins
+	*/
+	-text: rgb(221,230,237);
+	-background: rgb(59, 74, 94);
+	-primary: rgb(36, 67, 121);
+    -secondary: rgb(29, 45, 65);
+    -accent: rgb(100, 167, 255);
+    -error: rgb(219, 59, 59);
+    
+    -fx-font-size: 16px;
+    
+}
+
+.button{
+	-fx-cursor: hand; 
+}
+
+.text-field{
+	-fx-text-fill: -primary;
+}
+
+#menuPane{
+	-fx-background-color: -secondary;
+	-fx-alignement: center;
+	
+	/* next 2 lines to create margin */
+	-fx-padding: 30 0 0 0;
+    -fx-border-insets: 30 0 0 0;
+
+    -fx-effect: innershadow(three-pass-box, rgba(0,0,0,0.8), 5, 0, 0, 0);
+}
+ 
+#menuPane .button {
+    -fx-background-radius: 0;
+    -fx-background-insets: 0;
+    -fx-background-color: -secondary;
+	-fx-text-fill: -text;
+	
+	-fx-pref-width: 150px;
+	-fx-pref-height: 50px;
+}
+
+#menuButtons{
+	-fx-spacing: 2px;
+}
+
+#menuPane .button:hover {
+    -fx-effect: innershadow(three-pass-box, rgba(200,200,200,0.2), 15, 0, 0, 0);
+    /*-fx-background-color: -primary;*/
+    /*-fx-text-fill: -secondary;*/
+    /*-fx-text-fill: red;*/
+     -fx-padding: 0 0 0 8px;
+}
+
+#menuPane #activeMenuButton:hover{
+	-fx-padding: 0;
+	-fx-effect: none;
+}
+
+#menuPane #activeMenuButton {
+	-fx-background-color: -background;
+}
+
+/****************
+ *   CONTENT
+ ****************/
+
+#content{
+	-fx-background-color: -background;
+	-fx-padding: 20;
+}
+
+#content > Label{
+	-fx-text-fill: -text;
+	-fx-wrap-text: true;
+}
+
+#searchLabel{
+	-fx-font-weight: bold;
+    -fx-font-size: 1.1em; 
+    -fx-text-fill: -text;
+    -fx-padding: 5 0 0 0;
+}
+
+#clientTop{
+	/*-fx-background-color: yellow;*/
+	-fx-pref-height: 55;
+}
+
+#createClientButton {
+    -fx-padding: 5 15 12 15;
+    -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;
+    -fx-background-radius: 8;
+    -fx-background-color: 
+    	-primary,
+        -secondary,
+        -primary;  
+
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );
+    -fx-font-weight: bold;
+    -fx-font-size: 1.1em; 
+    -fx-text-fill: -text;
+}
+
+#createClientButton:hover {
+    -fx-background-color: 
+        -primary,
+        -secondary,
+        -background;        
+}
+
+#createClientButton:pressed{
+    -fx-padding: 6 15 12 15;
+}
+
+/* TABLE */
+#ClientBody{
+ 	-fx-padding: -20;
+}
+
+#ClientBody > * {
+ 	-fx-padding: 20;
+}
+ 
+
+.table-cell .text,.table-view .column-header .text{
+	-fx-fill: -primary;
+}
+
+
+#Table_Client{
+	-fx-border-width: 0;
+}
+
+
+.table-column {
+	-fx-alignment: CENTER-RIGHT;
+}
+
+
+.table-row-cell:selected {
+    -fx-background-color: transparent; 
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-background-color: -primary; 
+    -fx-table-cell-border-color: transparent; 
+}
+.table-row-cell:selected .text {
+    -fx-fill: -text;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-border-width: 0; 
+}
+
+#searchLabel{
+	-fx-text-fill : -text;
+}
+
+.table-view {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+
+/****************
+ *   OVERLAY
+ ****************/
+ 
+#overlayContentPane{
+	-fx-background-color : -secondary;
+
+}
+
+#overlayContentPane VBox{
+	-fx-padding : 0 30 0 30;
+
+}
+
+#overlayContentPane Button{
+	-fx-min-width: 80px;
+}
+
+#overlayContentPane > * > Button:hover{
+	/*-fx-background-color: blue;*/
+}
+
+/* top section */
+
+#overlayContentPane #overlayTopDelete{
+	-fx-padding: 20 0 0 390;
+	
+}
+
+#overlayTopDelete Button{
+
+	-fx-text-fill : -error;
+	
+}
+
+#Delete_Client {
+	
+}
+
+#errorLabelnewClient{
+	-fx-text-fill: -error;
+	-fx-padding : 30 0 -10 0;
+}
+
+/* center section */
+
+#overlayContentPane Label{
+	-fx-padding: 10 0 0 0;
+    -fx-border-insets: 10 0 0 0;
+}
+
+
+#overLayContent > Label{
+	-fx-text-fill: -text;
+}
+
+.date-picker > .text-field{
+	-fx-text-fill: -primary;
+}
+
+/* bottom section */
+
+#overlayBottomButtons{
+	-fx-padding: 35 0 20 290;
+    -fx-spacing: 20px;
+    
+}
+
+#overlayBottomButtons .button{
+	-fx-text-fill: -text;
+}
+
+#overlayContentPane > * > .button {
+    -fx-padding: 5 0 12 0;
+    -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;
+    -fx-background-radius: 8;
+    -fx-background-color: 
+    	-primary,
+        -secondary,
+        -background;
+
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );
+    -fx-font-weight: bold;
+    -fx-font-size: 1.1em; 
+
+}
+
+#overlayContentPane > * > .button:hover {
+    -fx-background-color: 
+        -primary,
+        -secondary,
+        -primary;          
+}
+
+#overlayContentPane > * > .button:pressed{
+    -fx-padding: 6 0 12 0;
+}
+
