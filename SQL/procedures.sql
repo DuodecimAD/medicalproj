@@ -154,7 +154,7 @@ BEGIN
 
     countPos := 1;
 
-    IF tableName = 'CLIENT' THEN
+    --IF tableName = 'CLIENT' THEN
         WHILE startPos <= LENGTH(inputColumns) LOOP
             endPos := INSTR(inputColumns, separator, startPos);
 
@@ -245,7 +245,7 @@ BEGIN
         -- Record does not exist, proceed with the insert
         InsertRecord(tableName, inputColumns, s_value1, s_value2, d_value1, s_value4, s_value5);
 
-    END IF;
+    --END IF;
     
     -- Log
     INSERT INTO debug_log (procedure_name, variable_name, variable_value)
@@ -328,7 +328,7 @@ BEGIN
     sql_stmt := 'UPDATE ' || v_tableName || ' SET ' || v_column || ' = :1 WHERE ' || v_checkColumn || ' = :2';
     
     CASE
-        WHEN v_column = 'DATE_NAIS_CLIENT' THEN
+        WHEN v_column = 'DATE_NAIS_CLIENT' OR v_column = 'DATE_NAIS_SPECIALISTE' THEN
             d_value1 := TO_DATE(v_value, 'YYYY-MM-DD');
             EXECUTE IMMEDIATE sql_stmt USING d_value1, v_checkValue;
             
