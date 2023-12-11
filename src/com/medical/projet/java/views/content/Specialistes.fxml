@@ -16,7 +16,7 @@
          <children>
             <BorderPane>
                <center>
-                  <TableView id="Table" fx:id="table" prefHeight="560.0">
+                  <TableView id="Table" fx:id="table" prefHeight="1000.0">
                     <columns>
                       <TableColumn id="name" fx:id="name" editable="false" minWidth="100.0" prefWidth="140.0" text="Name" />
                         <TableColumn id="surname" fx:id="surname" editable="false" minWidth="100.0" prefWidth="140.0" text="Surname" />

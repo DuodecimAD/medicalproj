@@ -30,7 +30,7 @@ import javafx.scene.layout.VBox;
 public class AppController {
 
     /** The body. */
-    @FXML private BorderPane body;
+    @FXML private BorderPane appBody;
 
     /** The menu pane. */
     @FXML private BorderPane menuPane;
@@ -51,7 +51,7 @@ public class AppController {
 
         /* to stop having a button focused while content is not connected to it */
         Platform.runLater(() -> {
-            body.requestFocus();
+            appBody.requestFocus();
         });
 
         LoggerUtil.getLogger().info("Initialize done");
@@ -178,12 +178,12 @@ public class AppController {
     public void loadContent(String fxmlName) {
         try {
             Label loading = new Label("loading...");
-            body.setCenter(loading);
+            appBody.setCenter(loading);
 
             // Check if the FXML content is already cached
             if (fxmlCache.containsKey(fxmlName)) {
                 CachedFXML cachedFXML = fxmlCache.get(fxmlName);
-                body.setCenter(cachedFXML.getContent());
+                appBody.setCenter(cachedFXML.getContent());
             } else {
                 URL pathUrl;
                 if(!fxmlName.equals("Settings.fxml")) {
@@ -200,7 +200,7 @@ public class AppController {
                  fxmlCache.put(fxmlName, new CachedFXML(content, controller));
 
                  content.setId("content");
-                 body.setCenter(content);
+                 appBody.setCenter(content);
              }
          } catch (Exception e) {
              e.printStackTrace();

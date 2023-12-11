@@ -24,7 +24,6 @@
 #menuPane{
 	-fx-background-color: -secondary;
 	-fx-alignement: center;
-	
 	/* next 2 lines to create margin */
 	-fx-padding: 30 0 0 0;
     -fx-border-insets: 30 0 0 0;
@@ -84,12 +83,12 @@
     -fx-padding: 5 0 0 0;
 }
 
-#clientTop{
+#top{
 	/*-fx-background-color: yellow;*/
 	-fx-pref-height: 55;
 }
 
-#createClientButton {
+#createButton {
     -fx-padding: 5 15 12 15;
     -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;
     -fx-background-radius: 8;
@@ -104,23 +103,23 @@
     -fx-text-fill: -text;
 }
 
-#createClientButton:hover {
+#createButton:hover {
     -fx-background-color: 
         -primary,
         -secondary,
         -background;        
 }
 
-#createClientButton:pressed{
+#createButton:pressed{
     -fx-padding: 6 15 12 15;
 }
 
 /* TABLE */
-#ClientBody{
+#body {
  	-fx-padding: -20;
 }
 
-#ClientBody > * {
+#body > * {
  	-fx-padding: 20;
 }
  
@@ -130,7 +129,7 @@
 }
 
 
-#Table_Client{
+#table{
 	-fx-border-width: 0;
 }
 
@@ -202,11 +201,7 @@
 	
 }
 
-#Delete_Client {
-	
-}
-
-#errorLabelnewClient{
+#errorLabelnew{
 	-fx-text-fill: -error;
 	-fx-padding : 30 0 -10 0;
 }
