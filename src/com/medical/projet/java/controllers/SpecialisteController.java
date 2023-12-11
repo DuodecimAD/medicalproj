@@ -9,7 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
 
-import com.medical.projet.java.models.Client;
+import com.medical.projet.java.models.Specialiste;
 import com.medical.projet.java.utility.AppSecurity;
 import com.medical.projet.java.utility.AppSettings;
 
@@ -36,34 +36,34 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 
-public class ClientController {
+public class SpecialisteController {
 
-    private ObservableList<Client> clientsObsList = FXCollections.observableArrayList();
+    private ObservableList<Specialiste> specialistesObsList = FXCollections.observableArrayList();
+
+    private static final String tableNameShort = "_SPECIALISTE";
     
-    private static final String tableNameShort = "_CLIENT";
-
     /** The body. **/
 
     @FXML
     private StackPane body;
 
     @FXML
-    private TableView<Client> table;
+    private TableView<Specialiste> table;
 
     @FXML
-    private TableColumn<Client, String> name;
+    private TableColumn<Specialiste, String> name;
 
     @FXML
-    private TableColumn<Client, String> surname;
+    private TableColumn<Specialiste, String> surname;
 
     @FXML
-    private TableColumn<Client, String> dateNais;
+    private TableColumn<Specialiste, String> dateNais;
 
     @FXML
-    private TableColumn<Client, String> tel;
+    private TableColumn<Specialiste, String> tel;
 
     @FXML
-    private TableColumn<Client, String> email;
+    private TableColumn<Specialiste, String> email;
 
     @FXML
     private Button createButton;
@@ -78,7 +78,7 @@ public class ClientController {
 
         new Thread(() -> {
             Platform.runLater(() -> {
-                readAllClients();
+                readAllSpecialistes();
                 updateTableView();
                 searchTable();
             });
@@ -87,8 +87,8 @@ public class ClientController {
         // When data's row is clicked, open overlay with data from that row
         openOverlayPopulateData();
 
-        // Create a new Client
-        openOverlayNewClient();
+        // Create a new Specialiste
+        openOverlayNewSpecialiste();
 
     }
 
@@ -101,14 +101,14 @@ public class ClientController {
         table.setPlaceholder(loadingImageView);
     }
 
-    private ObservableList<Client> readAllClients() {
+    private ObservableList<Specialiste> readAllSpecialistes() {
 
-        // Get raw data from the Client model
-        List<List<Object>> rawClientData = null;
+        // Get raw data from the Specialiste model
+        List<List<Object>> rawSpecialisteData = null;
         Label placeholderLabel = new Label(); // Create label outside of the timer
 
         try {
-            rawClientData = Client.getAllClientsData();
+            rawSpecialisteData = Specialiste.getAllSpecialistesData();
         } catch (Exception e) {
             final int[] seconds = {30}; // Initial countdown value
 
@@ -123,7 +123,7 @@ public class ClientController {
 
                         if (seconds[0] < 0) {
                             timer.cancel(); // Stop the timer when the countdown reaches zero
-                            readAllClients(); // Optionally, trigger another attempt here
+                            readAllSpecialistes(); // Optionally, trigger another attempt here
                         }
                     });
                 }
@@ -131,8 +131,8 @@ public class ClientController {
         }
 
 
-        if (rawClientData != null) {
-            for (List<Object> row : rawClientData) {
+        if (rawSpecialisteData != null) {
+            for (List<Object> row : rawSpecialisteData) {
 
                 String nom = (String) row.get(1);
                 String prenom = (String) row.get(2);
@@ -141,44 +141,44 @@ public class ClientController {
                 LocalDate date_nais = timestamp.toLocalDateTime().toLocalDate();
                 String tel = (String) row.get(4);
                 String email = (String) row.get(5);
-                // Create a Client object and add to the list
-                clientsObsList.add(new Client(nom, prenom, date_nais, tel, email));
+                // Create a Specialiste object and add to the list
+                specialistesObsList.add(new Specialiste(nom, prenom, date_nais, tel, email));
             }
         }
-        return clientsObsList;
+        return specialistesObsList;
     }
 
 
     private void updateTableView() {
 
         // Set the items with the correct data type
-        table.setItems(clientsObsList);
+        table.setItems(specialistesObsList);
 
         // Populate columns of TableView with the data
-        name.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomClient()));
-        surname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomClient()));
-        dateNais.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateNaisClient().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
-        tel.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getTelClient()));
-        email.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getEmailClient()));
+        name.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomSpecialiste()));
+        surname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomSpecialiste()));
+        dateNais.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateNaisSpecialiste().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+        tel.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getTelSpecialiste()));
+        email.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getEmailSpecialiste()));
 
     }
 
     private void openOverlayPopulateData() {
         table.setRowFactory(tv -> {
-            TableRow<Client> row = new TableRow<>();
+            TableRow<Specialiste> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 1 && !row.isEmpty()) {
-                    Client rowData = row.getItem();
-                    openOverlayWithClientData(rowData);
+                    Specialiste rowData = row.getItem();
+                    openOverlayWithSpecialisteData(rowData);
                 }
             });
             return row;
         });
     }
 
-    private void openOverlayNewClient() {
+    private void openOverlayNewSpecialiste() {
         createButton.setOnMouseClicked(event -> {
-            openOverlayForNewClient();
+            openOverlayForNewSpecialiste();
         });
     }
 
@@ -211,43 +211,43 @@ public class ClientController {
 
     }
 
-    // overlay with client data
-    private void openOverlayWithClientData(Client client) {
-        createOverlay(body, contentPane -> populateOverlayContent(contentPane, client));
+    // overlay with specialiste data
+    private void openOverlayWithSpecialisteData(Specialiste specialiste) {
+        createOverlay(body, contentPane -> populateOverlayContent(contentPane, specialiste));
     }
 
-    // overlay for a new client
-    private void openOverlayForNewClient() {
-        createOverlay(body, contentPane -> populateOverlayForNewClient(contentPane));
+    // overlay for a new specialiste
+    private void openOverlayForNewSpecialiste() {
+        createOverlay(body, contentPane -> populateOverlayForNewSpecialiste(contentPane));
     }
 
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
-    private void populateOverlayContent(BorderPane contentPane, Client client) {
+    private void populateOverlayContent(BorderPane contentPane, Specialiste specialiste) {
 
         Label nameLabel = new Label("Name");
         nameLabel.setId("NOM" + tableNameShort);
         TextField nameField = new TextField();
-        nameField.setText(client.getNomClient());
+        nameField.setText(specialiste.getNomSpecialiste());
 
         Label surnameLabel = new Label("Surname");
         surnameLabel.setId("PRENOM" + tableNameShort);
         TextField surnameField = new TextField();
-        surnameField.setText(client.getPrenomClient());
+        surnameField.setText(specialiste.getPrenomSpecialiste());
 
         Label date_naisLabel = new Label("Birthday");
         date_naisLabel.setId("DATE_NAIS" + tableNameShort);
         DatePicker date_naisField = new DatePicker();
-        date_naisField.setValue(client.getDateNaisClient());
+        date_naisField.setValue(specialiste.getDateNaisSpecialiste());
 
         Label telLabel = new Label("Telephone");
         telLabel.setId("TEL" + tableNameShort);
         TextField telField = new TextField();
-        telField.setText(client.getTelClient());
+        telField.setText(specialiste.getTelSpecialiste());
 
         Label emailLabel = new Label("Email");
         emailLabel.setId("EMAIL" + tableNameShort);
         TextField emailField = new TextField();
-        emailField.setText(client.getEmailClient());
+        emailField.setText(specialiste.getEmailSpecialiste());
 
         VBox overLayContent = new VBox();
         overLayContent.setId("overLayContent");
@@ -276,86 +276,86 @@ public class ClientController {
         });
 
         buttonDelete.setOnAction(e -> {
-            deleteClient(client);
-            getClientsObsList().remove(client);
+            deleteSpecialiste(specialiste);
+            getSpecialistesObsList().remove(specialiste);
             closeOverlay();
         });
 
         buttonOk.setOnAction(e -> {
-            updateClient(client, nameLabel.getId(),         client.getNomClient(),      nameField.getText(),        emailLabel.getId(),     client.getEmailClient() );
-            updateClient(client, surnameLabel.getId(),      client.getPrenomClient(),   surnameField.getText(),     emailLabel.getId(),     client.getEmailClient() );
-            updateClient(client, date_naisLabel.getId(),    client.getDateNaisClient(), date_naisField.getValue(),  emailLabel.getId(),     client.getEmailClient() );
-            updateClient(client, telLabel.getId(),          client.getTelClient(),      telField.getText(),         emailLabel.getId(),     client.getEmailClient() );
-            updateClient(client, emailLabel.getId(),        client.getEmailClient(),    emailField.getText(),       emailLabel.getId(),     client.getEmailClient() );
+            updateSpecialiste(specialiste, nameLabel.getId(),         specialiste.getNomSpecialiste(),      nameField.getText(),        emailLabel.getId(),     specialiste.getEmailSpecialiste() );
+            updateSpecialiste(specialiste, surnameLabel.getId(),      specialiste.getPrenomSpecialiste(),   surnameField.getText(),     emailLabel.getId(),     specialiste.getEmailSpecialiste() );
+            updateSpecialiste(specialiste, date_naisLabel.getId(),    specialiste.getDateNaisSpecialiste(), date_naisField.getValue(),  emailLabel.getId(),     specialiste.getEmailSpecialiste() );
+            updateSpecialiste(specialiste, telLabel.getId(),          specialiste.getTelSpecialiste(),      telField.getText(),         emailLabel.getId(),     specialiste.getEmailSpecialiste() );
+            updateSpecialiste(specialiste, emailLabel.getId(),        specialiste.getEmailSpecialiste(),    emailField.getText(),       emailLabel.getId(),     specialiste.getEmailSpecialiste() );
             closeOverlay();
         });
     }
 
-    private void deleteClient(Client client) {
-        client.deleteClientDB(client.getTelClient());
+    private void deleteSpecialiste(Specialiste specialiste) {
+        specialiste.deleteSpecialisteDB(specialiste.getTelSpecialiste());
     }
 
-    public void updateClient(Client client, String fieldName, Object oldValue, Object newValue, String checkColumn, String checkValue) {
+    public void updateSpecialiste(Specialiste specialiste, String fieldName, Object oldValue, Object newValue, String checkColumn, String checkValue) {
 
         if(!(newValue instanceof LocalDate)) {
             newValue = AppSecurity.sanitize(newValue.toString());
         }
 
         switch (fieldName) {
-        case "NOM_CLIENT" -> {
+        case "NOM_SPECIALISTE" -> {
             if (compare(oldValue, newValue)) {
 
                 try {
-                    client.updateClientDB(fieldName, newValue, checkColumn, checkValue);
-                    client.setNomClient(newValue.toString());
+                    specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
+                    specialiste.setNomSpecialiste(newValue.toString());
                     System.out.println("name has been changed");
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
         }
-        case "PRENOM_CLIENT" -> {
+        case "PRENOM_SPECIALISTE" -> {
             if (compare(oldValue, newValue)) {
                 try {
-                    client.updateClientDB(fieldName, newValue, checkColumn, checkValue);
+                    specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                client.setPrenomClient(newValue.toString());
+                specialiste.setPrenomSpecialiste(newValue.toString());
                 System.out.println("surname has been changed");
             }
         }
-        case "DATE_NAIS_CLIENT" -> {
+        case "DATE_NAIS_SPECIALISTE" -> {
             if (compare(oldValue, newValue)) {
                 try {
-                    client.updateClientDB(fieldName, newValue, checkColumn, checkValue);
+                    specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
                 LocalDate newDate = LocalDate.parse(newValue.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                client.setDateNaisClient(newDate);
+                specialiste.setDateNaisSpecialiste(newDate);
                 System.out.println("date_nais has been changed");
             }
         }
-        case "TEL_CLIENT" -> {
+        case "TEL_SPECIALISTE" -> {
             if (compare(oldValue, newValue)) {
                 try {
-                    client.updateClientDB(fieldName, newValue, checkColumn, checkValue);
+                    specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                client.setTelClient(newValue.toString());
+                specialiste.setTelSpecialiste(newValue.toString());
                 System.out.println("tel has been changed");
             }
         }
-        case "EMAIL_CLIENT" -> {
+        case "EMAIL_SPECIALISTE" -> {
             if (compare(oldValue, newValue)) {
                 try {
-                    client.updateClientDB(fieldName, newValue, checkColumn, checkValue);
+                    specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-                client.setEmailClient(newValue.toString());
+                specialiste.setEmailSpecialiste(newValue.toString());
                 System.out.println("email has been changed");
             }
         }
@@ -369,8 +369,8 @@ public class ClientController {
     }
 
 
-    // populating inputs in the overlay when clicking create new client
-    private void populateOverlayForNewClient(BorderPane contentPane) {
+    // populating inputs in the overlay when clicking create new specialiste
+    private void populateOverlayForNewSpecialiste(BorderPane contentPane) {
 
         Label nameLabel = new Label("Name");
         TextField nameField = new TextField();
@@ -410,24 +410,24 @@ public class ClientController {
         });
 
         buttonOk.setOnAction(e -> {
-            String newClientOK = createNewClient(nameField.getText(), surnameField.getText(), date_naisField.getValue(), telField.getText(), emailField.getText());
+            String newSpecialisteOK = createNewSpecialiste(nameField.getText(), surnameField.getText(), date_naisField.getValue(), telField.getText(), emailField.getText());
 
-            if(newClientOK.equals("")) {
+            if(newSpecialisteOK.equals("")) {
                 closeOverlay();
             }else {
-                errorLabel.setText(newClientOK);
+                errorLabel.setText(newSpecialisteOK);
             }
         });
     }
 
-    private String createNewClient(String nameField, String SurnameField, LocalDate date_naisField, String telField, String emailField) {
+    private String createNewSpecialiste(String nameField, String SurnameField, LocalDate date_naisField, String telField, String emailField) {
 
-        Client newClient = new Client(nameField, SurnameField, date_naisField, telField, emailField);
+        Specialiste newSpecialiste = new Specialiste(nameField, SurnameField, date_naisField, telField, emailField);
 
         try {
-            newClient.insertClientDB(newClient);
-            System.out.println(newClient.toString() + " added to database without problem");
-            getClientsObsList().add(newClient);
+            newSpecialiste.insertSpecialisteDB(newSpecialiste);
+            System.out.println(newSpecialiste.toString() + " added to database without problem");
+            getSpecialistesObsList().add(newSpecialiste);
         } catch (SQLException e) {
             String errorMessage = e.getMessage();
             int startIndex = errorMessage.indexOf("ORA-20001: ");
@@ -453,8 +453,8 @@ public class ClientController {
         return "";
     }
 
-    public ObservableList<Client> getClientsObsList() {
-        return clientsObsList;
+    public ObservableList<Specialiste> getSpecialistesObsList() {
+        return specialistesObsList;
     }
 
 
@@ -472,32 +472,32 @@ public class ClientController {
      */
 
     private void searchTable() {
-        FilteredList<Client> filteredData = new FilteredList<>(clientsObsList, p -> true);
+        FilteredList<Specialiste> filteredData = new FilteredList<>(specialistesObsList, p -> true);
 
         // Add listener to the searchField text property
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             // Create a filtered list to apply the search
 
             // Set the predicate for the filter
-            filteredData.setPredicate(client -> {
-                // If filter text is empty, display all clients
+            filteredData.setPredicate(specialiste -> {
+                // If filter text is empty, display all specialistes
                 if (newValue == null || newValue.isEmpty()) {
                     return true;
                 }
 
-                // Convert client information to lowercase for case-insensitive search
+                // Convert specialiste information to lowercase for case-insensitive search
                 String lowerCaseFilter = newValue.toLowerCase();
 
-                // Check if any of the client attributes contain the filter text
-                return client.getNomClient().toLowerCase().contains(lowerCaseFilter)
-                        || client.getPrenomClient().toLowerCase().contains(lowerCaseFilter)
-                        || String.valueOf(client.getDateNaisClient()).toLowerCase().contains(lowerCaseFilter)
-                        || client.getTelClient().toLowerCase().contains(lowerCaseFilter)
-                        || client.getEmailClient().toLowerCase().contains(lowerCaseFilter);
+                // Check if any of the specialiste attributes contain the filter text
+                return specialiste.getNomSpecialiste().toLowerCase().contains(lowerCaseFilter)
+                        || specialiste.getPrenomSpecialiste().toLowerCase().contains(lowerCaseFilter)
+                        || String.valueOf(specialiste.getDateNaisSpecialiste()).toLowerCase().contains(lowerCaseFilter)
+                        || specialiste.getTelSpecialiste().toLowerCase().contains(lowerCaseFilter)
+                        || specialiste.getEmailSpecialiste().toLowerCase().contains(lowerCaseFilter);
             });
 
             // Wrap the FilteredList in a SortedList
-            SortedList<Client> sortedData = new SortedList<>(filteredData);
+            SortedList<Specialiste> sortedData = new SortedList<>(filteredData);
 
             // Bind the SortedList comparator to the TableView comparator
             sortedData.comparatorProperty().bind(table.comparatorProperty());

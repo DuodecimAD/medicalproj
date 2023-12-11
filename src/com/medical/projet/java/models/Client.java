@@ -12,7 +12,9 @@ import com.medical.projet.java.utility.database.DbUpdate;
 
 public class Client {
 
-    private static String tableName = "CLIENT";
+    private static final String tableName = "CLIENT";
+    
+    private static final String tableNameShort = "_CLIENT";
 
     private String NOM_CLIENT;
 
@@ -82,12 +84,12 @@ public class Client {
     public static List<List<Object>> getAllClientsData() {
         // Fetch data from the database (using DbRead or any other method)
         // Return raw data as a List<List<?>>
-        return DbRead.read(tableName, "NOM_CLIENT");
+        return DbRead.read(tableName, "NOM" + tableNameShort);
     }
 
     public void insertClientDB(Client client) throws SQLException {
 
-        List<String> columnsList = new ArrayList<>(List.of("NOM_CLIENT", "PRENOM_CLIENT", "DATE_NAIS_CLIENT", "TEL_CLIENT", "EMAIL_CLIENT"));
+        List<String> columnsList = new ArrayList<>(List.of("NOM" + tableNameShort, "PRENOM" + tableNameShort, "DATE_NAIS" + tableNameShort, "TEL" + tableNameShort, "EMAIL" + tableNameShort));
         List<Object> valuesList =  new ArrayList<>(List.of(client.getNomClient(), client.getPrenomClient(), client.getDateNaisClient(), client.getTelClient(), client.getEmailClient()));
 
         try {
@@ -98,7 +100,7 @@ public class Client {
     }
 
     public void deleteClientDB(String telValue) {
-        DbDelete.delete(tableName, "TEL_CLIENT", telValue);
+        DbDelete.delete(tableName, "TEL" + tableNameShort, telValue);
     }
 
     public void updateClientDB(String column, Object value, String checkColumn, String checkValue) throws SQLException {
