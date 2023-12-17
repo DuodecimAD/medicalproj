@@ -73,6 +73,8 @@ public class SpecialisteController {
 
 
     public void initialize() {
+        
+        dynamicCssStuff();
 
         loadingTableIcon();
 
@@ -90,6 +92,19 @@ public class SpecialisteController {
         // Create a new Specialiste
         openOverlayNewSpecialiste();
 
+    }
+    
+    private void dynamicCssStuff() {
+        
+        createButton.layoutXProperty().bind(body.widthProperty().subtract(createButton.widthProperty()));
+        
+        // Set percentage widths for the columns
+        double tableWidth = table.getPrefWidth();
+        name.prefWidthProperty().bind(table.widthProperty().multiply(0.17)); // 20% of table width
+        surname.prefWidthProperty().bind(table.widthProperty().multiply(0.17)); // 20% of table width
+        dateNais.prefWidthProperty().bind(table.widthProperty().multiply(0.155)); // 20% of table width
+        tel.prefWidthProperty().bind(table.widthProperty().multiply(0.155)); // 20% of table width
+        email.prefWidthProperty().bind(table.widthProperty().multiply(0.32)); // 20% of table width
     }
 
     private void loadingTableIcon() {
@@ -166,7 +181,7 @@ public class SpecialisteController {
     private void openOverlayPopulateData() {
         table.setRowFactory(tv -> {
             TableRow<Specialiste> row = new TableRow<>();
-            row.setOnMouseClicked(event -> {
+            row.setOnMousePressed(event -> {
                 if (event.getClickCount() == 1 && !row.isEmpty()) {
                     Specialiste rowData = row.getItem();
                     openOverlayWithSpecialisteData(rowData);
@@ -207,7 +222,7 @@ public class SpecialisteController {
 
         // Set the dimensions after the stage is shown
         contentPane.setLayoutX((stackPane.getWidth() - contentPane.getPrefWidth()) / 2);
-        contentPane.setLayoutY(80);
+        contentPane.setLayoutY(((stackPane.getHeight() - contentPane.getPrefHeight()) / 2));
 
     }
 

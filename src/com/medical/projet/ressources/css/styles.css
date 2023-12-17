@@ -37,8 +37,8 @@
     -fx-background-color: -secondary;
 	-fx-text-fill: -text;
 	
-	-fx-pref-width: 150px;
-	-fx-pref-height: 50px;
+	-fx-pref-width: 150;
+	-fx-pref-height: 50;
 }
 
 #menuButtons{
@@ -50,7 +50,7 @@
     /*-fx-background-color: -primary;*/
     /*-fx-text-fill: -secondary;*/
     /*-fx-text-fill: red;*/
-     -fx-padding: 0 0 0 8px;
+     -fx-padding: 0 0 0 8;
 }
 
 #menuPane #activeMenuButton:hover{
@@ -115,6 +115,7 @@
 }
 
 /* TABLE */
+
 #body {
  	-fx-padding: -20;
 }
@@ -147,6 +148,7 @@
     -fx-background-color: -primary; 
     -fx-table-cell-border-color: transparent; 
 }
+
 .table-row-cell:selected .text {
     -fx-fill: -text;
 }
@@ -154,6 +156,11 @@
 .table-view .column-header {
     -fx-background-color: transparent;
     -fx-border-width: 0; 
+}
+
+.table-view .column-header:hover{
+	-fx-background-color: rgba(0,0,0,0.1);
+	-fx-cursor: hand; 
 }
 
 #searchLabel{
@@ -172,11 +179,14 @@
  
 #overlayContentPane{
 	-fx-background-color : -secondary;
+	-fx-border-width: 10;
+	-fx-padding: 10 30 10 30;
+	-fx-border-color: -primary;
 
 }
 
 #overlayContentPane VBox{
-	-fx-padding : 0 30 0 30;
+
 
 }
 

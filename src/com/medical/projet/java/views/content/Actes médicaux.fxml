@@ -1,8 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1">
-    <Label text="Actes médicaux" />
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.medical.projet.java.controllers.ActesMedicauxController">
+   <children>
+      <StackPane fx:id="body">
+         <children>
+            <BorderPane>
+               <center>
+                  <TableView id="Table" fx:id="table" prefHeight="560.0">
+                    <columns>
+                      	<TableColumn id="Ref" fx:id="ref_acte_med" editable="false" minWidth="100.0" prefWidth="140.0" text="Reference" />
+                        <TableColumn id="Client" fx:id="client" editable="false" minWidth="100.0" prefWidth="103.0" text="Client" />
+                        <TableColumn id="Specialiste" fx:id="specialiste" editable="false" minWidth="100.0" prefWidth="121.0" text="Specialiste" />
+                        <TableColumn id="Lieu" fx:id="lieu" editable="false" minWidth="118.0" prefWidth="151.0" text="Lieu" />
+                        <TableColumn id="Date début" fx:id="date_debut" editable="false" minWidth="100.0" prefWidth="118.0" text="Date début" />
+                        <TableColumn id="Date fin" fx:id="date_fin" editable="false" minWidth="169.0" prefWidth="169.0" text="Date fin" />
+                    </columns>
+                  </TableView>
+               </center>
+               <top>
+                  <Pane fx:id="top" prefHeight="45.0" prefWidth="770.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label fx:id="searchLabel" layoutY="5.0" text="Search : " />
+                        <TextField fx:id="searchField" layoutX="70.0" prefHeight="42.0" prefWidth="250.0" />
+                        <Button fx:id="createButton" layoutX="630.0" mnemonicParsing="false" text="+ Create a new Acte médical" />
+                     </children>
+                  </Pane>
+               </top>
+            </BorderPane>
+         </children>
+      </StackPane>
+   </children>
 </VBox>
