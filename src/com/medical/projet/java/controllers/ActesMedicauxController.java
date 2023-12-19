@@ -228,12 +228,12 @@ public class ActesMedicauxController {
 
         // Set the dimensions after the stage is shown
         contentPane.setLayoutX(((stackPane.getWidth() - contentPane.getPrefWidth()) / 2) + 20);
-        contentPane.setLayoutY(((stackPane.getHeight() - contentPane.getPrefHeight()) / 2) + 5);
+        contentPane.setLayoutY(((stackPane.getHeight() - contentPane.getPrefHeight()) / 2) + 10);
     }
 
     // overlay with client data
-    private void openOverlayWithActeMedicalData(ActeMedical client) {
-        createOverlay(body, contentPane -> populateOverlayContent(contentPane, client));
+    private void openOverlayWithActeMedicalData(ActeMedical acteMedical) {
+        createOverlay(body, contentPane -> populateOverlayContent(contentPane, acteMedical));
     }
 
     // overlay for a new client
@@ -406,40 +406,84 @@ public class ActesMedicauxController {
     // populating inputs in the overlay when clicking create new client
     private void populateOverlayForNewActeMedical(BorderPane contentPane) {
 
+        
         Label amLabel = new Label("Acte Medical");
         TextField amField = new TextField();
-
+        VBox amAmVbox = new VBox();
+        amAmVbox.getChildren().addAll(amLabel, amField);
+        
+        HBox overlayAmTop = new HBox();
+        overlayAmTop.setId("overlayAmTop");
+        overlayAmTop.getChildren().addAll(amAmVbox);
+        
+        
         Label clientLabel = new Label("Client");
         TextField clientField = new TextField();
-
+        VBox clientAmVbox = new VBox();
+        clientAmVbox.getChildren().addAll(clientLabel, clientField);
+        
         Label specialisteLabel = new Label("Specialiste");
         TextField specialisteField = new TextField();
+        VBox specialisteAmVbox = new VBox();
+        specialisteAmVbox.getChildren().addAll(specialisteLabel, specialisteField);
+        
+        HBox overlayAmCenter = new HBox();
+        overlayAmCenter.setId("overlayAmCenter");
+        overlayAmCenter.getChildren().addAll(clientAmVbox, specialisteAmVbox);
+        
 
         Label lieuLabel = new Label("Lieu");
         TextField lieuField = new TextField();
+        VBox lieueAmVbox = new VBox();
+        lieueAmVbox.getChildren().addAll(lieuLabel, lieuField);
 
         Label date_debutLabel = new Label("Date de début");
         DatePicker date_debutField = new DatePicker();
+        VBox date_debutAmVbox = new VBox();
+        date_debutAmVbox.getChildren().addAll(date_debutLabel, date_debutField);
         
         Label date_finLabel = new Label("Date de fin");
         DatePicker date_finField = new DatePicker();
+        VBox date_finAmVbox = new VBox();
+        date_finAmVbox.getChildren().addAll(date_finLabel, date_finField);
+        
+        HBox overlayAmBottom = new HBox();
+        overlayAmBottom.setId("overlayAmBottom");
+        overlayAmBottom.getChildren().addAll(lieueAmVbox, date_debutAmVbox, date_finAmVbox );
+        
+        TableView<?> tableAm = new TableView<>();
+        tableAm.setId("tableAm");
+        
 
         Label errorLabel = new Label("");
         errorLabel.setId("errorLabelnew");
 
         VBox overLayContent = new VBox();
         overLayContent.setId("overLayContent");
-        overLayContent.getChildren().addAll(amLabel, amField, clientLabel, clientField, specialisteLabel, specialisteField, lieuLabel, lieuField, date_debutLabel, date_debutField, date_finLabel, date_finField, errorLabel);
-
+        overLayContent.getChildren().addAll(overlayAmTop, overlayAmCenter, overlayAmBottom, tableAm, errorLabel);
+        
+        
+        Label amSearchLabel = new Label("Search : ");
+        amSearchLabel.setId("amSearchLabel");
+        TextField amSearchField = new TextField();
+        amSearchField.setId("amSearchField");
+        HBox overlayAmSearch = new HBox();
+        overlayAmSearch.setId("overlayAmSearch");
+        overlayAmSearch.getChildren().addAll(amSearchLabel, amSearchField);
+        
         Button buttonOk = new Button("ok");
         Button buttonCancel = new Button("Cancel");
 
-        HBox overlayBottomButtons = new HBox();
-        overlayBottomButtons.setId("overlayBottomButtons");
-        overlayBottomButtons.getChildren().addAll(buttonOk, buttonCancel);
+        HBox overlayAmBottomButtons = new HBox();
+        overlayAmBottomButtons.setId("overlayAmBottomButtons");
+        overlayAmBottomButtons.getChildren().addAll(buttonOk, buttonCancel);
+        
+        HBox overlayAmBottomStuff = new HBox();
+        overlayAmBottomStuff.setId("overlayAmBottomStuff");
+        overlayAmBottomStuff.getChildren().addAll(overlayAmSearch, overlayAmBottomButtons);
 
         contentPane.setCenter(overLayContent);
-        contentPane.setBottom(overlayBottomButtons);
+        contentPane.setBottom(overlayAmBottomStuff);
 
         // buttons event logic
         buttonCancel.setOnAction(e -> {

@@ -244,7 +244,7 @@
 	-fx-text-fill: -text;
 }
 
-#overlayContentPane > * > .button {
+#overlayContentPane > * > .button{
     -fx-padding: 5 0 12 0;
     -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;
     -fx-background-radius: 8;
@@ -270,3 +270,86 @@
     -fx-padding: 6 0 12 0;
 }
 
+/***** overlay Acte Medical  *****/
+
+#overlayAmTop, #overlayAmCenter, #overlayAmBottom{
+	-fx-spacing: 25;
+}
+
+#overlayAmTop Label, #overlayAmCenter Label, #overlayAmBottom Label{
+	-fx-text-fill: -text;
+}
+
+#overlayAmTop TextField, #overlayAmTop DatePicker, #overlayAmCenter TextField, #overlayAmCenter DatePicker, #overlayAmBottom TextField, #overlayAmBottom DatePicker {
+	-fx-pref-width: 230;
+}
+
+#overlayAmBottom{
+	-fx-padding: 0 0 30 0;
+}
+
+#tableAm{
+	-fx-min-height: 200;
+    -fx-pref-height: 200;
+    -fx-max-height: 200;
+}
+
+#overlayAmBottomButtons{
+	-fx-spacing: 20;
+}
+
+#overlayAmSearch Label, #overlayAmBottomButtons Button{
+	-fx-text-fill: -text;
+}
+
+#overlayAmSearch{
+	-fx-padding: 4 0 0 0;
+}
+
+#amSearchLabel{
+	-fx-padding: 4 0 0 0;
+}
+
+#amSearchField{
+	
+	-fx-pref-width: 250;
+}
+
+#overlayAmBottomButtons{
+	-fx-padding: 0 0 0 250;
+}
+
+#overlayAmBottomButtons .button{
+    -fx-padding: 5 0 12 0;
+    -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;
+    -fx-background-radius: 8;
+    -fx-background-color: 
+    	-primary,
+        -secondary,
+        -background;
+
+    -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.75) , 4,0,0,1 );
+    -fx-font-weight: bold;
+    -fx-font-size: 1.1em; 
+
+}
+
+#overlayAmBottomButtons .button:hover {
+    -fx-background-color: 
+        -primary,
+        -secondary,
+        -primary;          
+}
+
+#overlayAmBottomButtons .button:pressed{
+    -fx-padding: 6 0 12 0;
+}
+
+#errorLabelnew{
+	-fx-padding: 10 0 10 0;
+}
+
+
+#overlayAmBottomStuff{
+	-fx-padding: 0 0 20 0;
+}
