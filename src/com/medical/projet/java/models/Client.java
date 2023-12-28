@@ -14,82 +14,108 @@ public class Client {
 
     private static final String tableName = "CLIENT";
     
-    private static final String tableNameShort = "_CLIENT";
+    private static final String tableNameAffix = "_CLIENT";
+    
+    private int id;
 
-    private String NOM_CLIENT;
+    private String nom;
 
-    private String PRENOM_CLIENT;
+    private String prenom;
 
-    private LocalDate DATE_NAIS_CLIENT;
+    private LocalDate dateNais;
 
-    private String TEL_CLIENT;
+    private String telephone;
 
-    private String EMAIL_CLIENT;
+    private String email;
 
 
     public Client() {}
 
-    public Client(String NOM_CLIENT, String PRENOM_CLIENT, LocalDate DATE_NAIS_CLIENT, String TEL_CLIENT, String EMAIL_CLIENT) {
-        this.NOM_CLIENT = NOM_CLIENT;
-        this.PRENOM_CLIENT = PRENOM_CLIENT;
-        this.DATE_NAIS_CLIENT = DATE_NAIS_CLIENT;
-        this.TEL_CLIENT = TEL_CLIENT;
-        this.EMAIL_CLIENT = EMAIL_CLIENT;
+    public Client(String nom, String prenom, LocalDate dateNais, String telephone, String email) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dateNais = dateNais;
+        this.telephone = telephone;
+        this.email = email;
+    }
+    
+    public Client(int id, String nom, String prenom, LocalDate dateNais, String telephone, String email) {
+        this.id = id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dateNais = dateNais;
+        this.telephone = telephone;
+        this.email = email;
     }
 
     public String getTableName() {
         return tableName;
     }
 
-    public String getNomClient() {
-        return NOM_CLIENT;
+    public int getClientId() {
+        return id;
+    }
+    
+    public void setClientId(int newId) {
+        id = newId;
     }
 
-    public void setNomClient(String nOM_CLIENT) {
-        NOM_CLIENT = nOM_CLIENT;
+    public String getNomClient() {
+        return nom;
+    }
+
+    public void setNomClient(String newNom) {
+        nom = newNom;
     }
 
     public String getPrenomClient() {
-        return PRENOM_CLIENT;
+        return prenom;
     }
 
-    public void setPrenomClient(String pRENOM_CLIENT) {
-        PRENOM_CLIENT = pRENOM_CLIENT;
+    public void setPrenomClient(String newPrenom) {
+        prenom = newPrenom;
     }
 
     public LocalDate getDateNaisClient() {
-        return DATE_NAIS_CLIENT;
+        return dateNais;
     }
 
-    public void setDateNaisClient(LocalDate dATE_NAIS_CLIENT) {
-        DATE_NAIS_CLIENT = dATE_NAIS_CLIENT;
+    public void setDateNaisClient(LocalDate newDateNais) {
+        dateNais = newDateNais;
     }
 
     public String getTelClient() {
-        return TEL_CLIENT;
+        return telephone;
     }
 
-    public void setTelClient(String tEL_CLIENT) {
-        TEL_CLIENT = tEL_CLIENT;
+    public void setTelClient(String newTelephone) {
+        telephone = newTelephone;
     }
 
     public String getEmailClient() {
-        return EMAIL_CLIENT;
+        return email;
     }
 
-    public void setEmailClient(String eMAIL_CLIENT) {
-        EMAIL_CLIENT = eMAIL_CLIENT;
+    public void setEmailClient(String newEmail) {
+        email = newEmail;
     }
 
     public static List<List<Object>> getAllClientsData() {
         // Fetch data from the database (using DbRead or any other method)
         // Return raw data as a List<List<?>>
-        return DbRead.read(tableName, "NOM" + tableNameShort);
+        return DbRead.readTable(tableName, "NOM" + tableNameAffix);
+    }
+    
+    public void setClientIdFromDb(Client client) {
+        
+        int newId = DbRead.readId("ID" + tableNameAffix, tableName, "EMAIL" + tableNameAffix, email.toLowerCase());
+        //System.out.println("id from db is : " + newId);
+        client.setClientId(newId);
     }
 
     public void insertClientDB(Client client) throws SQLException {
 
-        List<String> columnsList = new ArrayList<>(List.of("NOM" + tableNameShort, "PRENOM" + tableNameShort, "DATE_NAIS" + tableNameShort, "TEL" + tableNameShort, "EMAIL" + tableNameShort));
+        List<String> columnsList = new ArrayList<>(List.of("NOM" + tableNameAffix, "PRENOM" + tableNameAffix, "DATE_NAIS" + tableNameAffix, "TEL" + tableNameAffix, "EMAIL" + tableNameAffix));
         List<Object> valuesList =  new ArrayList<>(List.of(client.getNomClient(), client.getPrenomClient(), client.getDateNaisClient(), client.getTelClient(), client.getEmailClient()));
 
         try {
@@ -99,17 +125,30 @@ public class Client {
         }
     }
 
-    public void deleteClientDB(String telValue) {
-        DbDelete.delete(tableName, "TEL" + tableNameShort, telValue);
+    public void deleteClientDB(String checkColumn, String checkValue) {
+        DbDelete.delete(tableName, checkColumn + tableNameAffix, checkValue);
     }
 
-    public void updateClientDB(String column, Object value, String checkColumn, String checkValue) throws SQLException {
+    public void updateClientDB(String column, Object newValue, String checkColumn, String checkValue) throws SQLException {
 
         try {
-            DbUpdate.update(tableName, column, value, checkColumn, checkValue);
+            DbUpdate.update(tableName, column, newValue, checkColumn, checkValue);
         } catch (SQLException e) {
             throw e;
         }
+    }
+    
+    public String toString() {
+
+        return  "--------------"                        + "\r"  +
+                "This Client is : "                     + "\r"  +
+                "id : "          + getClientId()        + "\r"  +
+                "nom : "         + getNomClient()       + "\r"  +
+                "prenom : "      + getPrenomClient()    + "\r"  +
+                "dateNais : "    + getDateNaisClient()  + "\r"  +
+                "telephone : "   + getTelClient()       + "\r"  +
+                "email : "       + getEmailClient()     + "\r"  +
+                "--------------"                        + "\r"  ;
     }
 
 }

@@ -67,7 +67,7 @@ public class DbCreate {
             // Execute the stored procedure
             callableStatement.execute();
 
-            System.out.println(valuesList + " was inserted successfully!");
+            System.out.println(valuesList + " has been inserted successfully!");
 
         } catch (SQLException e) {
 

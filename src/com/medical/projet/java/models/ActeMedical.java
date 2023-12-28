@@ -15,93 +15,118 @@ public class ActeMedical {
     private static final String tableName = "ACTE_MED";
     
     private static final String tableNameShort = "_ACTE_MED";
-
-    private String REF_ACTE_MED;
     
-    private String ID_CLIENT;
+    private int idActeMed;
 
-    private String ID_SPECIALISTE;
+    private String refActeMed;
     
-    private String ID_LIEU;
+    private int idClient;
 
-    private LocalDate DATE_DEBUT;
+    private int idSpecialiste;
     
-    private LocalDate DATE_FIN;
+    private int idLieu;
+
+    private LocalDate dateDebut;
+    
+    private LocalDate dateFin;
 
 
     public ActeMedical() {}
 
-    public ActeMedical(String rEF_ACTE_MED, String iD_CLIENT, String iD_SPECIALISTE, String iD_LIEU, LocalDate dATE_DEBUT, LocalDate dATE_FIN) {
-        this.REF_ACTE_MED = rEF_ACTE_MED;
-        this.DATE_DEBUT = dATE_DEBUT;
-        this.DATE_FIN = dATE_FIN;
-        this.ID_CLIENT = iD_CLIENT;
-        this.ID_SPECIALISTE = iD_SPECIALISTE;
-        this.ID_LIEU = iD_LIEU;
+    public ActeMedical(String refActeMed, int idClient, int idSpecialiste, int idLieu, LocalDate dateDebut, LocalDate dateFin) {
+        this.refActeMed = refActeMed;
+        this.idClient = idClient;
+        this.idSpecialiste = idSpecialiste;
+        this.idLieu = idLieu;
+        this.dateDebut = dateDebut;
+        this.dateFin = dateFin;
+    }
+    
+    public ActeMedical(int idActeMed, String refActeMed, int idClient, int idSpecialiste, int idLieu, LocalDate dateDebut, LocalDate dateFin) {
+        this.idActeMed = idActeMed;
+        this.refActeMed = refActeMed;
+        this.idClient = idClient;
+        this.idSpecialiste = idSpecialiste;
+        this.idLieu = idLieu;
+        this.dateDebut = dateDebut;
+        this.dateFin = dateFin;
     }
 
     public String getTableName() {
         return tableName;
     }
 
-    public String getREF_ACTE_MED() {
-        return REF_ACTE_MED;
+    public int getIdActeMed() {
+        return idActeMed;
     }
 
-    public void setREF_ACTE_MED(String rEF_ACTE_MED) {
-        REF_ACTE_MED = rEF_ACTE_MED;
+    public void setIdActeMed(int idActeMed) {
+        this.idActeMed = idActeMed;
     }
 
-    public LocalDate getDATE_DEBUT() {
-        return DATE_DEBUT;
+    public String getRefActeMed() {
+        return refActeMed;
     }
 
-    public void setDATE_DEBUT(LocalDate dATE_DEBUT) {
-        DATE_DEBUT = dATE_DEBUT;
+    public void setRefActeMed(String refActeMed) {
+        this.refActeMed = refActeMed;
     }
 
-    public LocalDate getDATE_FIN() {
-        return DATE_FIN;
+    public int getIdClient() {
+        return idClient;
     }
 
-    public void setDATE_FIN(LocalDate dATE_FIN) {
-        DATE_FIN = dATE_FIN;
+    public void setIdClient(int idClient) {
+        this.idClient = idClient;
     }
 
-    public String getID_CLIENT() {
-        return ID_CLIENT;
+    public int getIdSpecialiste() {
+        return idSpecialiste;
     }
 
-    public void setID_CLIENT(String iD_CLIENT) {
-        ID_CLIENT = iD_CLIENT;
+    public void setIdSpecialiste(int idSpecialiste) {
+        this.idSpecialiste = idSpecialiste;
     }
 
-    public String getID_SPECIALISTE() {
-        return ID_SPECIALISTE;
+    public int getIdLieu() {
+        return idLieu;
     }
 
-    public void setID_SPECIALISTE(String iD_SPECIALISTE) {
-        ID_SPECIALISTE = iD_SPECIALISTE;
+    public void setIdLieu(int idLieu) {
+        this.idLieu = idLieu;
     }
 
-    public String getID_LIEU() {
-        return ID_LIEU;
+    public LocalDate getDateDebut() {
+        return dateDebut;
     }
 
-    public void setID_LIEU(String iD_LIEU) {
-        ID_LIEU = iD_LIEU;
+    public void setDateDebut(LocalDate dateDebut) {
+        this.dateDebut = dateDebut;
+    }
+
+    public LocalDate getDateFin() {
+        return dateFin;
+    }
+
+    public void setDateFin(LocalDate dateFin) {
+        this.dateFin = dateFin;
     }
 
     public static List<List<Object>> getAllActesMedicauxData() {
         // Fetch data from the database (using DbRead or any other method)
         // Return raw data as a List<List<?>>
-        return DbRead.read(tableName, "DATE_DEBUT");
+        return DbRead.readTable(tableName, "DATE_DEBUT");
     }
 
     public void insertActeMedicalDB(ActeMedical acteMedical) throws SQLException {
 
         List<String> columnsList = new ArrayList<>(List.of("REF" + tableNameShort, "CLIENT", "SPECIALISTE", "LIEU", "DATE_DEBUT", "DATE_FIN"));
-        List<Object> valuesList =  new ArrayList<>(List.of(acteMedical.getREF_ACTE_MED(), acteMedical.getID_CLIENT(), acteMedical.getID_SPECIALISTE(), acteMedical.getID_LIEU(), acteMedical.getDATE_DEBUT(), acteMedical.getDATE_FIN()));
+        List<Object> valuesList =  new ArrayList<>(
+                                                    List.of(    
+                                                            acteMedical.getRefActeMed(), acteMedical.getIdClient(), 
+                                                            acteMedical.getIdSpecialiste(), acteMedical.getIdLieu(), 
+                                                            acteMedical.getDateDebut(), acteMedical.getDateFin()
+                                                    ));
 
         try {
             DbCreate.insert(tableName, columnsList, valuesList);

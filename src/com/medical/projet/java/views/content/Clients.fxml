@@ -18,7 +18,7 @@
                <center>
                   <TableView id="Table" fx:id="table">
                     <columns>
-                      <TableColumn id="name" fx:id="name" editable="false" minWidth="100.0" prefWidth="140.0" text="Name" />
+                        <TableColumn id="name" fx:id="name" editable="false" minWidth="100.0" prefWidth="140.0" text="Name" />
                         <TableColumn id="surname" fx:id="surname" editable="false" minWidth="100.0" prefWidth="140.0" text="Surname" />
                         <TableColumn id="dateNais" fx:id="dateNais" editable="false" minWidth="100.0" prefWidth="130.0" text="DateNais" />
                         <TableColumn id="tel" fx:id="tel" editable="false" minWidth="100.0" prefWidth="130.0" text="Tel" />

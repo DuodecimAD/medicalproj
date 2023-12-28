@@ -1,5 +1,6 @@
 package com.medical.projet.java.controllers;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,7 @@ import com.medical.projet.java.utility.AppSecurity;
 import com.medical.projet.java.utility.AppSettings;
 
 import javafx.application.Platform;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,7 +42,7 @@ public class SpecialisteController {
 
     private ObservableList<Specialiste> specialistesObsList = FXCollections.observableArrayList();
 
-    private static final String tableNameShort = "_SPECIALISTE";
+    private static final String tableNameSuffix = "_SPECIALISTE";
     
     /** The body. **/
 
@@ -96,15 +98,16 @@ public class SpecialisteController {
     
     private void dynamicCssStuff() {
         
+        // absolute position of the create button on the right side
         createButton.layoutXProperty().bind(body.widthProperty().subtract(createButton.widthProperty()));
         
-        // Set percentage widths for the columns
-        double tableWidth = table.getPrefWidth();
-        name.prefWidthProperty().bind(table.widthProperty().multiply(0.17)); // 20% of table width
-        surname.prefWidthProperty().bind(table.widthProperty().multiply(0.17)); // 20% of table width
-        dateNais.prefWidthProperty().bind(table.widthProperty().multiply(0.155)); // 20% of table width
-        tel.prefWidthProperty().bind(table.widthProperty().multiply(0.155)); // 20% of table width
-        email.prefWidthProperty().bind(table.widthProperty().multiply(0.32)); // 20% of table width
+        // auto size of the TableView columns depending of the table - scrollbar
+        DoubleBinding tableWidth = table.widthProperty().subtract(22);
+        name.prefWidthProperty().bind(tableWidth.multiply(0.17));
+        surname.prefWidthProperty().bind(tableWidth.multiply(0.17));
+        dateNais.prefWidthProperty().bind(tableWidth.multiply(0.155));
+        tel.prefWidthProperty().bind(tableWidth.multiply(0.155));
+        email.prefWidthProperty().bind(tableWidth.multiply(0.35));
     }
 
     private void loadingTableIcon() {
@@ -148,7 +151,7 @@ public class SpecialisteController {
 
         if (rawSpecialisteData != null) {
             for (List<Object> row : rawSpecialisteData) {
-
+                BigDecimal id = (BigDecimal) row.get(0);
                 String nom = (String) row.get(1);
                 String prenom = (String) row.get(2);
                 // Convert date to java.time.LocalDate
@@ -157,7 +160,7 @@ public class SpecialisteController {
                 String tel = (String) row.get(4);
                 String email = (String) row.get(5);
                 // Create a Specialiste object and add to the list
-                specialistesObsList.add(new Specialiste(nom, prenom, date_nais, tel, email));
+                specialistesObsList.add(new Specialiste(id.intValue(), nom, prenom, date_nais, tel, email));
             }
         }
         return specialistesObsList;
@@ -238,29 +241,31 @@ public class SpecialisteController {
 
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
     private void populateOverlayContent(BorderPane contentPane, Specialiste specialiste) {
+        
+        System.out.println(specialiste.toString());
 
         Label nameLabel = new Label("Name");
-        nameLabel.setId("NOM" + tableNameShort);
+        nameLabel.setId("NOM" + tableNameSuffix);
         TextField nameField = new TextField();
         nameField.setText(specialiste.getNomSpecialiste());
 
         Label surnameLabel = new Label("Surname");
-        surnameLabel.setId("PRENOM" + tableNameShort);
+        surnameLabel.setId("PRENOM" + tableNameSuffix);
         TextField surnameField = new TextField();
         surnameField.setText(specialiste.getPrenomSpecialiste());
 
         Label date_naisLabel = new Label("Birthday");
-        date_naisLabel.setId("DATE_NAIS" + tableNameShort);
+        date_naisLabel.setId("DATE_NAIS" + tableNameSuffix);
         DatePicker date_naisField = new DatePicker();
         date_naisField.setValue(specialiste.getDateNaisSpecialiste());
 
         Label telLabel = new Label("Telephone");
-        telLabel.setId("TEL" + tableNameShort);
+        telLabel.setId("TEL" + tableNameSuffix);
         TextField telField = new TextField();
         telField.setText(specialiste.getTelSpecialiste());
 
         Label emailLabel = new Label("Email");
-        emailLabel.setId("EMAIL" + tableNameShort);
+        emailLabel.setId("EMAIL" + tableNameSuffix);
         TextField emailField = new TextField();
         emailField.setText(specialiste.getEmailSpecialiste());
 
@@ -441,7 +446,8 @@ public class SpecialisteController {
 
         try {
             newSpecialiste.insertSpecialisteDB(newSpecialiste);
-            System.out.println(newSpecialiste.toString() + " added to database without problem");
+            System.out.println("insert done");
+            newSpecialiste.setSpecialisteIdFromDb(newSpecialiste);
             getSpecialistesObsList().add(newSpecialiste);
         } catch (SQLException e) {
             String errorMessage = e.getMessage();

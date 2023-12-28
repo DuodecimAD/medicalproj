@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,11 +27,11 @@ public class DbRead {
      * Instantiates a new db read.
      */
     // Private constructor to prevent instantiation
-    private DbRead() {}
+    private DbRead() {
+        
+    }
 
-
-
-    public static List<List<Object>> read(String tableName, String sortBy) {
+    public static List<List<Object>> readTable(String tableName, String sortBy) {
         String sanitizedTableName = AppSecurity.sanitize(tableName);
         String sanitizedSortBy = AppSecurity.sanitize(sortBy);
 
@@ -45,7 +46,6 @@ public class DbRead {
 
             // Register the OUT parameter for the result set
             callableStatement.registerOutParameter(3, OracleTypes.CURSOR);
-
 
             // Execute the stored procedure
             callableStatement.execute();
@@ -82,6 +82,40 @@ public class DbRead {
         }
 
         return Collections.emptyList(); // Return an empty list if there's an error or no results
+    }
+    
+    public static int readId(String columnValue, String tableName, String checColumn, String checkValue) {
+        String sanitizedcolumnValue = AppSecurity.sanitize(columnValue);
+        String sanitizedTableName = AppSecurity.sanitize(tableName);
+        String sanitizedChecColumn = AppSecurity.sanitize(checColumn);
+        String sanitizedCheckValue = AppSecurity.sanitize(checkValue);
+
+        conn = DbConnect.sharedConnection();
+
+        String call = "{call GetIntData(?, ?, ?, ?, ?)}";
+
+        try (CallableStatement callableStatement = conn.prepareCall(call)) {
+            callableStatement.setString(1, sanitizedcolumnValue);
+            callableStatement.setString(2, sanitizedTableName);
+            callableStatement.setString(3, sanitizedChecColumn);
+            callableStatement.setString(4, sanitizedCheckValue);
+
+            // Register the OUT parameter for the result set
+            callableStatement.registerOutParameter(5, Types.INTEGER);
+
+            // Execute the stored procedure
+            callableStatement.execute();
+
+            // Get the result from the OUT parameter
+            int result = callableStatement.getInt(5);
+            
+            return result;
+            
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return -1; // Return an empty list if there's an error or no results
     }
 
 }

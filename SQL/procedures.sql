@@ -272,6 +272,11 @@ BEGIN
      sql_stmt := 'SELECT * FROM ' || v_tableName || ' ORDER BY ' || v_orderBy;
      
     OPEN p_resultSet FOR sql_stmt;
+    
+    -- Log
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetTableData', 'Closing Procedure', 'got table ' || v_tableName || ' data' );
+    COMMIT;
 
 END;
 /
@@ -336,5 +341,43 @@ BEGIN
             EXECUTE IMMEDIATE sql_stmt USING v_value, v_checkValue;
     END CASE;
     
+END;
+/
+create or replace PROCEDURE GetIntData (
+    p_columnValue  IN VARCHAR2,
+    p_tableName    IN VARCHAR2,
+    p_checkColumn  IN VARCHAR2,
+    p_checkValue   IN VARCHAR2,
+    p_resultValue  OUT NUMBER
+)
+IS
+    v_columnValue   VARCHAR2(255)   := p_columnValue;
+    v_tableName     VARCHAR2(255)   := p_tableName;
+    v_checkColumn   VARCHAR2(255)   := p_checkColumn;
+    v_checkValue    VARCHAR2(255)   := p_checkValue;
+    sql_stmt        VARCHAR2(1000)  ;
+
+BEGIN
+    -- Log
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'Entering Procedure', 'beginning getting table ' || v_columnValue);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'v_columnValue', v_columnValue);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'v_tableName', v_tableName);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'v_checkColumn', v_checkColumn);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'v_checkValue', v_checkValue);
+    COMMIT;
+
+    sql_stmt := 'SELECT ' || v_columnValue || ' FROM ' || v_tableName || ' WHERE ' || v_checkColumn || ' = ''' || v_checkValue || '''';
+
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'p_resultValue', p_resultValue);
+    COMMIT;
+
+    EXECUTE IMMEDIATE sql_stmt INTO p_resultValue;
+
 END;
 /

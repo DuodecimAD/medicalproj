@@ -1,5 +1,8 @@
 package com.medical.projet.java.controllers;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -14,12 +17,15 @@ import com.medical.projet.java.utility.AppSecurity;
 import com.medical.projet.java.utility.AppSettings;
 
 import javafx.application.Platform;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -40,7 +46,7 @@ public class ClientController {
 
     private ObservableList<Client> clientsObsList = FXCollections.observableArrayList();
     
-    private static final String tableNameShort = "_CLIENT";
+    private static final String tableNameSuffix = "_CLIENT";
 
     /** The body. **/
 
@@ -96,15 +102,16 @@ public class ClientController {
     
     private void dynamicCssStuff() {
         
+        // absolute position of the create button on the right side
         createButton.layoutXProperty().bind(body.widthProperty().subtract(createButton.widthProperty()));
         
-        // Set percentage widths for the columns
-        double tableWidth = table.getPrefWidth();
-        name.prefWidthProperty().bind(table.widthProperty().multiply(0.17)); // 20% of table width
-        surname.prefWidthProperty().bind(table.widthProperty().multiply(0.17)); // 20% of table width
-        dateNais.prefWidthProperty().bind(table.widthProperty().multiply(0.155)); // 20% of table width
-        tel.prefWidthProperty().bind(table.widthProperty().multiply(0.155)); // 20% of table width
-        email.prefWidthProperty().bind(table.widthProperty().multiply(0.32)); // 20% of table width
+        // auto size of the TableView columns depending of the table - scrollbar
+        DoubleBinding tableWidth = table.widthProperty().subtract(22);
+        name.prefWidthProperty().bind(tableWidth.multiply(0.17));
+        surname.prefWidthProperty().bind(tableWidth.multiply(0.17));
+        dateNais.prefWidthProperty().bind(tableWidth.multiply(0.155));
+        tel.prefWidthProperty().bind(tableWidth.multiply(0.155)); 
+        email.prefWidthProperty().bind(tableWidth.multiply(0.35)); 
     }
 
     private void loadingTableIcon() {
@@ -148,7 +155,7 @@ public class ClientController {
 
         if (rawClientData != null) {
             for (List<Object> row : rawClientData) {
-
+                BigDecimal id = (BigDecimal) row.get(0);
                 String nom = (String) row.get(1);
                 String prenom = (String) row.get(2);
                 // Convert date to java.time.LocalDate
@@ -157,7 +164,7 @@ public class ClientController {
                 String tel = (String) row.get(4);
                 String email = (String) row.get(5);
                 // Create a Client object and add to the list
-                clientsObsList.add(new Client(nom, prenom, date_nais, tel, email));
+                clientsObsList.add(new Client(id.intValue(), nom, prenom, date_nais, tel, email));
             }
         }
         return clientsObsList;
@@ -207,7 +214,18 @@ public class ClientController {
         BorderPane contentPane = new BorderPane();
         contentPane.setId("overlayContentPane");
         contentPane.setPrefSize(500, 500);
-
+        
+        // if i want to load an fxml directly instead of writing 2 times the elements of both overlays
+        /*
+        try {
+            FXMLLoader loader = new FXMLLoader(new URL(AppSettings.INSTANCE.appUrlPath +"content/overlay/clientOverlay.fxml"));
+            VBox centerContent = loader.load();
+            contentPane.setCenter(centerContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+         */
+        
         // Use the callback to populate the content
         contentPopulationCallback.accept(contentPane);
 
@@ -238,29 +256,32 @@ public class ClientController {
 
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
     private void populateOverlayContent(BorderPane contentPane, Client client) {
+        
+        System.out.println(client.toString());
 
         Label nameLabel = new Label("Name");
-        nameLabel.setId("NOM" + tableNameShort);
+        nameLabel.setId("NOM" + tableNameSuffix);
+        
         TextField nameField = new TextField();
         nameField.setText(client.getNomClient());
 
         Label surnameLabel = new Label("Surname");
-        surnameLabel.setId("PRENOM" + tableNameShort);
+        surnameLabel.setId("PRENOM" + tableNameSuffix);
         TextField surnameField = new TextField();
         surnameField.setText(client.getPrenomClient());
 
         Label date_naisLabel = new Label("Birthday");
-        date_naisLabel.setId("DATE_NAIS" + tableNameShort);
+        date_naisLabel.setId("DATE_NAIS" + tableNameSuffix);
         DatePicker date_naisField = new DatePicker();
         date_naisField.setValue(client.getDateNaisClient());
 
         Label telLabel = new Label("Telephone");
-        telLabel.setId("TEL" + tableNameShort);
+        telLabel.setId("TEL" + tableNameSuffix);
         TextField telField = new TextField();
         telField.setText(client.getTelClient());
 
         Label emailLabel = new Label("Email");
-        emailLabel.setId("EMAIL" + tableNameShort);
+        emailLabel.setId("EMAIL" + tableNameSuffix);
         TextField emailField = new TextField();
         emailField.setText(client.getEmailClient());
 
@@ -282,6 +303,7 @@ public class ClientController {
         overlayTopDelete.getChildren().addAll(buttonDelete);
 
         contentPane.setTop(overlayTopDelete);
+        // comment this if using fxml
         contentPane.setCenter(overLayContent);
         contentPane.setBottom(overlayBottomButtons);
 
@@ -307,7 +329,7 @@ public class ClientController {
     }
 
     private void deleteClient(Client client) {
-        client.deleteClientDB(client.getTelClient());
+        client.deleteClientDB("TEL", client.getTelClient());
     }
 
     public void updateClient(Client client, String fieldName, Object oldValue, Object newValue, String checkColumn, String checkValue) {
@@ -416,6 +438,7 @@ public class ClientController {
         overlayBottomButtons.setId("overlayBottomButtons");
         overlayBottomButtons.getChildren().addAll(buttonOk, buttonCancel);
 
+        // comment this if using fxml
         contentPane.setCenter(overLayContent);
         contentPane.setBottom(overlayBottomButtons);
 
@@ -441,7 +464,8 @@ public class ClientController {
 
         try {
             newClient.insertClientDB(newClient);
-            System.out.println(newClient.toString() + " added to database without problem");
+            System.out.println("insert done");
+            newClient.setClientIdFromDb(newClient);
             getClientsObsList().add(newClient);
         } catch (SQLException e) {
             String errorMessage = e.getMessage();

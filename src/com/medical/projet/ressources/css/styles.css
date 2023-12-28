@@ -205,14 +205,11 @@
 	
 }
 
-#overlayTopDelete Button{
-
+#overlayTopDelete Button, #overlayAmTopDelete .button, #errorLabelnew{
 	-fx-text-fill : -error;
-	
 }
 
 #errorLabelnew{
-	-fx-text-fill: -error;
 	-fx-padding : 30 0 -10 0;
 }
 
@@ -259,7 +256,7 @@
 
 }
 
-#overlayContentPane > * > .button:hover {
+#overlayContentPane > * > .button:hover{
     -fx-background-color: 
         -primary,
         -secondary,
@@ -276,12 +273,22 @@
 	-fx-spacing: 25;
 }
 
-#overlayAmTop Label, #overlayAmCenter Label, #overlayAmBottom Label{
+#overlayAmTop Label, #overlayAmCenter Label, #overlayAmBottom > * > Label{
 	-fx-text-fill: -text;
 }
 
 #overlayAmTop TextField, #overlayAmTop DatePicker, #overlayAmCenter TextField, #overlayAmCenter DatePicker, #overlayAmBottom TextField, #overlayAmBottom DatePicker {
 	-fx-pref-width: 230;
+}
+
+#overlayAmTopDelete{
+	-fx-padding: 20 0 0 350;
+	-fx-spacing: 20;
+}
+
+#overlayAmTopDelete #PrintButton{
+	-fx-text-fill: -text;
+	-fx-pref-width: 250;
 }
 
 #overlayAmBottom{
@@ -319,7 +326,7 @@
 	-fx-padding: 0 0 0 250;
 }
 
-#overlayAmBottomButtons .button{
+#overlayAmBottomButtons .button, #overlayAmTopDelete .button{
     -fx-padding: 5 0 12 0;
     -fx-background-insets: 0,0 0 5 0, 0 0 6 0, 0 0 7 0;
     -fx-background-radius: 8;
@@ -334,21 +341,20 @@
 
 }
 
-#overlayAmBottomButtons .button:hover {
+#overlayAmBottomButtons .button:hover, #overlayAmTopDelete .button:hover {
     -fx-background-color: 
         -primary,
         -secondary,
         -primary;          
 }
 
-#overlayAmBottomButtons .button:pressed{
+#overlayAmBottomButtons .button:pressed, #overlayAmTopDelete .button:pressed{
     -fx-padding: 6 0 12 0;
 }
 
 #errorLabelnew{
 	-fx-padding: 10 0 10 0;
 }
-
 
 #overlayAmBottomStuff{
 	-fx-padding: 0 0 20 0;

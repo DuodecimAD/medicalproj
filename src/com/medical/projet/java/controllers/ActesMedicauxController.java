@@ -1,5 +1,6 @@
 package com.medical.projet.java.controllers;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,8 @@ import com.medical.projet.java.utility.AppSecurity;
 import com.medical.projet.java.utility.AppSettings;
 
 import javafx.application.Platform;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,6 +42,8 @@ import javafx.scene.layout.VBox;
 public class ActesMedicauxController {
 
     private ObservableList<ActeMedical> actesMedicauxObsList = FXCollections.observableArrayList();
+    
+    private static final String tableNameSuffix = "_ACTE_MED";
 
     /** The body. **/
 
@@ -52,13 +57,13 @@ public class ActesMedicauxController {
     private TableColumn<ActeMedical, String> ref_acte_med;
 
     @FXML
-    private TableColumn<ActeMedical, String> client;
+    private TableColumn<ActeMedical, Integer> client;
 
     @FXML
-    private TableColumn<ActeMedical, String> specialiste;
+    private TableColumn<ActeMedical, Integer> specialiste;
     
     @FXML
-    private TableColumn<ActeMedical, String> lieu;
+    private TableColumn<ActeMedical, Integer> lieu;
 
     @FXML
     private TableColumn<ActeMedical, String> date_debut;
@@ -97,20 +102,21 @@ public class ActesMedicauxController {
     
     private void dynamicCssStuff() {
         
+        // absolute position of the create button on the right side
         createButton.layoutXProperty().bind(body.widthProperty().subtract(createButton.widthProperty()));
         
-        // Set percentage widths for the columns
-        double tableWidth = table.getPrefWidth();
-        ref_acte_med.prefWidthProperty().bind(table.widthProperty().multiply(0.1)); // 20% of table width
-        client.prefWidthProperty().bind(table.widthProperty().multiply(0.2)); // 20% of table width
-        specialiste.prefWidthProperty().bind(table.widthProperty().multiply(0.2)); // 20% of table width
-        lieu.prefWidthProperty().bind(table.widthProperty().multiply(0.18)); // 20% of table width
-        date_debut.prefWidthProperty().bind(table.widthProperty().multiply(0.15)); // 20% of table width
-        date_fin.prefWidthProperty().bind(table.widthProperty().multiply(0.15)); // 20% of table width
+        // auto size of the TableView columns depending of the table - scrollbar
+        DoubleBinding tableWidth = table.widthProperty().subtract(22);
+        ref_acte_med.prefWidthProperty().bind(tableWidth.multiply(0.1));
+        client.prefWidthProperty().bind(tableWidth.multiply(0.1));
+        specialiste.prefWidthProperty().bind(tableWidth.multiply(0.1));
+        lieu.prefWidthProperty().bind(tableWidth.multiply(0.1));
+        date_debut.prefWidthProperty().bind(tableWidth.multiply(0.3));
+        date_fin.prefWidthProperty().bind(tableWidth.multiply(0.3));
     }
 
     private void loadingTableIcon() {
-        // Load the loading GIF
+        // Load the loading GIF n TableView
         Image loadingImage = new Image(getClass().getResourceAsStream(AppSettings.INSTANCE.imagesPath+"loading.gif"));
         ImageView loadingImageView = new ImageView(loadingImage);
 
@@ -152,14 +158,17 @@ public class ActesMedicauxController {
             for (List<Object> row : rawActeMedicalData) {
 
                 String ref = (String) row.get(1);
-                String client = (String) row.get(2);
-                String specialiste = (String) row.get(3);
-                String lieu = (String) row.get(4);
+                BigDecimal clientBD = (BigDecimal) row.get(4);
+                int client = clientBD.intValue();
+                BigDecimal specialisteBD = (BigDecimal) row.get(6);
+                int specialiste = specialisteBD.intValue();
+                BigDecimal lieuBD = (BigDecimal) row.get(5);
+                int lieu = lieuBD.intValue();
                 // Convert date to java.time.LocalDate
-                java.sql.Timestamp timestamp = (java.sql.Timestamp) row.get(5);
+                java.sql.Timestamp timestamp = (java.sql.Timestamp) row.get(2);
                 LocalDate date_debut = timestamp.toLocalDateTime().toLocalDate();
                 // Convert date to java.time.LocalDate
-                java.sql.Timestamp timestamp2 = (java.sql.Timestamp) row.get(6);
+                java.sql.Timestamp timestamp2 = (java.sql.Timestamp) row.get(3);
                 LocalDate date_fin = timestamp2.toLocalDateTime().toLocalDate();
                 // Create a ActeMedical object and add to the list
                 actesMedicauxObsList.add(new ActeMedical(ref, client, specialiste, lieu, date_debut, date_fin));
@@ -175,12 +184,12 @@ public class ActesMedicauxController {
         table.setItems(actesMedicauxObsList);
 
         // Populate columns of TableView with the data
-        ref_acte_med.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getREF_ACTE_MED()));
-        client.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getID_CLIENT()));
-        specialiste.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getID_SPECIALISTE()));
-        lieu.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getID_LIEU()));
-        date_debut.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDATE_DEBUT().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
-        date_fin.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDATE_FIN().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+        ref_acte_med.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getRefActeMed()));
+        client.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdClient()).asObject());
+        specialiste.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdSpecialiste()).asObject());
+        lieu.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdLieu()).asObject());
+        date_debut.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateDebut().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+        date_fin.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
 
     }
 
@@ -242,159 +251,239 @@ public class ActesMedicauxController {
     }
 
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
-    private void populateOverlayContent(BorderPane contentPane, ActeMedical client) {
-/*
-        Label nameLabel = new Label("Name");
-        nameLabel.setId("NOM" + tableNameShort);
-        TextField nameField = new TextField();
-        nameField.setText(client.getNomActeMedical());
+    private void populateOverlayContent(BorderPane contentPane, ActeMedical acteMedical) {
 
-        Label surnameLabel = new Label("Surname");
-        surnameLabel.setId("PRENOM" + tableNameShort);
-        TextField surnameField = new TextField();
-        surnameField.setText(client.getPrenomActeMedical());
+        Label refLabel = new Label("Ref AM");
+        refLabel.setId("REF" + tableNameSuffix);
+        
+        TextField refField = new TextField();
+        refField.setText(acteMedical.getRefActeMed());
+        //refField.setDisable(true);
+        refField.setEditable(false);
+        
+        VBox refAmVbox = new VBox();
+        refAmVbox.getChildren().addAll(refLabel, refField);
+        
+        Button buttonDelete = new Button("Delete");
+        buttonDelete.setId("DeleteButton");
+        
+        Button buttonPrint = new Button("Print Document");
+        buttonPrint.setId("PrintButton");
+        
+        HBox overlayTopDelete = new HBox();
+        overlayTopDelete.setId("overlayAmTopDelete");
+        overlayTopDelete.getChildren().addAll(buttonPrint, buttonDelete);
 
-        Label date_naisLabel = new Label("Birthday");
-        date_naisLabel.setId("DATE_NAIS" + tableNameShort);
-        DatePicker date_naisField = new DatePicker();
-        date_naisField.setValue(client.getDateNaisActeMedical());
+        HBox overlayAmTop = new HBox();
+        overlayAmTop.setId("overlayAmTop");
+        overlayAmTop.getChildren().addAll(refAmVbox, overlayTopDelete);
+        
+        //buttonDelete.layoutXProperty().bind(body.widthProperty().subtract(buttonDelete.widthProperty()));
+        
+        
+        Label clientLabel = new Label("Client");
+        clientLabel.setId("ID_CLIENT");
+        
+        TextField clientField = new TextField();
+        clientField.setText(Integer.toString(acteMedical.getIdClient()));
+        
+        VBox clientAmVbox = new VBox();
+        clientAmVbox.getChildren().addAll(clientLabel, clientField);
+        
+        Label specialisteLabel = new Label("Specialiste");
+        specialisteLabel.setId("ID_SPECIALISTE");
+        
+        TextField specialisteField = new TextField();
+        specialisteField.setText(Integer.toString(acteMedical.getIdSpecialiste()));
+        
+        VBox specialisteAmVbox = new VBox();
+        specialisteAmVbox.getChildren().addAll(specialisteLabel, specialisteField);
+        
+        HBox overlayAmCenter = new HBox();
+        overlayAmCenter.setId("overlayAmCenter");
+        overlayAmCenter.getChildren().addAll(clientAmVbox, specialisteAmVbox);
+        
 
-        Label telLabel = new Label("Telephone");
-        telLabel.setId("TEL" + tableNameShort);
-        TextField telField = new TextField();
-        telField.setText(client.getTelActeMedical());
+        Label lieuLabel = new Label("Lieu");
+        lieuLabel.setId("ID_LIEU");
+        
+        TextField lieuField = new TextField();
+        lieuField.setText(Integer.toString(acteMedical.getIdLieu()));
+        
+        VBox lieueAmVbox = new VBox();
+        lieueAmVbox.getChildren().addAll(lieuLabel, lieuField);
 
-        Label emailLabel = new Label("Email");
-        emailLabel.setId("EMAIL" + tableNameShort);
-        TextField emailField = new TextField();
-        emailField.setText(client.getEmailActeMedical());
+        Label date_debutLabel = new Label("Date de début");
+        date_debutLabel.setId("DATE_DEBUT");
+        
+        DatePicker date_debutField = new DatePicker();
+        date_debutField.setValue(acteMedical.getDateDebut());
+
+        VBox date_debutAmVbox = new VBox();
+        date_debutAmVbox.getChildren().addAll(date_debutLabel, date_debutField);
+        
+        Label date_finLabel = new Label("Date de fin");
+        date_finLabel.setId("DATE_FIN");
+        
+        DatePicker date_finField = new DatePicker();
+        date_finField.setValue(acteMedical.getDateFin());
+        
+        VBox date_finAmVbox = new VBox();
+        date_finAmVbox.getChildren().addAll(date_finLabel, date_finField);
+        
+        HBox overlayAmBottom = new HBox();
+        overlayAmBottom.setId("overlayAmBottom");
+        overlayAmBottom.getChildren().addAll(lieueAmVbox, date_debutAmVbox, date_finAmVbox );
+        
+        TableView<?> tableAm = new TableView<>();
+        tableAm.setId("tableAm");
+        
+
+        Label errorLabel = new Label("");
+        errorLabel.setId("errorLabelnew");
 
         VBox overLayContent = new VBox();
         overLayContent.setId("overLayContent");
-        overLayContent.getChildren().addAll(nameLabel, nameField, surnameLabel, surnameField, date_naisLabel, date_naisField, telLabel, telField, emailLabel, emailField);
-
-        Button buttonDelete = new Button("Delete");
-        buttonDelete.setId("DeleteButton");
+        overLayContent.getChildren().addAll(overlayAmTop, overlayAmCenter, overlayAmBottom, tableAm, errorLabel);
+        
+        
+        Label amSearchLabel = new Label("Search : ");
+        amSearchLabel.setId("amSearchLabel");
+        TextField amSearchField = new TextField();
+        amSearchField.setId("amSearchField");
+        HBox overlayAmSearch = new HBox();
+        overlayAmSearch.setId("overlayAmSearch");
+        overlayAmSearch.getChildren().addAll(amSearchLabel, amSearchField);
+        
         Button buttonOk = new Button("ok");
         Button buttonCancel = new Button("Cancel");
 
-        HBox overlayBottomButtons = new HBox();
-        overlayBottomButtons.setId("overlayBottomButtons");
-        overlayBottomButtons.getChildren().addAll(buttonOk, buttonCancel);
+        HBox overlayAmBottomButtons = new HBox();
+        overlayAmBottomButtons.setId("overlayAmBottomButtons");
+        overlayAmBottomButtons.getChildren().addAll(buttonOk, buttonCancel);
+        
+        HBox overlayAmBottomStuff = new HBox();
+        overlayAmBottomStuff.setId("overlayAmBottomStuff");
+        overlayAmBottomStuff.getChildren().addAll(overlayAmSearch, overlayAmBottomButtons);
 
-        HBox overlayTopDelete = new HBox();
-        overlayTopDelete.setId("overlayTopDelete");
-        overlayTopDelete.getChildren().addAll(buttonDelete);
-
-        contentPane.setTop(overlayTopDelete);
         contentPane.setCenter(overLayContent);
-        contentPane.setBottom(overlayBottomButtons);
-
+        contentPane.setBottom(overlayAmBottomStuff);
+        
         // buttons event logic
         buttonCancel.setOnAction(e -> {
             closeOverlay();
         });
 
         buttonDelete.setOnAction(e -> {
-            deleteActeMedical(client);
-            getActeMedicalsObsList().remove(client);
+            deleteActeMedical(acteMedical);
+            getActeMedicalsObsList().remove(acteMedical);
             closeOverlay();
         });
 
         buttonOk.setOnAction(e -> {
-            updateActeMedical(client, nameLabel.getId(),         client.getNomActeMedical(),      nameField.getText(),        emailLabel.getId(),     client.getEmailActeMedical() );
-            updateActeMedical(client, surnameLabel.getId(),      client.getPrenomActeMedical(),   surnameField.getText(),     emailLabel.getId(),     client.getEmailActeMedical() );
-            updateActeMedical(client, date_naisLabel.getId(),    client.getDateNaisActeMedical(), date_naisField.getValue(),  emailLabel.getId(),     client.getEmailActeMedical() );
-            updateActeMedical(client, telLabel.getId(),          client.getTelActeMedical(),      telField.getText(),         emailLabel.getId(),     client.getEmailActeMedical() );
-            updateActeMedical(client, emailLabel.getId(),        client.getEmailActeMedical(),    emailField.getText(),       emailLabel.getId(),     client.getEmailActeMedical() );
+            updateActeMedical(acteMedical, clientLabel.getId(),         acteMedical.getIdClient(),        Integer.parseInt(clientField.getText()),      refLabel.getId(),   acteMedical.getRefActeMed() );
+            updateActeMedical(acteMedical, specialisteLabel.getId(),    acteMedical.getIdSpecialiste(),   Integer.parseInt(specialisteField.getText()), refLabel.getId(),   acteMedical.getRefActeMed() );
+            updateActeMedical(acteMedical, lieuLabel.getId(),           acteMedical.getIdLieu(),          Integer.parseInt(lieuField.getText()),        refLabel.getId(),   acteMedical.getRefActeMed() );
+            updateActeMedical(acteMedical, date_debutLabel.getId(),     acteMedical.getDateDebut(),       date_debutField.getValue(),                   refLabel.getId(),   acteMedical.getRefActeMed() );
+            updateActeMedical(acteMedical, date_finLabel.getId(),       acteMedical.getDateFin(),         date_finField.getValue(),                     refLabel.getId(),   acteMedical.getRefActeMed() );
             closeOverlay();
         });
-        
-*/
+
     }
 
     private void deleteActeMedical(ActeMedical acteMedical) {
-        acteMedical.deleteActeMedicalDB(acteMedical.getREF_ACTE_MED());
+        acteMedical.deleteActeMedicalDB(acteMedical.getRefActeMed());
     }
 
     public void updateActeMedical(ActeMedical acteMedical, String fieldName, Object oldValue, Object newValue, String checkColumn, String checkValue) {
 
-        if(!(newValue instanceof LocalDate)) {
+        if(newValue instanceof LocalDate) {
+            System.out.println("this is a local date");
+            String newValueTemp = AppSecurity.sanitize(newValue.toString());
+            newValue = LocalDate.parse(newValueTemp, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }else if(newValue instanceof Integer){
+            System.out.println("this is an integer");
+            String newValueTemp = AppSecurity.sanitize(newValue.toString());
+            newValue = Integer.parseInt(newValueTemp);
+        }else {
+            System.out.println("fuck this");
             newValue = AppSecurity.sanitize(newValue.toString());
         }
 
         switch (fieldName) {
-        case "REF_ACTE_MED" -> {
-            if (compare(oldValue, newValue)) {
-
-                try {
-                    acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
-                    acteMedical.setREF_ACTE_MED(checkValue);
-                    System.out.println("ref has been changed");
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            case "REF_ACTE_MED" -> {
+                if (compare(oldValue, newValue)) {
+    
+                    try {
+                        acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
+                        acteMedical.setRefActeMed(checkValue);
+                        System.out.println("ref has been changed");
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-        }
-        case "CLIENT" -> {
-            if (compare(oldValue, newValue)) {
-                try {
-                    acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            case "ID_CLIENT" -> {
+                if (compare(oldValue, newValue)) {
+                    try {
+                        acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    acteMedical.setIdClient((int) newValue);
+                    System.out.println("client has been changed");
                 }
-                acteMedical.setID_CLIENT(checkValue);
-                System.out.println("client has been changed");
             }
-        }
-        case "SPECIALISTE" -> {
-            if (compare(oldValue, newValue)) {
-                try {
-                    acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            case "ID_SPECIALISTE" -> {
+                if (compare(oldValue, newValue)) {
+                    try {
+                        acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    acteMedical.setIdSpecialiste((int) newValue);
+                    System.out.println("specialiste has been changed");
                 }
-                acteMedical.setID_SPECIALISTE(checkValue);
-                System.out.println("specialiste has been changed");
             }
-        }
-        case "LIEU" -> {
-            if (compare(oldValue, newValue)) {
-                try {
-                    acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            case "ID_LIEU" -> {
+                if (compare(oldValue, newValue)) {
+                    try {
+                        acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    acteMedical.setIdLieu((int) newValue);
+                    System.out.println("lieu has been changed");
                 }
-                acteMedical.setID_LIEU(checkValue);
-                System.out.println("lieu has been changed");
             }
-        }
-        case "DATE_DEBUT" -> {
-            if (compare(oldValue, newValue)) {
-                try {
-                    acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            case "DATE_DEBUT" -> {
+                System.out.println("date : " +oldValue.getClass());
+                System.out.println("date : " +newValue.getClass());
+                if (compare(oldValue, newValue)) {
+                    try {
+                        acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    LocalDate newDate = LocalDate.parse(newValue.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    acteMedical.setDateDebut(newDate);
+                    System.out.println("date_debut has been changed");
                 }
-                LocalDate newDate = LocalDate.parse(newValue.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                acteMedical.setDATE_DEBUT(newDate);
-                System.out.println("date_debut has been changed");
             }
-        }
-        case "DATE_FIN" -> {
-            if (compare(oldValue, newValue)) {
-                try {
-                    acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            case "DATE_FIN" -> {
+                if (compare(oldValue, newValue)) {
+                    try {
+                        acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    LocalDate newDate = LocalDate.parse(newValue.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    acteMedical.setDateFin(newDate);
+                    System.out.println("date_fin has been changed");
                 }
-                LocalDate newDate = LocalDate.parse(newValue.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                acteMedical.setDATE_FIN(newDate);
-                System.out.println("date_fin has been changed");
             }
-        }
-        default -> {}
-        }
+            default -> {}
+            }
         table.refresh();
     }
 
@@ -406,15 +495,15 @@ public class ActesMedicauxController {
     // populating inputs in the overlay when clicking create new client
     private void populateOverlayForNewActeMedical(BorderPane contentPane) {
 
-        
-        Label amLabel = new Label("Acte Medical");
-        TextField amField = new TextField();
-        VBox amAmVbox = new VBox();
-        amAmVbox.getChildren().addAll(amLabel, amField);
+        Label refLabel = new Label("Acte Medical");
+        TextField refField = new TextField();
+        //refField.setDisable(true);
+        VBox refAmVbox = new VBox();
+        refAmVbox.getChildren().addAll(refLabel, refField);
         
         HBox overlayAmTop = new HBox();
         overlayAmTop.setId("overlayAmTop");
-        overlayAmTop.getChildren().addAll(amAmVbox);
+        overlayAmTop.getChildren().addAll(refAmVbox);
         
         
         Label clientLabel = new Label("Client");
@@ -491,7 +580,13 @@ public class ActesMedicauxController {
         });
 
         buttonOk.setOnAction(e -> {
-            String newActeMedicalOK = createNewActeMedical(amField.getText(), clientField.getText(), specialisteField.getText(), lieuField.getText(), date_debutField.getValue(), date_finField.getValue());
+            String newActeMedicalOK = createNewActeMedical( refField.getText(), 
+                                                            Integer.parseInt(clientField.getText()), 
+                                                            Integer.parseInt(specialisteField.getText()), 
+                                                            Integer.parseInt(lieuField.getText()), 
+                                                            date_debutField.getValue(), 
+                                                            date_finField.getValue()
+                                                            );
 
             if(newActeMedicalOK.equals("")) {
                 closeOverlay();
@@ -501,7 +596,7 @@ public class ActesMedicauxController {
         });
     }
 
-    private String createNewActeMedical(String amField, String clientField, String specialisteField, String lieuField, LocalDate date_debutField, LocalDate date_finField) {
+    private String createNewActeMedical(String amField, int clientField, int specialisteField, int lieuField, LocalDate date_debutField, LocalDate date_finField) {
 
         ActeMedical newActeMedical = new ActeMedical(amField, clientField, specialisteField, lieuField, date_debutField, date_finField);
 
@@ -568,14 +663,18 @@ public class ActesMedicauxController {
 
                 // Convert client information to lowercase for case-insensitive search
                 String lowerCaseFilter = newValue.toLowerCase();
+                
+                String idClient = Integer.toString(acteMedical.getIdClient());
+                String idSpecialiste = Integer.toString(acteMedical.getIdSpecialiste());
+                String idLieu = Integer.toString(acteMedical.getIdLieu());
 
                 // Check if any of the client attributes contain the filter text
-                return acteMedical.getREF_ACTE_MED().toLowerCase().contains(lowerCaseFilter)
-                        || acteMedical.getID_CLIENT().toLowerCase().contains(lowerCaseFilter)
-                        || acteMedical.getID_SPECIALISTE().toLowerCase().contains(lowerCaseFilter)
-                        || acteMedical.getID_LIEU().toLowerCase().contains(lowerCaseFilter)
-                        || String.valueOf(acteMedical.getDATE_DEBUT()).toLowerCase().contains(lowerCaseFilter)
-                        || String.valueOf(acteMedical.getDATE_FIN()).toLowerCase().contains(lowerCaseFilter);
+                return acteMedical.getRefActeMed().toLowerCase().contains(lowerCaseFilter)
+                        || idClient.toLowerCase().contains(lowerCaseFilter)
+                        || idSpecialiste.toLowerCase().contains(lowerCaseFilter)
+                        || idLieu.toLowerCase().contains(lowerCaseFilter)
+                        || String.valueOf(acteMedical.getDateDebut()).toLowerCase().contains(lowerCaseFilter)
+                        || String.valueOf(acteMedical.getDateFin()).toLowerCase().contains(lowerCaseFilter);
             });
 
             // Wrap the FilteredList in a SortedList

@@ -16,14 +16,14 @@
          <children>
             <BorderPane>
                <center>
-                  <TableView id="Table" fx:id="table" prefHeight="560.0">
+                  <TableView id="Table" fx:id="table">
                     <columns>
-                      	<TableColumn id="Ref" fx:id="ref_acte_med" editable="false" minWidth="100.0" prefWidth="140.0" text="Reference" />
-                        <TableColumn id="Client" fx:id="client" editable="false" minWidth="100.0" prefWidth="103.0" text="Client" />
-                        <TableColumn id="Specialiste" fx:id="specialiste" editable="false" minWidth="100.0" prefWidth="121.0" text="Specialiste" />
-                        <TableColumn id="Lieu" fx:id="lieu" editable="false" minWidth="118.0" prefWidth="151.0" text="Lieu" />
-                        <TableColumn id="Date début" fx:id="date_debut" editable="false" minWidth="100.0" prefWidth="118.0" text="Date début" />
-                        <TableColumn id="Date fin" fx:id="date_fin" editable="false" minWidth="169.0" prefWidth="169.0" text="Date fin" />
+                      	<TableColumn id="Ref" fx:id="ref_acte_med" editable="false" minWidth="50.0" text="Ref" />
+                        <TableColumn id="Client" fx:id="client" editable="false" minWidth="50.0" text="Client" />
+                        <TableColumn id="Specialiste" fx:id="specialiste" editable="false" minWidth="50.0" text="Specialiste" />
+                        <TableColumn id="Lieu" fx:id="lieu" editable="false" minWidth="50.0"  text="Lieu" />
+                        <TableColumn id="Date début" fx:id="date_debut" editable="false" minWidth="150.0" text="Date début" />
+                        <TableColumn id="Date fin" fx:id="date_fin" editable="false" minWidth="150.0" text="Date fin" />
                     </columns>
                   </TableView>
                </center>
