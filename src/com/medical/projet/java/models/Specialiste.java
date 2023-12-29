@@ -13,9 +13,9 @@ import com.medical.projet.java.utility.database.DbUpdate;
 public class Specialiste {
 
     private static final String tableName = "SPECIALISTE";
-    
+
     private static final String tableNameAffix = "_SPECIALISTE";
-    
+
     private int id;
 
     private String nom;
@@ -38,7 +38,7 @@ public class Specialiste {
         this.telephone = telephone;
         this.email = email;
     }
-    
+
     public Specialiste(int id, String nom, String prenom, LocalDate dateNais, String telephone, String email) {
         this.id = id;
         this.nom = nom;
@@ -55,7 +55,7 @@ public class Specialiste {
     public int getSpecialisteId() {
         return id;
     }
-    
+
     public void setSpecialisteId(int newId) {
         id = newId;
     }
@@ -105,9 +105,9 @@ public class Specialiste {
         // Return raw data as a List<List<?>>
         return DbRead.readTable(tableName, "NOM" + tableNameAffix);
     }
-    
+
     public void setSpecialisteIdFromDb(Specialiste specialiste) {
-        
+
         int newId = DbRead.readId("ID" + tableNameAffix, tableName, "EMAIL" + tableNameAffix, email.toLowerCase());
         //System.out.println("id from db is : " + newId);
         specialiste.setSpecialisteId(newId);
@@ -137,7 +137,8 @@ public class Specialiste {
             throw e;
         }
     }
-    
+
+    @Override
     public String toString() {
 
         return  "--------------"                            + "\r"  +

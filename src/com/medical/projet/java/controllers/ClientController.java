@@ -1,8 +1,6 @@
 package com.medical.projet.java.controllers;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -18,14 +16,12 @@ import com.medical.projet.java.utility.AppSettings;
 
 import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -44,8 +40,8 @@ import javafx.scene.layout.VBox;
 
 public class ClientController {
 
-    private ObservableList<Client> clientsObsList = FXCollections.observableArrayList();
-    
+    private static ObservableList<Client> clientsObsList = FXCollections.observableArrayList();
+
     private static final String tableNameSuffix = "_CLIENT";
 
     /** The body. **/
@@ -60,7 +56,7 @@ public class ClientController {
     private TableColumn<Client, String> name;
 
     @FXML
-    private TableColumn<Client, String> surname;
+    private TableColumn<Client, String> lastname;
 
     @FXML
     private TableColumn<Client, String> dateNais;
@@ -79,7 +75,7 @@ public class ClientController {
 
 
     public void initialize() {
-        
+
         dynamicCssStuff();
 
         loadingTableIcon();
@@ -99,19 +95,19 @@ public class ClientController {
         openOverlayNewClient();
 
     }
-    
+
     private void dynamicCssStuff() {
-        
+
         // absolute position of the create button on the right side
         createButton.layoutXProperty().bind(body.widthProperty().subtract(createButton.widthProperty()));
-        
+
         // auto size of the TableView columns depending of the table - scrollbar
         DoubleBinding tableWidth = table.widthProperty().subtract(22);
         name.prefWidthProperty().bind(tableWidth.multiply(0.17));
-        surname.prefWidthProperty().bind(tableWidth.multiply(0.17));
+        lastname.prefWidthProperty().bind(tableWidth.multiply(0.17));
         dateNais.prefWidthProperty().bind(tableWidth.multiply(0.155));
-        tel.prefWidthProperty().bind(tableWidth.multiply(0.155)); 
-        email.prefWidthProperty().bind(tableWidth.multiply(0.35)); 
+        tel.prefWidthProperty().bind(tableWidth.multiply(0.155));
+        email.prefWidthProperty().bind(tableWidth.multiply(0.35));
     }
 
     private void loadingTableIcon() {
@@ -123,7 +119,7 @@ public class ClientController {
         table.setPlaceholder(loadingImageView);
     }
 
-    private ObservableList<Client> readAllClients() {
+    public static ObservableList<Client> readAllClients() {
 
         // Get raw data from the Client model
         List<List<Object>> rawClientData = null;
@@ -140,7 +136,7 @@ public class ClientController {
                 public void run() {
                     Platform.runLater(() -> {
                         placeholderLabel.setText("Connection to the database failed. Retrying in " + seconds[0] + " sec.");
-                        table.setPlaceholder(placeholderLabel);
+                        //table.setPlaceholder(placeholderLabel);
                         seconds[0]--;
 
                         if (seconds[0] < 0) {
@@ -156,29 +152,37 @@ public class ClientController {
         if (rawClientData != null) {
             for (List<Object> row : rawClientData) {
                 BigDecimal id = (BigDecimal) row.get(0);
-                String nom = (String) row.get(1);
-                String prenom = (String) row.get(2);
-                // Convert date to java.time.LocalDate
-                java.sql.Timestamp timestamp = (java.sql.Timestamp) row.get(3);
-                LocalDate date_nais = timestamp.toLocalDateTime().toLocalDate();
-                String tel = (String) row.get(4);
-                String email = (String) row.get(5);
-                // Create a Client object and add to the list
-                clientsObsList.add(new Client(id.intValue(), nom, prenom, date_nais, tel, email));
+
+                // Check if the client with the same id already exists in clientsObsList
+                boolean clientExists = clientsObsList.stream()
+                        .anyMatch(client -> client.getClientId() == id.intValue());
+
+                if (!clientExists) {
+                    String nom = (String) row.get(1);
+                    String prenom = (String) row.get(2);
+                    // Convert date to java.time.LocalDate
+                    java.sql.Timestamp timestamp = (java.sql.Timestamp) row.get(3);
+                    LocalDate date_nais = timestamp.toLocalDateTime().toLocalDate();
+                    String tel = (String) row.get(4);
+                    String email = (String) row.get(5);
+
+                    // Create a Client object and add to the list
+                    clientsObsList.add(new Client(id.intValue(), nom, prenom, date_nais, tel, email));
+                }
             }
         }
+
         return clientsObsList;
     }
 
-
-    private void updateTableView() {
+    private <T> void updateTableView() {
 
         // Set the items with the correct data type
         table.setItems(clientsObsList);
 
         // Populate columns of TableView with the data
         name.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomClient()));
-        surname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomClient()));
+        lastname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomClient()));
         dateNais.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateNaisClient().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
         tel.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getTelClient()));
         email.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getEmailClient()));
@@ -214,7 +218,7 @@ public class ClientController {
         BorderPane contentPane = new BorderPane();
         contentPane.setId("overlayContentPane");
         contentPane.setPrefSize(500, 500);
-        
+
         // if i want to load an fxml directly instead of writing 2 times the elements of both overlays
         /*
         try {
@@ -225,7 +229,7 @@ public class ClientController {
             e.printStackTrace();
         }
          */
-        
+
         // Use the callback to populate the content
         contentPopulationCallback.accept(contentPane);
 
@@ -256,12 +260,12 @@ public class ClientController {
 
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
     private void populateOverlayContent(BorderPane contentPane, Client client) {
-        
+
         System.out.println(client.toString());
 
         Label nameLabel = new Label("Name");
         nameLabel.setId("NOM" + tableNameSuffix);
-        
+
         TextField nameField = new TextField();
         nameField.setText(client.getNomClient());
 
@@ -492,7 +496,7 @@ public class ClientController {
         return "";
     }
 
-    public ObservableList<Client> getClientsObsList() {
+    public static ObservableList<Client> getClientsObsList() {
         return clientsObsList;
     }
 

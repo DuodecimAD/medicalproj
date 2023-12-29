@@ -1,5 +1,10 @@
 package com.medical.projet;
 
+import java.io.IOException;
+import java.net.URL;
+
+import com.medical.projet.java.controllers.ClientController;
+import com.medical.projet.java.controllers.SpecialisteController;
 //import com.medical.projet.java.utility.AppMemory;
 //import com.medical.projet.myapp.java.utility.AppSecurity;
 //import com.medical.projet.myapp.java.utility.AppTree;
@@ -7,8 +12,6 @@ import com.medical.projet.java.utility.AppSettings;
 import com.medical.projet.java.utility.LoggerUtil;
 import com.medical.projet.java.utility.database.DbConnect;
 
-import java.io.IOException;
-import java.net.URL;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -31,8 +34,11 @@ public class App extends Application {
     public static void main(String[] args) {
 
         launch(args);
-        LoggerUtil.getLogger().info("Main Closing");
+        
+        LoggerUtil.getLogger().info("App is Closing");
         DbConnect.closeConnection();
+        System.exit(0);
+       
     }
 
     /**
@@ -54,6 +60,8 @@ public class App extends Application {
                 //AppTree.printScene(primaryStage.getScene());
                 //AppMemory.printMemoryUsage();
                 DbConnect.sharedConnection();
+                ClientController.readAllClients();
+                SpecialisteController.readAllSpecialistes();
             });
         }).start();
 

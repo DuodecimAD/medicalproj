@@ -28,7 +28,7 @@ public class DbRead {
      */
     // Private constructor to prevent instantiation
     private DbRead() {
-        
+
     }
 
     public static List<List<Object>> readTable(String tableName, String sortBy) {
@@ -83,7 +83,7 @@ public class DbRead {
 
         return Collections.emptyList(); // Return an empty list if there's an error or no results
     }
-    
+
     public static int readId(String columnValue, String tableName, String checColumn, String checkValue) {
         String sanitizedcolumnValue = AppSecurity.sanitize(columnValue);
         String sanitizedTableName = AppSecurity.sanitize(tableName);
@@ -108,9 +108,9 @@ public class DbRead {
 
             // Get the result from the OUT parameter
             int result = callableStatement.getInt(5);
-            
+
             return result;
-            
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }

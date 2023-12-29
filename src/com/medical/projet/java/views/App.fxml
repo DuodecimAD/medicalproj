@@ -3,6 +3,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.control.Label?>
 
 <BorderPane fx:id="appBody" fx:controller="com.medical.projet.java.controllers.AppController" xmlns:fx="http://javafx.com/fxml/1" prefWidth="1000" prefHeight="600">
@@ -12,9 +13,6 @@
 		</BorderPane>
     </left>
     <center>
-        <VBox fx:id="content">
-    		<Label text="My APP" />
-    		
-		</VBox>
+        
     </center>
 </BorderPane>

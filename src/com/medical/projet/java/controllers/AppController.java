@@ -2,26 +2,35 @@ package com.medical.projet.java.controllers;
 
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import com.medical.projet.java.utility.AppSettings;
 import com.medical.projet.java.utility.LoggerUtil;
 
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -34,6 +43,8 @@ public class AppController {
 
     /** The menu pane. */
     @FXML private BorderPane menuPane;
+
+    @FXML private StackPane content;
 
     /** The buttons menu. */
     static List<Button> buttonsMenu = new ArrayList<>();
@@ -52,6 +63,7 @@ public class AppController {
         /* to stop having a button focused while content is not connected to it */
         Platform.runLater(() -> {
             appBody.requestFocus();
+            loadingIcon();
         });
 
         LoggerUtil.getLogger().info("Initialize done");
@@ -170,6 +182,52 @@ public class AppController {
 
     }
 
+    private void loadingIcon() {
+        // Load the loading GIF
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(AppSettings.INSTANCE.pathLocation+"ressources/images/loader.gif");
+        Image svgLoader = new Image(inputStream);
+        ImageView loadingImageView = new ImageView(svgLoader);
+        loadingImageView.setFitHeight(80);
+        loadingImageView.setPreserveRatio(true);
+        
+        //BorderPane loadingPane = new BorderPane();
+        VBox loadingPane = new VBox();
+        //loadingPane.setCenter(loadingImageView);
+        loadingPane.getChildren().add(loadingImageView);
+        loadingPane.setId("content");
+        
+        loadingPane.setAlignment(Pos.CENTER);
+        appBody.setCenter(loadingPane);
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            int seconds = 7;
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                       
+                    seconds--;
+
+                    if(seconds == 2) {
+                        fadeAnimation(loadingPane);
+
+                    }else if(seconds == 0) {
+                        Label hello = new Label("<< App is ready, click a page to start");
+                        loadingPane.getChildren().add(hello);
+                    }
+                });
+            }
+        }, 0, 1000);
+    }
+    
+    private void fadeAnimation(VBox thisNode) {
+        FadeTransition fadeOut = new FadeTransition(Duration.seconds(1), thisNode.getChildren().get(0));
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+        fadeOut.setOnFinished(event -> thisNode.getChildren().clear());
+        fadeOut.play();
+    }
+
     /**
      * Load content.
      *
@@ -193,19 +251,21 @@ public class AppController {
                 }
 
                 FXMLLoader loader = new FXMLLoader(pathUrl);
-                 Node content = loader.load();
-                 Object controller = loader.getController();
+                Node content = loader.load();
+                Object controller = loader.getController();
 
-                 // Cache the FXML content and its controller
-                 fxmlCache.put(fxmlName, new CachedFXML(content, controller));
+                // Cache the FXML content and its controller
+                fxmlCache.put(fxmlName, new CachedFXML(content, controller));
 
-                 content.setId("content");
-                 appBody.setCenter(content);
+                content.setId("content");
+                appBody.setCenter(content);
              }
          } catch (Exception e) {
              e.printStackTrace();
          }
      }
+
+
 
     public class CachedFXML {
 

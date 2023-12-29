@@ -13,21 +13,21 @@ import com.medical.projet.java.utility.database.DbUpdate;
 public class ActeMedical {
 
     private static final String tableName = "ACTE_MED";
-    
+
     private static final String tableNameShort = "_ACTE_MED";
-    
+
     private int idActeMed;
 
     private String refActeMed;
-    
+
     private int idClient;
 
     private int idSpecialiste;
-    
+
     private int idLieu;
 
     private LocalDate dateDebut;
-    
+
     private LocalDate dateFin;
 
 
@@ -41,7 +41,7 @@ public class ActeMedical {
         this.dateDebut = dateDebut;
         this.dateFin = dateFin;
     }
-    
+
     public ActeMedical(int idActeMed, String refActeMed, int idClient, int idSpecialiste, int idLieu, LocalDate dateDebut, LocalDate dateFin) {
         this.idActeMed = idActeMed;
         this.refActeMed = refActeMed;
@@ -122,9 +122,9 @@ public class ActeMedical {
 
         List<String> columnsList = new ArrayList<>(List.of("REF" + tableNameShort, "CLIENT", "SPECIALISTE", "LIEU", "DATE_DEBUT", "DATE_FIN"));
         List<Object> valuesList =  new ArrayList<>(
-                                                    List.of(    
-                                                            acteMedical.getRefActeMed(), acteMedical.getIdClient(), 
-                                                            acteMedical.getIdSpecialiste(), acteMedical.getIdLieu(), 
+                                                    List.of(
+                                                            acteMedical.getRefActeMed(), acteMedical.getIdClient(),
+                                                            acteMedical.getIdSpecialiste(), acteMedical.getIdLieu(),
                                                             acteMedical.getDateDebut(), acteMedical.getDateFin()
                                                     ));
 

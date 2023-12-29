@@ -40,10 +40,10 @@ import javafx.scene.layout.VBox;
 
 public class SpecialisteController {
 
-    private ObservableList<Specialiste> specialistesObsList = FXCollections.observableArrayList();
+    private static ObservableList<Specialiste> specialistesObsList = FXCollections.observableArrayList();
 
     private static final String tableNameSuffix = "_SPECIALISTE";
-    
+
     /** The body. **/
 
     @FXML
@@ -56,7 +56,7 @@ public class SpecialisteController {
     private TableColumn<Specialiste, String> name;
 
     @FXML
-    private TableColumn<Specialiste, String> surname;
+    private TableColumn<Specialiste, String> lastname;
 
     @FXML
     private TableColumn<Specialiste, String> dateNais;
@@ -75,7 +75,7 @@ public class SpecialisteController {
 
 
     public void initialize() {
-        
+
         dynamicCssStuff();
 
         loadingTableIcon();
@@ -95,16 +95,16 @@ public class SpecialisteController {
         openOverlayNewSpecialiste();
 
     }
-    
+
     private void dynamicCssStuff() {
-        
+
         // absolute position of the create button on the right side
         createButton.layoutXProperty().bind(body.widthProperty().subtract(createButton.widthProperty()));
-        
+
         // auto size of the TableView columns depending of the table - scrollbar
         DoubleBinding tableWidth = table.widthProperty().subtract(22);
         name.prefWidthProperty().bind(tableWidth.multiply(0.17));
-        surname.prefWidthProperty().bind(tableWidth.multiply(0.17));
+        lastname.prefWidthProperty().bind(tableWidth.multiply(0.17));
         dateNais.prefWidthProperty().bind(tableWidth.multiply(0.155));
         tel.prefWidthProperty().bind(tableWidth.multiply(0.155));
         email.prefWidthProperty().bind(tableWidth.multiply(0.35));
@@ -119,7 +119,7 @@ public class SpecialisteController {
         table.setPlaceholder(loadingImageView);
     }
 
-    private ObservableList<Specialiste> readAllSpecialistes() {
+    public static ObservableList<Specialiste> readAllSpecialistes() {
 
         // Get raw data from the Specialiste model
         List<List<Object>> rawSpecialisteData = null;
@@ -136,7 +136,7 @@ public class SpecialisteController {
                 public void run() {
                     Platform.runLater(() -> {
                         placeholderLabel.setText("Connection to the database failed. Retrying in " + seconds[0] + " sec.");
-                        table.setPlaceholder(placeholderLabel);
+                        //table.setPlaceholder(placeholderLabel);
                         seconds[0]--;
 
                         if (seconds[0] < 0) {
@@ -152,15 +152,22 @@ public class SpecialisteController {
         if (rawSpecialisteData != null) {
             for (List<Object> row : rawSpecialisteData) {
                 BigDecimal id = (BigDecimal) row.get(0);
-                String nom = (String) row.get(1);
-                String prenom = (String) row.get(2);
-                // Convert date to java.time.LocalDate
-                java.sql.Timestamp timestamp = (java.sql.Timestamp) row.get(3);
-                LocalDate date_nais = timestamp.toLocalDateTime().toLocalDate();
-                String tel = (String) row.get(4);
-                String email = (String) row.get(5);
-                // Create a Specialiste object and add to the list
-                specialistesObsList.add(new Specialiste(id.intValue(), nom, prenom, date_nais, tel, email));
+
+                // Check if the client with the same id already exists in clientsObsList
+                boolean specialisteExists = specialistesObsList.stream()
+                        .anyMatch(specialiste -> specialiste.getSpecialisteId() == id.intValue());
+
+                if (!specialisteExists) {
+                    String nom = (String) row.get(1);
+                    String prenom = (String) row.get(2);
+                    // Convert date to java.time.LocalDate
+                    java.sql.Timestamp timestamp = (java.sql.Timestamp) row.get(3);
+                    LocalDate date_nais = timestamp.toLocalDateTime().toLocalDate();
+                    String tel = (String) row.get(4);
+                    String email = (String) row.get(5);
+                    // Create a Specialiste object and add to the list
+                    specialistesObsList.add(new Specialiste(id.intValue(), nom, prenom, date_nais, tel, email));
+                }
             }
         }
         return specialistesObsList;
@@ -174,7 +181,7 @@ public class SpecialisteController {
 
         // Populate columns of TableView with the data
         name.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomSpecialiste()));
-        surname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomSpecialiste()));
+        lastname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomSpecialiste()));
         dateNais.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateNaisSpecialiste().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
         tel.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getTelSpecialiste()));
         email.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getEmailSpecialiste()));
@@ -241,7 +248,7 @@ public class SpecialisteController {
 
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
     private void populateOverlayContent(BorderPane contentPane, Specialiste specialiste) {
-        
+
         System.out.println(specialiste.toString());
 
         Label nameLabel = new Label("Name");
@@ -474,7 +481,7 @@ public class SpecialisteController {
         return "";
     }
 
-    public ObservableList<Specialiste> getSpecialistesObsList() {
+    public static ObservableList<Specialiste> getSpecialistesObsList() {
         return specialistesObsList;
     }
 
