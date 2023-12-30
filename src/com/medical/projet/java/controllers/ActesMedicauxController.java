@@ -26,6 +26,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
@@ -38,7 +39,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -175,7 +175,7 @@ public class ActesMedicauxController {
                 java.sql.Timestamp timestamp2 = (java.sql.Timestamp) row.get(3);
                 LocalDate date_fin = timestamp2.toLocalDateTime().toLocalDate();
                 // Create a ActeMedical object and add to the list
-                actesMedicauxObsList.add(new ActeMedical(ref, client, specialiste, lieu, date_debut, date_fin));
+                actesMedicauxObsList.add(new ActeMedical(ref, date_debut, date_fin, client, lieu, specialiste));
             }
         }
         return actesMedicauxObsList;
@@ -220,14 +220,14 @@ public class ActesMedicauxController {
 
     private void createOverlay(StackPane stackPane, Consumer<BorderPane> contentPopulationCallback) {
         // Create a darkened overlay pane
-        Pane overlayPane = new Pane();
+        VBox overlayPane = new VBox();
         overlayPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.4);"); // Semi-transparent black background
         overlayPane.setPrefSize(stackPane.getWidth(), stackPane.getHeight());
 
         // Create your content pane
         BorderPane contentPane = new BorderPane();
         contentPane.setId("overlayContentPane");
-        contentPane.setPrefSize(820, 560);
+        contentPane.setMaxSize(820, 560);
 
         // Use the callback to populate the content
         contentPopulationCallback.accept(contentPane);
@@ -242,8 +242,9 @@ public class ActesMedicauxController {
         stackPane.getChildren().add(overlayPane);
 
         // Set the dimensions after the stage is shown
-        contentPane.setLayoutX(((stackPane.getWidth() - contentPane.getPrefWidth()) / 2) + 20);
-        contentPane.setLayoutY(((stackPane.getHeight() - contentPane.getPrefHeight()) / 2) + 10);
+        //contentPane.setLayoutX(((stackPane.getWidth() - contentPane.getPrefWidth()) / 2) + 20);
+        //contentPane.setLayoutY(((stackPane.getHeight() - contentPane.getPrefHeight()) / 2) + 10);
+        overlayPane.setAlignment(Pos.CENTER);
     }
 
     // overlay with client data
@@ -597,11 +598,11 @@ public class ActesMedicauxController {
 
         buttonOk.setOnAction(e -> {
             String newActeMedicalOK = createNewActeMedical( refField.getText(),
-                                                            Integer.parseInt(clientField.getText()),
-                                                            Integer.parseInt(specialisteField.getText()),
-                                                            lieuChoiceBox.getValue(),
                                                             date_debutField.getValue(),
-                                                            date_finField.getValue()
+                                                            date_finField.getValue(),
+                                                            Integer.parseInt(clientField.getText()),
+                                                            lieuChoiceBox.getValue(),
+                                                            Integer.parseInt(specialisteField.getText())
                                                             );
 
             if(newActeMedicalOK.equals("")) {
@@ -610,11 +611,20 @@ public class ActesMedicauxController {
                 errorLabel.setText(newActeMedicalOK);
             }
         });
+
+        clientField.setOnMouseClicked(e -> {
+            tableAmOverlay(tableAm, "Clients");
+        });
+
+        specialisteField.setOnMouseClicked(e -> {
+            tableAmOverlay(tableAm, "Specialistes");
+        });
+
     }
 
-    private String createNewActeMedical(String amField, int clientField, int specialisteField, int lieuField, LocalDate date_debutField, LocalDate date_finField) {
+    private String createNewActeMedical(String amField, LocalDate date_debutField, LocalDate date_finField, int clientField, int lieuField, int specialisteField) {
 
-        ActeMedical newActeMedical = new ActeMedical(amField, clientField, specialisteField, lieuField, date_debutField, date_finField);
+        ActeMedical newActeMedical = new ActeMedical(amField, date_debutField, date_finField, clientField, lieuField, specialisteField);
 
         try {
             newActeMedical.insertActeMedicalDB(newActeMedical);
@@ -622,6 +632,8 @@ public class ActesMedicauxController {
             getActeMedicalsObsList().add(newActeMedical);
         } catch (SQLException e) {
             String errorMessage = e.getMessage();
+            System.out.println(errorMessage);
+            /*
             int startIndex = errorMessage.indexOf("ORA-20001: ");
             if (startIndex != -1) {
                 // Extract the substring from the index to the end of the line
@@ -640,7 +652,7 @@ public class ActesMedicauxController {
                 System.out.println(errorMessage);
                 return errorMessage;
             }
-
+             */
         }
         return "";
     }
@@ -776,7 +788,7 @@ public class ActesMedicauxController {
                 TableColumn<Specialiste, String> tel = new TableColumn<>("Tel");
                 TableColumn<Specialiste, String> email = new TableColumn<>("Email");
 
-             // Define how to get values from the object for each column
+                // Define how to get values from the object for each column
                 name.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomSpecialiste()));
                 lastname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomSpecialiste()));
                 dateNais.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateNaisSpecialiste().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));

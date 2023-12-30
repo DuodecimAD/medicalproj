@@ -189,13 +189,13 @@ public class AppController {
         ImageView loadingImageView = new ImageView(svgLoader);
         loadingImageView.setFitHeight(80);
         loadingImageView.setPreserveRatio(true);
-        
+
         //BorderPane loadingPane = new BorderPane();
         VBox loadingPane = new VBox();
         //loadingPane.setCenter(loadingImageView);
         loadingPane.getChildren().add(loadingImageView);
         loadingPane.setId("content");
-        
+
         loadingPane.setAlignment(Pos.CENTER);
         appBody.setCenter(loadingPane);
 
@@ -205,7 +205,7 @@ public class AppController {
             @Override
             public void run() {
                 Platform.runLater(() -> {
-                       
+
                     seconds--;
 
                     if(seconds == 2) {
@@ -219,7 +219,7 @@ public class AppController {
             }
         }, 0, 1000);
     }
-    
+
     private void fadeAnimation(VBox thisNode) {
         FadeTransition fadeOut = new FadeTransition(Duration.seconds(1), thisNode.getChildren().get(0));
         fadeOut.setFromValue(1.0);

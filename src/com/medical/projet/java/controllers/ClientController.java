@@ -22,6 +22,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -33,7 +34,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -56,7 +56,7 @@ public class ClientController {
     private TableColumn<Client, String> name;
 
     @FXML
-    private TableColumn<Client, String> lastname;
+    private TableColumn<Client, String> firstname;
 
     @FXML
     private TableColumn<Client, String> dateNais;
@@ -104,7 +104,7 @@ public class ClientController {
         // auto size of the TableView columns depending of the table - scrollbar
         DoubleBinding tableWidth = table.widthProperty().subtract(22);
         name.prefWidthProperty().bind(tableWidth.multiply(0.17));
-        lastname.prefWidthProperty().bind(tableWidth.multiply(0.17));
+        firstname.prefWidthProperty().bind(tableWidth.multiply(0.17));
         dateNais.prefWidthProperty().bind(tableWidth.multiply(0.155));
         tel.prefWidthProperty().bind(tableWidth.multiply(0.155));
         email.prefWidthProperty().bind(tableWidth.multiply(0.35));
@@ -182,7 +182,7 @@ public class ClientController {
 
         // Populate columns of TableView with the data
         name.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomClient()));
-        lastname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomClient()));
+        firstname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomClient()));
         dateNais.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateNaisClient().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
         tel.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getTelClient()));
         email.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getEmailClient()));
@@ -210,14 +210,14 @@ public class ClientController {
 
     private void createOverlay(StackPane stackPane, Consumer<BorderPane> contentPopulationCallback) {
         // Create a darkened overlay pane
-        Pane overlayPane = new Pane();
+        VBox overlayPane = new VBox();
         overlayPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.4);"); // Semi-transparent black background
         overlayPane.setPrefSize(stackPane.getWidth(), stackPane.getHeight());
 
         // Create your content pane
         BorderPane contentPane = new BorderPane();
         contentPane.setId("overlayContentPane");
-        contentPane.setPrefSize(500, 500);
+        contentPane.setMaxSize(500, 500);
 
         // if i want to load an fxml directly instead of writing 2 times the elements of both overlays
         /*
@@ -243,8 +243,9 @@ public class ClientController {
         stackPane.getChildren().add(overlayPane);
 
         // Set the dimensions after the stage is shown
-        contentPane.setLayoutX((stackPane.getWidth() - contentPane.getPrefWidth()) / 2);
-        contentPane.setLayoutY(((stackPane.getHeight() - contentPane.getPrefHeight()) / 2));
+        //contentPane.setLayoutX((stackPane.getWidth() - contentPane.getPrefWidth()) / 2);
+        //contentPane.setLayoutY(((stackPane.getHeight() - contentPane.getPrefHeight()) / 2));
+        overlayPane.setAlignment(Pos.CENTER);
 
     }
 
@@ -261,7 +262,7 @@ public class ClientController {
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
     private void populateOverlayContent(BorderPane contentPane, Client client) {
 
-        System.out.println(client.toString());
+        //System.out.println(client.toString());
 
         Label nameLabel = new Label("Name");
         nameLabel.setId("NOM" + tableNameSuffix);
@@ -269,12 +270,12 @@ public class ClientController {
         TextField nameField = new TextField();
         nameField.setText(client.getNomClient());
 
-        Label surnameLabel = new Label("Surname");
-        surnameLabel.setId("PRENOM" + tableNameSuffix);
-        TextField surnameField = new TextField();
-        surnameField.setText(client.getPrenomClient());
+        Label firstnameLabel = new Label("Firstname");
+        firstnameLabel.setId("PRENOM" + tableNameSuffix);
+        TextField firstnameField = new TextField();
+        firstnameField.setText(client.getPrenomClient());
 
-        Label date_naisLabel = new Label("Birthday");
+        Label date_naisLabel = new Label("DateNais");
         date_naisLabel.setId("DATE_NAIS" + tableNameSuffix);
         DatePicker date_naisField = new DatePicker();
         date_naisField.setValue(client.getDateNaisClient());
@@ -291,7 +292,7 @@ public class ClientController {
 
         VBox overLayContent = new VBox();
         overLayContent.setId("overLayContent");
-        overLayContent.getChildren().addAll(nameLabel, nameField, surnameLabel, surnameField, date_naisLabel, date_naisField, telLabel, telField, emailLabel, emailField);
+        overLayContent.getChildren().addAll(nameLabel, nameField, firstnameLabel, firstnameField, date_naisLabel, date_naisField, telLabel, telField, emailLabel, emailField);
 
         Button buttonDelete = new Button("Delete");
         buttonDelete.setId("DeleteButton");
@@ -324,7 +325,7 @@ public class ClientController {
 
         buttonOk.setOnAction(e -> {
             updateClient(client, nameLabel.getId(),         client.getNomClient(),      nameField.getText(),        emailLabel.getId(),     client.getEmailClient() );
-            updateClient(client, surnameLabel.getId(),      client.getPrenomClient(),   surnameField.getText(),     emailLabel.getId(),     client.getEmailClient() );
+            updateClient(client, firstnameLabel.getId(),      client.getPrenomClient(),   firstnameField.getText(),     emailLabel.getId(),     client.getEmailClient() );
             updateClient(client, date_naisLabel.getId(),    client.getDateNaisClient(), date_naisField.getValue(),  emailLabel.getId(),     client.getEmailClient() );
             updateClient(client, telLabel.getId(),          client.getTelClient(),      telField.getText(),         emailLabel.getId(),     client.getEmailClient() );
             updateClient(client, emailLabel.getId(),        client.getEmailClient(),    emailField.getText(),       emailLabel.getId(),     client.getEmailClient() );
@@ -363,7 +364,7 @@ public class ClientController {
                     e.printStackTrace();
                 }
                 client.setPrenomClient(newValue.toString());
-                System.out.println("surname has been changed");
+                System.out.println("firstname has been changed");
             }
         }
         case "DATE_NAIS_CLIENT" -> {
@@ -416,8 +417,8 @@ public class ClientController {
         Label nameLabel = new Label("Name");
         TextField nameField = new TextField();
 
-        Label surnameLabel = new Label("Surname");
-        TextField surnameField = new TextField();
+        Label firstnameLabel = new Label("Firstname");
+        TextField firstnameField = new TextField();
 
         Label date_naisLabel = new Label("Date_Nais");
         DatePicker date_naisField = new DatePicker();
@@ -433,7 +434,7 @@ public class ClientController {
 
         VBox overLayContent = new VBox();
         overLayContent.setId("overLayContent");
-        overLayContent.getChildren().addAll(nameLabel, nameField, surnameLabel, surnameField, date_naisLabel, date_naisField, telLabel, telField, emailLabel, emailField, errorLabel);
+        overLayContent.getChildren().addAll(nameLabel, nameField, firstnameLabel, firstnameField, date_naisLabel, date_naisField, telLabel, telField, emailLabel, emailField, errorLabel);
 
         Button buttonOk = new Button("ok");
         Button buttonCancel = new Button("Cancel");
@@ -452,7 +453,7 @@ public class ClientController {
         });
 
         buttonOk.setOnAction(e -> {
-            String newClientOK = createNewClient(nameField.getText(), surnameField.getText(), date_naisField.getValue(), telField.getText(), emailField.getText());
+            String newClientOK = createNewClient(nameField.getText(), firstnameField.getText(), date_naisField.getValue(), telField.getText(), emailField.getText());
 
             if(newClientOK.equals("")) {
                 closeOverlay();

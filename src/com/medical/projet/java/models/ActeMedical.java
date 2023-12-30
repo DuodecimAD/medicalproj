@@ -33,7 +33,7 @@ public class ActeMedical {
 
     public ActeMedical() {}
 
-    public ActeMedical(String refActeMed, int idClient, int idSpecialiste, int idLieu, LocalDate dateDebut, LocalDate dateFin) {
+    public ActeMedical(String refActeMed, LocalDate dateDebut, LocalDate dateFin, int idClient, int idLieu, int idSpecialiste) {
         this.refActeMed = refActeMed;
         this.idClient = idClient;
         this.idSpecialiste = idSpecialiste;
@@ -42,7 +42,7 @@ public class ActeMedical {
         this.dateFin = dateFin;
     }
 
-    public ActeMedical(int idActeMed, String refActeMed, int idClient, int idSpecialiste, int idLieu, LocalDate dateDebut, LocalDate dateFin) {
+    public ActeMedical(int idActeMed, String refActeMed, LocalDate dateDebut, LocalDate dateFin, int idClient, int idLieu, int idSpecialiste) {
         this.idActeMed = idActeMed;
         this.refActeMed = refActeMed;
         this.idClient = idClient;
@@ -120,12 +120,15 @@ public class ActeMedical {
 
     public void insertActeMedicalDB(ActeMedical acteMedical) throws SQLException {
 
-        List<String> columnsList = new ArrayList<>(List.of("REF" + tableNameShort, "CLIENT", "SPECIALISTE", "LIEU", "DATE_DEBUT", "DATE_FIN"));
+        List<String> columnsList = new ArrayList<>(List.of("REF" + tableNameShort, "DATE_DEBUT", "DATE_FIN", "ID_CLIENT", "ID_LIEU", "ID_SPECIALISTE"));
         List<Object> valuesList =  new ArrayList<>(
                                                     List.of(
-                                                            acteMedical.getRefActeMed(), acteMedical.getIdClient(),
-                                                            acteMedical.getIdSpecialiste(), acteMedical.getIdLieu(),
-                                                            acteMedical.getDateDebut(), acteMedical.getDateFin()
+                                                            acteMedical.getRefActeMed(),
+                                                            acteMedical.getDateDebut(),
+                                                            acteMedical.getDateFin(),
+                                                            acteMedical.getIdClient(),
+                                                            acteMedical.getIdLieu(),
+                                                            acteMedical.getIdSpecialiste()
                                                     ));
 
         try {

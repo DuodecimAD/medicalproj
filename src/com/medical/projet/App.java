@@ -34,11 +34,11 @@ public class App extends Application {
     public static void main(String[] args) {
 
         launch(args);
-        
+
         LoggerUtil.getLogger().info("App is Closing");
         DbConnect.closeConnection();
         System.exit(0);
-       
+
     }
 
     /**

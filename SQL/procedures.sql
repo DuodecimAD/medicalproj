@@ -47,7 +47,7 @@ BEGIN
     
     -- Log
     INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-    VALUES ('CheckIfExists', 'closing procedure', v_value || ' dont exist : closing');
+    VALUES ('CheckIfExists', 'closing procedure', v_value || ' dont exist : can now do the insert');
     COMMIT;
     
 END;
@@ -89,23 +89,21 @@ BEGIN
 END;
 /
 
-
 create or replace PROCEDURE InsertIfNotExists (
     p_tableName     IN VARCHAR2,
     p_columns       IN VARCHAR2,
-    p_columnsLength IN INT,
     p_values        IN VARCHAR2
 )
 IS 
     recordExists    INT;
     tableName       VARCHAR2(255)   := p_tableName;
     inputColumns    VARCHAR2(255)   := p_columns;
-    columnsLength   INT             := p_columnsLength;
     inputValues     VARCHAR2(255)   := p_values;
     separator       VARCHAR2(1)     := ',';
     startPos        INT             := 1;
     endPos          INT;
     countPos        INT;
+    c_values    SYS.ODCIVARCHAR2LIST := SYS.ODCIVARCHAR2LIST();
     c_result    VARCHAR2(100);
     c_value1    VARCHAR2(100);
     c_value2    VARCHAR2(100);
@@ -117,6 +115,7 @@ IS
     c_value8    VARCHAR2(100);
     c_value9    VARCHAR2(100);
     v_result    VARCHAR2(100);
+    s_values    SYS.ODCIVARCHAR2LIST := SYS.ODCIVARCHAR2LIST();
     s_value1    VARCHAR2(100);
     s_value2    VARCHAR2(100);
     s_value3    VARCHAR2(100);
@@ -136,6 +135,7 @@ IS
     d_value2    DATE;
     d_value3    DATE;
     d_value4    DATE;
+    sql_stmt    VARCHAR2(1000);
 BEGIN
 
     -- Log
@@ -146,113 +146,198 @@ BEGIN
     INSERT INTO debug_log (procedure_name, variable_name, variable_value)
     VALUES ('InsertIfNotExists', 'inputColumns', inputColumns);
     INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-    VALUES ('InsertIfNotExists', 'columnsLength', columnsLength);
-    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
     VALUES ('InsertIfNotExists', 'inputValues', inputValues);
     COMMIT; 
 
-
+/*
     countPos := 1;
 
     --IF tableName = 'CLIENT' THEN
-        WHILE startPos <= LENGTH(inputColumns) LOOP
-            endPos := INSTR(inputColumns, separator, startPos);
+    WHILE startPos <= LENGTH(inputColumns) LOOP
+        endPos := INSTR(inputColumns, separator, startPos);
 
-            IF endPos = 0 THEN
-                endPos := LENGTH(inputColumns) + 1;
-            END IF;
-            
-            IF countPos = 1 THEN
-                c_value1 := TRIM(SUBSTR(inputColumns, startPos, endPos - startPos));
-            ELSIF countPos = 2 THEN
-                c_value2 := TRIM(SUBSTR(inputColumns, startPos, endPos - startPos));
-            ELSIF countPos = 3 THEN
-                c_value3 := TRIM(SUBSTR(inputColumns, startPos, endPos - startPos));
-            ELSIF countPos = 4 THEN
-                c_value4 := TRIM(SUBSTR(inputColumns, startPos, endPos - startPos));
-            ELSIF countPos = 5 THEN
-                c_value5 := TRIM(SUBSTR(inputColumns, startPos, endPos - startPos));
-            END IF;
+        IF endPos = 0 THEN
+            endPos := LENGTH(inputColumns) + 1;
+        END IF;
 
-            startPos := endPos + 1;
-            countPos := countPos + 1;
-        END LOOP;
+        IF countPos = 1 THEN
+            c_value1 := TRIM(SUBSTR(inputColumns, startPos, endPos - startPos));
+        ELSIF countPos = 2 THEN
+            c_value2 := TRIM(SUBSTR(inputColumns, startPos, endPos - startPos));
+        ELSIF countPos = 3 THEN
+            c_value3 := TRIM(SUBSTR(inputColumns, startPos, endPos - startPos));
+        ELSIF countPos = 4 THEN
+            c_value4 := TRIM(SUBSTR(inputColumns, startPos, endPos - startPos));
+        ELSIF countPos = 5 THEN
+            c_value5 := TRIM(SUBSTR(inputColumns, startPos, endPos - startPos));
+        END IF;
 
-        startPos := 1;
-        endPos := 0;
-        countPos := 1;
+        startPos := endPos + 1;
+        countPos := countPos + 1;
+    END LOOP;
+    
+    -- Log
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 'c_value1', c_value1);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 'c_value2', c_value2);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 'c_value3', c_value3);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 'c_value4', c_value4);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 'c_value5', c_value5);
+*/
 
-        WHILE startPos <= LENGTH(inputValues) LOOP
-            endPos := INSTR(inputValues, separator, startPos);
+/*
+    startPos := 1;
+    endPos := 0;
+    countPos := 1;
 
-            IF endPos = 0 THEN
-                endPos := LENGTH(inputValues) + 1;
-            END IF;
+    WHILE startPos <= LENGTH(inputValues) LOOP
+        endPos := INSTR(inputValues, separator, startPos);
 
-            IF countPos = 1 THEN
-                s_value1 := TRIM(SUBSTR(inputValues, startPos, endPos - startPos));
-            ELSIF countPos = 2 THEN
-                s_value2 := TRIM(SUBSTR(inputValues, startPos, endPos - startPos));
-            ELSIF countPos = 3 THEN
-                s_value3 := TRIM(SUBSTR(inputValues, startPos, endPos - startPos));
-            ELSIF countPos = 4 THEN
-                s_value4 := TRIM(SUBSTR(inputValues, startPos, endPos - startPos));
-            ELSIF countPos = 5 THEN
-                s_value5 := TRIM(SUBSTR(inputValues, startPos, endPos - startPos));
-            END IF;
+        IF endPos = 0 THEN
+            endPos := LENGTH(inputValues) + 1;
+        END IF;
 
-            startPos := endPos + 1;
-            countPos := countPos + 1;
-        END LOOP;
+        IF countPos = 1 THEN
+            s_value1 := TRIM(SUBSTR(inputValues, startPos, endPos - startPos));
+        ELSIF countPos = 2 THEN
+            s_value2 := TRIM(SUBSTR(inputValues, startPos, endPos - startPos));
+        ELSIF countPos = 3 THEN
+            s_value3 := TRIM(SUBSTR(inputValues, startPos, endPos - startPos));
+        ELSIF countPos = 4 THEN
+            s_value4 := TRIM(SUBSTR(inputValues, startPos, endPos - startPos));
+        ELSIF countPos = 5 THEN
+            s_value5 := TRIM(SUBSTR(inputValues, startPos, endPos - startPos));
+        END IF;
+
+        startPos := endPos + 1;
+        countPos := countPos + 1;
+    END LOOP;
+
+    -- Log
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 's_value1', s_value1);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 's_value2', s_value2);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 's_value3', s_value3);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 's_value4', s_value4);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 's_value5', s_value5);
+    COMMIT;
+*/
+
+    -- Split the columns into an array
+    SELECT TRIM(BOTH ' ' FROM REGEXP_SUBSTR(inputColumns, '[^' || separator || ']+', 1, LEVEL))
+    BULK COLLECT INTO c_values
+    FROM dual
+    CONNECT BY REGEXP_SUBSTR(inputColumns, '[^' || separator || ']+', 1, LEVEL) IS NOT NULL;
+
+
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 'column 1 in array', c_values(1));
+    COMMIT; 
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 'column 2 in array', c_values(2));
+    COMMIT;
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 'column 3 in array', c_values(3));
+    COMMIT; 
+    
+    
+    
+    -- Split the values into an array
+    SELECT TRIM(BOTH ' ' FROM REGEXP_SUBSTR(inputValues, '[^' || separator || ']+', 1, LEVEL))
+    BULK COLLECT INTO s_values
+    FROM dual
+    CONNECT BY REGEXP_SUBSTR(inputValues, '[^' || separator || ']+', 1, LEVEL) IS NOT NULL;
+
+
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 'value 1 in array', s_values(1));
+    COMMIT; 
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 'value 2 in array', s_values(2));
+    COMMIT;
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertIfNotExists', 'value 3 in array', s_values(3));
+    COMMIT; 
+    
+    IF tableName = 'CLIENT' OR tableName = 'SPECIALISTE' THEN
+    
+        -- Check if the record exists
+        CheckIfExists(tableName, c_values(4), s_values(4));
+        -- Check if the record exists
+        CheckIfExists(tableName, c_values(5), s_values(5));
         
-        -- Log
-        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 'c_value1', c_value1);
-        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 'c_value2', c_value2);
-        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 'c_value3', c_value3);
-        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 'c_value4', c_value4);
-        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 'c_value5', c_value5);
-        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 's_value1', s_value1);
-        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 's_value2', s_value2);
-        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 's_value3', s_value3);
-        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 's_value4', s_value4);
-        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 's_value5', s_value5);
-        COMMIT;
-
-
-        -- Check if the record exists
-        CheckIfExists(tableName, c_value4, s_value4);
-        -- Check if the record exists
-        CheckIfExists(tableName, c_value5, s_value5);
-
         -- Convert the string to a DATE
-        d_value1 := TO_DATE(s_value3, 'YYYY-MM-DD'); 
-        
+        d_value1 := TO_DATE(s_values(3), 'YYYY-MM-DD'); 
+    
         -- Log
         INSERT INTO debug_log (procedure_name, variable_name, variable_value)
         VALUES ('InsertIfNotExists', 'd_value1', d_value1);
         COMMIT;
+        
+        sql_stmt := 'INSERT INTO ' || tableName || ' (' || inputColumns || ') ' ||
+                'VALUES (:1, :2, :3, :4, :5)';
 
+        EXECUTE IMMEDIATE sql_stmt USING s_values(1), s_values(2), d_value1, s_values(4), s_values(5);
+        
         -- Record does not exist, proceed with the insert
-        InsertRecord(tableName, inputColumns, s_value1, s_value2, d_value1, s_value4, s_value5);
-
-    --END IF;
+        --InsertRecord(tableName, inputColumns, s_values(1), s_values(2), d_value1, s_values(4), s_values(5));
+        
+    ELSIF tableName = 'ACTE_MED' THEN
+        
+        -- Check if the record exists
+        CheckIfExists(tableName, c_values(1), s_values(1));
+        
+        -- Convert the string to a DATE
+        d_value1 := TO_DATE(s_values(2), 'YYYY-MM-DD');
+        d_value2 := TO_DATE(s_values(3), 'YYYY-MM-DD'); 
     
+        -- Log
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('InsertIfNotExists', 'd_value1', d_value1);
+        COMMIT;
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('InsertIfNotExists', 'd_value2', d_value2);
+        COMMIT;
+        
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('InsertIfNotExists', 'insert : table name : ', tableName);
+        COMMIT;
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('InsertIfNotExists', 'insert : columns : ', inputColumns);
+        COMMIT;
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('InsertIfNotExists', 'insert : values : ', s_values(1) || ',' || d_value1 || ',' || d_value2 || ',' || s_values(4) || ',' || s_values(5) || ',' || s_values(6));
+        COMMIT;
+        
+        sql_stmt := 'INSERT INTO ' || tableName || ' (' || inputColumns || ') ' ||
+                'VALUES (:1, :2, :3, :4, :5, :6)';
+
+        EXECUTE IMMEDIATE sql_stmt USING s_values(1), d_value1, d_value2, s_values(4), s_values(5), s_values(6);
+        
+        -- Record does not exist, proceed with the insert
+        --InsertRecord(tableName, inputColumns, s_values(1), d_value1, d_value2, s_values(4), s_values(5), s_values(6));
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('InsertIfNotExists', 'insert done', 'finished the inserts');
+        COMMIT;
+        
+    END IF;
+    
+
     -- Log
     INSERT INTO debug_log (procedure_name, variable_name, variable_value)
     VALUES ('InsertIfNotExists', 'closing procedure', 'closing all');
     COMMIT;
 END;
 /
+
 create or replace PROCEDURE GetTableData (
     p_tableName    IN VARCHAR2,
     p_orderBy      IN VARCHAR2,
@@ -373,11 +458,11 @@ BEGIN
 
     sql_stmt := 'SELECT ' || v_columnValue || ' FROM ' || v_tableName || ' WHERE ' || v_checkColumn || ' = ''' || v_checkValue || '''';
 
-    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-    VALUES ('GetIntData', 'p_resultValue', p_resultValue);
-    COMMIT;
-
     EXECUTE IMMEDIATE sql_stmt INTO p_resultValue;
+    
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('GetIntData', 'p_resultValue', p_resultValue);
+        COMMIT;
 
 END;
 /

@@ -22,6 +22,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -33,7 +34,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -56,7 +56,7 @@ public class SpecialisteController {
     private TableColumn<Specialiste, String> name;
 
     @FXML
-    private TableColumn<Specialiste, String> lastname;
+    private TableColumn<Specialiste, String> firstname;
 
     @FXML
     private TableColumn<Specialiste, String> dateNais;
@@ -104,7 +104,7 @@ public class SpecialisteController {
         // auto size of the TableView columns depending of the table - scrollbar
         DoubleBinding tableWidth = table.widthProperty().subtract(22);
         name.prefWidthProperty().bind(tableWidth.multiply(0.17));
-        lastname.prefWidthProperty().bind(tableWidth.multiply(0.17));
+        firstname.prefWidthProperty().bind(tableWidth.multiply(0.17));
         dateNais.prefWidthProperty().bind(tableWidth.multiply(0.155));
         tel.prefWidthProperty().bind(tableWidth.multiply(0.155));
         email.prefWidthProperty().bind(tableWidth.multiply(0.35));
@@ -181,7 +181,7 @@ public class SpecialisteController {
 
         // Populate columns of TableView with the data
         name.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomSpecialiste()));
-        lastname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomSpecialiste()));
+        firstname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomSpecialiste()));
         dateNais.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateNaisSpecialiste().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
         tel.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getTelSpecialiste()));
         email.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getEmailSpecialiste()));
@@ -209,14 +209,14 @@ public class SpecialisteController {
 
     private void createOverlay(StackPane stackPane, Consumer<BorderPane> contentPopulationCallback) {
         // Create a darkened overlay pane
-        Pane overlayPane = new Pane();
+        VBox overlayPane = new VBox();
         overlayPane.setStyle("-fx-background-color: rgba(0, 0, 0, 0.4);"); // Semi-transparent black background
         overlayPane.setPrefSize(stackPane.getWidth(), stackPane.getHeight());
 
         // Create your content pane
         BorderPane contentPane = new BorderPane();
         contentPane.setId("overlayContentPane");
-        contentPane.setPrefSize(500, 500);
+        contentPane.setMaxSize(500, 500);
 
         // Use the callback to populate the content
         contentPopulationCallback.accept(contentPane);
@@ -231,8 +231,9 @@ public class SpecialisteController {
         stackPane.getChildren().add(overlayPane);
 
         // Set the dimensions after the stage is shown
-        contentPane.setLayoutX((stackPane.getWidth() - contentPane.getPrefWidth()) / 2);
-        contentPane.setLayoutY(((stackPane.getHeight() - contentPane.getPrefHeight()) / 2));
+        //contentPane.setLayoutX((stackPane.getWidth() - contentPane.getPrefWidth()) / 2);
+        //contentPane.setLayoutY(((stackPane.getHeight() - contentPane.getPrefHeight()) / 2));
+        overlayPane.setAlignment(Pos.CENTER);
 
     }
 
@@ -249,19 +250,19 @@ public class SpecialisteController {
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
     private void populateOverlayContent(BorderPane contentPane, Specialiste specialiste) {
 
-        System.out.println(specialiste.toString());
+        //System.out.println(specialiste.toString());
 
         Label nameLabel = new Label("Name");
         nameLabel.setId("NOM" + tableNameSuffix);
         TextField nameField = new TextField();
         nameField.setText(specialiste.getNomSpecialiste());
 
-        Label surnameLabel = new Label("Surname");
-        surnameLabel.setId("PRENOM" + tableNameSuffix);
-        TextField surnameField = new TextField();
-        surnameField.setText(specialiste.getPrenomSpecialiste());
+        Label firstnameLabel = new Label("Firsname");
+        firstnameLabel.setId("PRENOM" + tableNameSuffix);
+        TextField firstnameField = new TextField();
+        firstnameField.setText(specialiste.getPrenomSpecialiste());
 
-        Label date_naisLabel = new Label("Birthday");
+        Label date_naisLabel = new Label("DateNais");
         date_naisLabel.setId("DATE_NAIS" + tableNameSuffix);
         DatePicker date_naisField = new DatePicker();
         date_naisField.setValue(specialiste.getDateNaisSpecialiste());
@@ -278,7 +279,7 @@ public class SpecialisteController {
 
         VBox overLayContent = new VBox();
         overLayContent.setId("overLayContent");
-        overLayContent.getChildren().addAll(nameLabel, nameField, surnameLabel, surnameField, date_naisLabel, date_naisField, telLabel, telField, emailLabel, emailField);
+        overLayContent.getChildren().addAll(nameLabel, nameField, firstnameLabel, firstnameField, date_naisLabel, date_naisField, telLabel, telField, emailLabel, emailField);
 
         Button buttonDelete = new Button("Delete");
         buttonDelete.setId("DeleteButton");
@@ -310,7 +311,7 @@ public class SpecialisteController {
 
         buttonOk.setOnAction(e -> {
             updateSpecialiste(specialiste, nameLabel.getId(),         specialiste.getNomSpecialiste(),      nameField.getText(),        emailLabel.getId(),     specialiste.getEmailSpecialiste() );
-            updateSpecialiste(specialiste, surnameLabel.getId(),      specialiste.getPrenomSpecialiste(),   surnameField.getText(),     emailLabel.getId(),     specialiste.getEmailSpecialiste() );
+            updateSpecialiste(specialiste, firstnameLabel.getId(),      specialiste.getPrenomSpecialiste(),   firstnameField.getText(),     emailLabel.getId(),     specialiste.getEmailSpecialiste() );
             updateSpecialiste(specialiste, date_naisLabel.getId(),    specialiste.getDateNaisSpecialiste(), date_naisField.getValue(),  emailLabel.getId(),     specialiste.getEmailSpecialiste() );
             updateSpecialiste(specialiste, telLabel.getId(),          specialiste.getTelSpecialiste(),      telField.getText(),         emailLabel.getId(),     specialiste.getEmailSpecialiste() );
             updateSpecialiste(specialiste, emailLabel.getId(),        specialiste.getEmailSpecialiste(),    emailField.getText(),       emailLabel.getId(),     specialiste.getEmailSpecialiste() );
@@ -349,7 +350,7 @@ public class SpecialisteController {
                     e.printStackTrace();
                 }
                 specialiste.setPrenomSpecialiste(newValue.toString());
-                System.out.println("surname has been changed");
+                System.out.println("firstname has been changed");
             }
         }
         case "DATE_NAIS_SPECIALISTE" -> {
@@ -402,8 +403,8 @@ public class SpecialisteController {
         Label nameLabel = new Label("Name");
         TextField nameField = new TextField();
 
-        Label surnameLabel = new Label("Surname");
-        TextField surnameField = new TextField();
+        Label firstnameLabel = new Label("Firstname");
+        TextField firstnameField = new TextField();
 
         Label date_naisLabel = new Label("Date_Nais");
         DatePicker date_naisField = new DatePicker();
@@ -419,7 +420,7 @@ public class SpecialisteController {
 
         VBox overLayContent = new VBox();
         overLayContent.setId("overLayContent");
-        overLayContent.getChildren().addAll(nameLabel, nameField, surnameLabel, surnameField, date_naisLabel, date_naisField, telLabel, telField, emailLabel, emailField, errorLabel);
+        overLayContent.getChildren().addAll(nameLabel, nameField, firstnameLabel, firstnameField, date_naisLabel, date_naisField, telLabel, telField, emailLabel, emailField, errorLabel);
 
         Button buttonOk = new Button("ok");
         Button buttonCancel = new Button("Cancel");
@@ -437,7 +438,7 @@ public class SpecialisteController {
         });
 
         buttonOk.setOnAction(e -> {
-            String newSpecialisteOK = createNewSpecialiste(nameField.getText(), surnameField.getText(), date_naisField.getValue(), telField.getText(), emailField.getText());
+            String newSpecialisteOK = createNewSpecialiste(nameField.getText(), firstnameField.getText(), date_naisField.getValue(), telField.getText(), emailField.getText());
 
             if(newSpecialisteOK.equals("")) {
                 closeOverlay();
@@ -447,9 +448,9 @@ public class SpecialisteController {
         });
     }
 
-    private String createNewSpecialiste(String nameField, String SurnameField, LocalDate date_naisField, String telField, String emailField) {
+    private String createNewSpecialiste(String nameField, String firsnameField, LocalDate date_naisField, String telField, String emailField) {
 
-        Specialiste newSpecialiste = new Specialiste(nameField, SurnameField, date_naisField, telField, emailField);
+        Specialiste newSpecialiste = new Specialiste(nameField, firsnameField, date_naisField, telField, emailField);
 
         try {
             newSpecialiste.insertSpecialisteDB(newSpecialiste);

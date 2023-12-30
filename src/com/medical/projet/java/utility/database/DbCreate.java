@@ -29,13 +29,13 @@ public class DbCreate {
 
         String columns = "";
         String values = "";
-        int columnsLength = 0;
+
 
         for (int i = 0; i < sanitizedColumnsList.size(); i++) {
 
             columns += sanitizedColumnsList.get(i);
             values += valuesList.get(i).toString();
-            columnsLength++;
+
 
             if (i < sanitizedColumnsList.size() - 1) {
                 columns += ", ";
@@ -43,15 +43,8 @@ public class DbCreate {
             }
         }
 
-        /*
-        System.out.println("table Name : " + tableName);
-        System.out.println("columns Name : " + columns);
-        System.out.println("columns length : " + columnsLength);
-        System.out.println("values : " + values);
-        System.out.println("checkIfExist : " + checkIfExist);
-         */
 
-        String call = "{call InsertIfNotExists(?, ?, ?, ?)}";
+        String call = "{call InsertIfNotExists(?, ?, ?)}";
 
 
         try (CallableStatement callableStatement = conn.prepareCall(call)) {
@@ -60,8 +53,7 @@ public class DbCreate {
             // Set parameter values
             callableStatement.setString(1, sanitizedTableName);
             callableStatement.setString(2, columns);
-            callableStatement.setInt(3, columnsLength);
-            callableStatement.setString(4, values);
+            callableStatement.setString(3, values);
 
 
             // Execute the stored procedure

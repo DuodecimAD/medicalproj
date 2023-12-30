@@ -220,6 +220,10 @@
     -fx-border-insets: 10 0 0 0;
 }
 
+#overlayContentPane .table-view Label{
+	-fx-padding: 0;
+}
+
 
 #overLayContent > Label{
 	-fx-text-fill: -text;
