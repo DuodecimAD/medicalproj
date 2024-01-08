@@ -65,6 +65,9 @@ public class ActesMedicauxController {
 
     @FXML
     private TableColumn<ActeMedical, Integer> specialiste;
+    
+    @FXML
+    private TableColumn<ActeMedical, Integer> typeOperation;
 
     @FXML
     private TableColumn<ActeMedical, Integer> lieu;
@@ -110,13 +113,14 @@ public class ActesMedicauxController {
         createButton.layoutXProperty().bind(body.widthProperty().subtract(createButton.widthProperty()));
 
         // auto size of the TableView columns depending of the table - scrollbar
-        DoubleBinding tableWidth = table.widthProperty().subtract(22);
+        DoubleBinding tableWidth = table.widthProperty().subtract(24);
         ref_acte_med.prefWidthProperty().bind(tableWidth.multiply(0.1));
-        client.prefWidthProperty().bind(tableWidth.multiply(0.1));
-        specialiste.prefWidthProperty().bind(tableWidth.multiply(0.1));
-        lieu.prefWidthProperty().bind(tableWidth.multiply(0.1));
-        date_debut.prefWidthProperty().bind(tableWidth.multiply(0.3));
-        date_fin.prefWidthProperty().bind(tableWidth.multiply(0.3));
+        client.prefWidthProperty().bind(tableWidth.multiply(0.15));
+        specialiste.prefWidthProperty().bind(tableWidth.multiply(0.15));
+        typeOperation.prefWidthProperty().bind(tableWidth.multiply(0.15));
+        lieu.prefWidthProperty().bind(tableWidth.multiply(0.15));
+        date_debut.prefWidthProperty().bind(tableWidth.multiply(0.15));
+        date_fin.prefWidthProperty().bind(tableWidth.multiply(0.15));
     }
 
     private void loadingTableIcon() {
@@ -191,6 +195,7 @@ public class ActesMedicauxController {
         ref_acte_med.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getRefActeMed()));
         client.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdClient()).asObject());
         specialiste.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdSpecialiste()).asObject());
+        typeOperation.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdSpecialiste()).asObject());
         lieu.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdLieu()).asObject());
         date_debut.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateDebut().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
         date_fin.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
@@ -701,8 +706,8 @@ public class ActesMedicauxController {
                         || idClient.toLowerCase().contains(lowerCaseFilter)
                         || idSpecialiste.toLowerCase().contains(lowerCaseFilter)
                         || idLieu.toLowerCase().contains(lowerCaseFilter)
-                        || String.valueOf(acteMedical.getDateDebut()).toLowerCase().contains(lowerCaseFilter)
-                        || String.valueOf(acteMedical.getDateFin()).toLowerCase().contains(lowerCaseFilter);
+                        || String.valueOf(acteMedical.getDateDebut().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).toLowerCase().contains(lowerCaseFilter)
+                        || String.valueOf(acteMedical.getDateFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).toLowerCase().contains(lowerCaseFilter);
             });
 
             // Wrap the FilteredList in a SortedList

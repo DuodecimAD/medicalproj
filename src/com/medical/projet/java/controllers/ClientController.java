@@ -535,7 +535,7 @@ public class ClientController {
                 // Check if any of the client attributes contain the filter text
                 return client.getNomClient().toLowerCase().contains(lowerCaseFilter)
                         || client.getPrenomClient().toLowerCase().contains(lowerCaseFilter)
-                        || String.valueOf(client.getDateNaisClient()).toLowerCase().contains(lowerCaseFilter)
+                        || String.valueOf(client.getDateNaisClient().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).toLowerCase().contains(lowerCaseFilter)
                         || client.getTelClient().toLowerCase().contains(lowerCaseFilter)
                         || client.getEmailClient().toLowerCase().contains(lowerCaseFilter);
             });

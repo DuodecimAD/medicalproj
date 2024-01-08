@@ -520,7 +520,7 @@ public class SpecialisteController {
                 // Check if any of the specialiste attributes contain the filter text
                 return specialiste.getNomSpecialiste().toLowerCase().contains(lowerCaseFilter)
                         || specialiste.getPrenomSpecialiste().toLowerCase().contains(lowerCaseFilter)
-                        || String.valueOf(specialiste.getDateNaisSpecialiste()).toLowerCase().contains(lowerCaseFilter)
+                        || String.valueOf(specialiste.getDateNaisSpecialiste().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).toLowerCase().contains(lowerCaseFilter)
                         || specialiste.getTelSpecialiste().toLowerCase().contains(lowerCaseFilter)
                         || specialiste.getEmailSpecialiste().toLowerCase().contains(lowerCaseFilter);
             });

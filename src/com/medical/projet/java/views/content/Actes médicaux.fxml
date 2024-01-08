@@ -18,12 +18,13 @@
                <center>
                   <TableView id="table" fx:id="table">
                     <columns>
-                      	<TableColumn id="ref" fx:id="ref_acte_med" editable="false" minWidth="50.0" text="Ref" />
-                        <TableColumn id="client" fx:id="client" editable="false" minWidth="50.0" text="Client" />
-                        <TableColumn id="specialiste" fx:id="specialiste" editable="false" minWidth="50.0" text="Specialiste" />
-                        <TableColumn id="lieu" fx:id="lieu" editable="false" minWidth="50.0"  text="Lieu" />
-                        <TableColumn id="date début" fx:id="date_debut" editable="false" minWidth="150.0" text="Date début" />
-                        <TableColumn id="date fin" fx:id="date_fin" editable="false" minWidth="150.0" text="Date fin" />
+                      	<TableColumn id="ref" fx:id="ref_acte_med" editable="false" text="Ref" />
+                        <TableColumn id="client" fx:id="client" editable="false" text="Client" />
+                        <TableColumn id="specialiste" fx:id="specialiste" editable="false" text="Specialiste" />
+                        <TableColumn id="typeOperation" fx:id="typeOperation" editable="false" text="Type operation" />
+                        <TableColumn id="lieu" fx:id="lieu" editable="false"  text="Lieu" />
+                        <TableColumn id="date début" fx:id="date_debut" editable="false" text="Date début" />
+                        <TableColumn id="date fin" fx:id="date_fin" editable="false" text="Date fin" />
                     </columns>
                   </TableView>
                </center>
