@@ -128,7 +128,7 @@ public class SpecialisteController {
         try {
             rawSpecialisteData = Specialiste.getAllSpecialistesData();
         } catch (Exception e) {
-            final int[] seconds = {30}; // Initial countdown value
+            final int[] seconds = {10}; // Initial countdown value
 
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {

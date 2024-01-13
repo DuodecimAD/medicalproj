@@ -47,7 +47,7 @@ public class DbConnect {
     }
 
     private void handleConnectionError() {
-        final int[] seconds = {30}; // Initial countdown value
+        final int[] seconds = {10}; // Initial countdown value
         timerActive = true;
 
         Timer timer = new Timer();

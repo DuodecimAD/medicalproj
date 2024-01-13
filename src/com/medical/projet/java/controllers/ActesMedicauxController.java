@@ -5,30 +5,37 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.medical.projet.java.models.ActeMedical;
 import com.medical.projet.java.models.Client;
 import com.medical.projet.java.models.Specialiste;
 import com.medical.projet.java.utility.AppSecurity;
 import com.medical.projet.java.utility.AppSettings;
+import com.medical.projet.java.utility.database.DbRead;
 
 import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -46,6 +53,10 @@ import javafx.scene.layout.VBox;
 public class ActesMedicauxController {
 
     private ObservableList<ActeMedical> actesMedicauxObsList = FXCollections.observableArrayList();
+    
+    private ObservableList<Client> clientsList = ClientController.getClientsObsList();
+    
+    private ObservableList<Specialiste> specialistesList = SpecialisteController.getSpecialistesObsList();
 
     private static final String tableNameSuffix = "_ACTE_MED";
 
@@ -61,10 +72,10 @@ public class ActesMedicauxController {
     private TableColumn<ActeMedical, String> ref_acte_med;
 
     @FXML
-    private TableColumn<ActeMedical, Integer> client;
+    private TableColumn<ActeMedical, String> client;
 
     @FXML
-    private TableColumn<ActeMedical, Integer> specialiste;
+    private TableColumn<ActeMedical, String> specialiste;
     
     @FXML
     private TableColumn<ActeMedical, Integer> typeOperation;
@@ -141,7 +152,7 @@ public class ActesMedicauxController {
         try {
             rawActeMedicalData = ActeMedical.getAllActesMedicauxData();
         } catch (Exception e) {
-            final int[] seconds = {30}; // Initial countdown value
+            final int[] seconds = {10}; // Initial countdown value
 
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
@@ -193,8 +204,13 @@ public class ActesMedicauxController {
 
         // Populate columns of TableView with the data
         ref_acte_med.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getRefActeMed()));
-        client.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdClient()).asObject());
-        specialiste.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdSpecialiste()).asObject());
+        
+        //client.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdClient()).asObject());
+        client.setCellValueFactory(param -> new SimpleStringProperty(clientsList.get(param.getValue().getIdClient()).getPrenomClient() + " " + clientsList.get(param.getValue().getIdClient()).getNomClient()));
+        
+        //specialiste.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdSpecialiste()).asObject());
+        specialiste.setCellValueFactory(param -> new SimpleStringProperty(specialistesList.get(param.getValue().getIdSpecialiste()).getPrenomSpecialiste() + " " + specialistesList.get(param.getValue().getIdSpecialiste()).getNomSpecialiste()));
+        
         typeOperation.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdSpecialiste()).asObject());
         lieu.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdLieu()).asObject());
         date_debut.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateDebut().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
@@ -270,11 +286,27 @@ public class ActesMedicauxController {
 
         TextField refField = new TextField();
         refField.setText(acteMedical.getRefActeMed());
+        refField.setId("refAm");
         //refField.setDisable(true);
         refField.setEditable(false);
-
+        
         VBox refAmVbox = new VBox();
         refAmVbox.getChildren().addAll(refLabel, refField);
+        
+        Label competenceLabel = new Label("Acte Medical");
+        ComboBox<Integer> competenceChoiceBox = new ComboBox<>();
+        List<Integer> competenceList = new ArrayList<>(List.of(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30));
+        competenceChoiceBox.getItems().addAll(competenceList);
+        competenceChoiceBox.setPrefWidth(230);
+        competenceChoiceBox.setVisibleRowCount(10);
+        
+        VBox competenceAmVbox = new VBox();
+        competenceAmVbox.getChildren().addAll(competenceLabel, competenceChoiceBox);
+        
+        HBox topAmHbox = new HBox();
+        topAmHbox.setId("topAmHbox");
+        topAmHbox.getChildren().addAll(refAmVbox, competenceAmVbox);
+        
 
         Button buttonDelete = new Button("Delete");
         buttonDelete.setId("DeleteButton");
@@ -288,7 +320,7 @@ public class ActesMedicauxController {
 
         HBox overlayAmTop = new HBox();
         overlayAmTop.setId("overlayAmTop");
-        overlayAmTop.getChildren().addAll(refAmVbox, overlayTopDelete);
+        overlayAmTop.getChildren().addAll(topAmHbox, overlayTopDelete);
 
         //buttonDelete.layoutXProperty().bind(body.widthProperty().subtract(buttonDelete.widthProperty()));
 
@@ -297,7 +329,8 @@ public class ActesMedicauxController {
         clientLabel.setId("ID_CLIENT");
 
         TextField clientField = new TextField();
-        clientField.setText(Integer.toString(acteMedical.getIdClient()));
+        clientField.setText(clientsList.get(acteMedical.getIdClient()).getPrenomClient() + " " + clientsList.get(acteMedical.getIdClient()).getNomClient());
+        clientField.setEditable(false);
 
         VBox clientAmVbox = new VBox();
         clientAmVbox.getChildren().addAll(clientLabel, clientField);
@@ -307,6 +340,7 @@ public class ActesMedicauxController {
 
         TextField specialisteField = new TextField();
         specialisteField.setText(Integer.toString(acteMedical.getIdSpecialiste()));
+        specialisteField.setEditable(false);
 
         VBox specialisteAmVbox = new VBox();
         specialisteAmVbox.getChildren().addAll(specialisteLabel, specialisteField);
@@ -324,8 +358,8 @@ public class ActesMedicauxController {
         List<Integer> lieuList = new ArrayList<>(List.of(1,2,3,4,5,6,7,8,9,10));
         lieuChoiceBox.getItems().addAll(lieuList);
 
-        VBox lieueAmVbox = new VBox();
-        lieueAmVbox.getChildren().addAll(lieuLabel, lieuChoiceBox);
+        VBox lieuAmVbox = new VBox();
+        lieuAmVbox.getChildren().addAll(lieuLabel, lieuChoiceBox);
 
         Label date_debutLabel = new Label("Date de début");
         date_debutLabel.setId("DATE_DEBUT");
@@ -347,10 +381,19 @@ public class ActesMedicauxController {
 
         HBox overlayAmBottom = new HBox();
         overlayAmBottom.setId("overlayAmBottom");
-        overlayAmBottom.getChildren().addAll(lieueAmVbox, date_debutAmVbox, date_finAmVbox );
+        overlayAmBottom.getChildren().addAll(lieuAmVbox, date_debutAmVbox, date_finAmVbox );
 
-        TableView<Object> tableAm = new TableView<>();
-        tableAm.setId("tableAm");
+        TableView<Client> tableAmClient = new TableView<>();
+        tableAmClient.setId("tableAmClient");
+        TableView<Specialiste> tableAmSpecialiste = new TableView<>();
+        tableAmSpecialiste.setId("tableAmSpecialiste");
+        
+        // Initially set one of them to not be managed and not visible.
+        tableAmSpecialiste.setManaged(false);
+        tableAmSpecialiste.setVisible(false);
+        
+        StackPane tableBoth = new StackPane();
+        tableBoth.getChildren().addAll(tableAmClient, tableAmSpecialiste);
 
 
         Label errorLabel = new Label("");
@@ -358,7 +401,7 @@ public class ActesMedicauxController {
 
         VBox overLayContent = new VBox();
         overLayContent.setId("overLayContent");
-        overLayContent.getChildren().addAll(overlayAmTop, overlayAmCenter, overlayAmBottom, tableAm, errorLabel);
+        overLayContent.getChildren().addAll(overlayAmTop, overlayAmCenter, overlayAmBottom, tableBoth, errorLabel);
 
 
         Label amSearchLabel = new Label("Search : ");
@@ -403,13 +446,35 @@ public class ActesMedicauxController {
             closeOverlay();
         });
 
-        clientField.setOnMouseClicked(e -> {
-            tableAmOverlay(tableAm, "Clients");
+        competenceChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Perform your action here
+            //System.out.println("Selected: " + newValue);
+
+            List<BigDecimal> specialisteWithCompetence = DbRead.getSpecialisteForCompetence(newValue);
+            
+            tableAmClient.setManaged(false);
+            tableAmClient.setVisible(false);
+            tableAmSpecialiste.setManaged(true);
+            tableAmSpecialiste.setVisible(true);
+
+            tableAmOverlaySpecialistes(tableAmSpecialiste, specialisteWithCompetence);
+            searchTableOverlaySpecialiste(tableAmSpecialiste, amSearchField);
+            amRowToSpecialiste(tableAmSpecialiste, specialisteField);
+
         });
 
-        specialisteField.setOnMouseClicked(e -> {
-            tableAmOverlay(tableAm, "Specialistes");
+        clientField.setOnMouseClicked(e -> {
+            
+            tableAmSpecialiste.setManaged(false);
+            tableAmSpecialiste.setVisible(false);
+            tableAmClient.setManaged(true);
+            tableAmClient.setVisible(true);
+            
+            tableAmOverlayClients(tableAmClient);
+            searchTableOverlayClient(tableAmClient, amSearchField);
+            amRowToClient(tableAmClient, clientField);
         });
+        
 
     }
 
@@ -515,24 +580,30 @@ public class ActesMedicauxController {
     // populating inputs in the overlay when clicking create new client
     private void populateOverlayForNewActeMedical(BorderPane contentPane) {
 
-        Label refLabel = new Label("Acte Medical");
-        TextField refField = new TextField();
+        Label competenceLabel = new Label("Acte Medical");
+        ComboBox<Integer> competenceChoiceBox = new ComboBox<>();
+        List<Integer> competenceList = new ArrayList<>(List.of(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30));
+        competenceChoiceBox.getItems().addAll(competenceList);
+        competenceChoiceBox.setPrefWidth(230);
+        competenceChoiceBox.setVisibleRowCount(10);
         //refField.setDisable(true);
-        VBox refAmVbox = new VBox();
-        refAmVbox.getChildren().addAll(refLabel, refField);
+        VBox competenceAmVbox = new VBox();
+        competenceAmVbox.getChildren().addAll(competenceLabel, competenceChoiceBox);
 
         HBox overlayAmTop = new HBox();
         overlayAmTop.setId("overlayAmTop");
-        overlayAmTop.getChildren().addAll(refAmVbox);
+        overlayAmTop.getChildren().addAll(competenceAmVbox);
 
 
         Label clientLabel = new Label("Client");
         TextField clientField = new TextField();
+        clientField.setEditable(false);
         VBox clientAmVbox = new VBox();
         clientAmVbox.getChildren().addAll(clientLabel, clientField);
 
         Label specialisteLabel = new Label("Specialiste");
         TextField specialisteField = new TextField();
+        specialisteField.setEditable(false);
         VBox specialisteAmVbox = new VBox();
         specialisteAmVbox.getChildren().addAll(specialisteLabel, specialisteField);
 
@@ -542,9 +613,10 @@ public class ActesMedicauxController {
 
 
         Label lieuLabel = new Label("Lieu");
-        ChoiceBox<Integer> lieuChoiceBox = new ChoiceBox<>();
+        ComboBox<Integer> lieuChoiceBox = new ComboBox<>();
         List<Integer> lieuList = new ArrayList<>(List.of(1,2,3,4,5,6,7,8,9,10));
         lieuChoiceBox.getItems().addAll(lieuList);
+        lieuChoiceBox.setPrefWidth(230);
         VBox lieueAmVbox = new VBox();
         lieueAmVbox.getChildren().addAll(lieuLabel, lieuChoiceBox);
 
@@ -562,16 +634,24 @@ public class ActesMedicauxController {
         overlayAmBottom.setId("overlayAmBottom");
         overlayAmBottom.getChildren().addAll(lieueAmVbox, date_debutAmVbox, date_finAmVbox );
 
-        TableView<?> tableAm = new TableView<>();
-        tableAm.setId("tableAm");
-
+        TableView<Client> tableAmClient = new TableView<>();
+        tableAmClient.setId("tableAmClient");
+        TableView<Specialiste> tableAmSpecialiste = new TableView<>();
+        tableAmSpecialiste.setId("tableAmSpecialiste");
+        
+        // Initially set one of them to not be managed and not visible.
+        tableAmSpecialiste.setManaged(false);
+        tableAmSpecialiste.setVisible(false);
+        
+        StackPane tableBoth = new StackPane();
+        tableBoth.getChildren().addAll(tableAmClient, tableAmSpecialiste);
 
         Label errorLabel = new Label("");
         errorLabel.setId("errorLabelnew");
 
         VBox overLayContent = new VBox();
         overLayContent.setId("overLayContent");
-        overLayContent.getChildren().addAll(overlayAmTop, overlayAmCenter, overlayAmBottom, tableAm, errorLabel);
+        overLayContent.getChildren().addAll(overlayAmTop, overlayAmCenter, overlayAmBottom, tableBoth, errorLabel);
 
 
         Label amSearchLabel = new Label("Search : ");
@@ -602,7 +682,7 @@ public class ActesMedicauxController {
         });
 
         buttonOk.setOnAction(e -> {
-            String newActeMedicalOK = createNewActeMedical( refField.getText(),
+            String newActeMedicalOK = createNewActeMedical( competenceChoiceBox.getValue(),
                                                             date_debutField.getValue(),
                                                             date_finField.getValue(),
                                                             Integer.parseInt(clientField.getText()),
@@ -616,20 +696,78 @@ public class ActesMedicauxController {
                 errorLabel.setText(newActeMedicalOK);
             }
         });
+        
+        competenceChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Perform your action here
+            //System.out.println("Selected: " + newValue);
+
+            List<BigDecimal> specialisteWithCompetence = DbRead.getSpecialisteForCompetence(newValue);
+            
+            tableAmClient.setManaged(false);
+            tableAmClient.setVisible(false);
+            tableAmSpecialiste.setManaged(true);
+            tableAmSpecialiste.setVisible(true);
+
+            tableAmOverlaySpecialistes(tableAmSpecialiste, specialisteWithCompetence);
+            searchTableOverlaySpecialiste(tableAmSpecialiste, amSearchField);
+            amRowToSpecialiste(tableAmSpecialiste, specialisteField);
+
+        });
 
         clientField.setOnMouseClicked(e -> {
-            tableAmOverlay(tableAm, "Clients");
+            
+            tableAmSpecialiste.setManaged(false);
+            tableAmSpecialiste.setVisible(false);
+            tableAmClient.setManaged(true);
+            tableAmClient.setVisible(true);
+            
+            tableAmOverlayClients(tableAmClient);
+            searchTableOverlayClient(tableAmClient, amSearchField);
+            amRowToClient(tableAmClient, clientField);
         });
-
-        specialisteField.setOnMouseClicked(e -> {
-            tableAmOverlay(tableAm, "Specialistes");
-        });
+/*
+        if(competenceChoiceBox != null) {
+            specialisteField.setOnMouseClicked(e -> {
+                tableAmOverlay(tableAm, "Specialistes");
+                searchTableOverlaySpecialiste((TableView<Specialiste>) tableAm, amSearchField);
+                
+                amRowToSpecialiste((TableView<Specialiste>) tableAm, specialisteField);
+            });
+        }
+       */ 
+        
 
     }
 
-    private String createNewActeMedical(String amField, LocalDate date_debutField, LocalDate date_finField, int clientField, int lieuField, int specialisteField) {
+    private void amRowToClient(TableView<Client> tableAm, TextField clientField) {
+        tableAm.setRowFactory(tv -> {
+            TableRow<Client> row = new TableRow<>();
+            row.setOnMousePressed(event -> {
+                if (event.getClickCount() == 1 && !row.isEmpty()) {
+                    Client rowData = row.getItem();
+                    clientField.setText(rowData.getPrenomClient()+ " "+ rowData.getNomClient());
+                }
+            });
+            return row;
+        });
+    }
+    
+    private void amRowToSpecialiste(TableView<Specialiste> tableAm, TextField specialisteField) {
+        tableAm.setRowFactory(tv -> {
+            TableRow<Specialiste> row = new TableRow<>();
+            row.setOnMousePressed(event -> {
+                if (event.getClickCount() == 1 && !row.isEmpty()) {
+                    Specialiste rowData = row.getItem();
+                    specialisteField.setText(rowData.getPrenomSpecialiste()+ " "+ rowData.getNomSpecialiste());
+                }
+            });
+            return row;
+        });
+    }
 
-        ActeMedical newActeMedical = new ActeMedical(amField, date_debutField, date_finField, clientField, lieuField, specialisteField);
+    private String createNewActeMedical(int competenceID, LocalDate date_debutField, LocalDate date_finField, int clientField, int lieuField, int specialisteField) {
+
+        ActeMedical newActeMedical = new ActeMedical(competenceID, date_debutField, date_finField, clientField, lieuField, specialisteField);
 
         try {
             newActeMedical.insertActeMedicalDB(newActeMedical);
@@ -731,90 +869,197 @@ public class ActesMedicauxController {
         searchField.setOnMouseClicked(event -> {
             // Clear the searchField text
             searchField.clear();
+
         });
     }
 
-    private void tableAmOverlay(TableView<?> thisTableParam, String checkTable) {
+    private void tableAmOverlayClients(TableView<Client> thisTableParam) {
+        
+        TableView<Client> thisTable = thisTableParam;
+        
+        // Add data to the TableView
+        thisTable.setItems(clientsList);
 
+        // Create columns
+        TableColumn<Client, String> firstname = new TableColumn<>("FirstName");
+        TableColumn<Client, String> name = new TableColumn<>("Name");
+        TableColumn<Client, String> dateNais = new TableColumn<>("DateNais");
+        TableColumn<Client, String> tel = new TableColumn<>("Tel");
+        TableColumn<Client, String> email = new TableColumn<>("Email");
 
-        switch (checkTable) {
+        // Define how to get values from the object for each column
+        firstname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomClient()));
+        name.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomClient()));
+        dateNais.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateNaisClient().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+        tel.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getTelClient()));
+        email.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getEmailClient()));
 
-            case "Clients" -> {
+        DoubleBinding tableWidth = thisTableParam.widthProperty().subtract(23);
+        firstname.prefWidthProperty().bind(tableWidth.multiply(0.17));
+        name.prefWidthProperty().bind(tableWidth.multiply(0.17));
 
-                TableView<Client> thisTable = (TableView<Client>) thisTableParam;
-                // Set the items with the correct data type
-                ObservableList<Client> clientsList = ClientController.getClientsObsList();
+        dateNais.prefWidthProperty().bind(tableWidth.multiply(0.155));
+        tel.prefWidthProperty().bind(tableWidth.multiply(0.155));
+        email.prefWidthProperty().bind(tableWidth.multiply(0.35));
 
-                // Add data to the TableView
-                thisTable.setItems(clientsList);
+        thisTable.getColumns().clear();
 
-                // Create columns
-                TableColumn<Client, String> name = new TableColumn<>("Name");
-                TableColumn<Client, String> lastname = new TableColumn<>("Lastname");
-                TableColumn<Client, String> dateNais = new TableColumn<>("DateNais");
-                TableColumn<Client, String> tel = new TableColumn<>("Tel");
-                TableColumn<Client, String> email = new TableColumn<>("Email");
+        thisTable.getColumns().addAll(firstname, name, dateNais, tel, email);
 
-                // Define how to get values from the object for each column
-                name.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomClient()));
-                lastname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomClient()));
-                dateNais.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateNaisClient().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
-                tel.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getTelClient()));
-                email.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getEmailClient()));
-
-                DoubleBinding tableWidth = thisTableParam.widthProperty().subtract(23);
-                name.prefWidthProperty().bind(tableWidth.multiply(0.17));
-                lastname.prefWidthProperty().bind(tableWidth.multiply(0.17));
-                dateNais.prefWidthProperty().bind(tableWidth.multiply(0.155));
-                tel.prefWidthProperty().bind(tableWidth.multiply(0.155));
-                email.prefWidthProperty().bind(tableWidth.multiply(0.35));
-
-                thisTable.getColumns().clear();
-                // Add columns to the TableView
-
-                thisTable.getColumns().addAll(name, lastname, dateNais, tel, email);
-
-
-
-            }
-            case "Specialistes" -> {
-
-                TableView<Specialiste> thisTable = (TableView<Specialiste>) thisTableParam;
-
-                // Set the items with the correct data type
-                ObservableList<Specialiste> specialistesList = SpecialisteController.getSpecialistesObsList();
-
-                thisTable.setItems(specialistesList);
-
-                // Create columns
-                TableColumn<Specialiste, String> name = new TableColumn<>("Name");
-                TableColumn<Specialiste, String> lastname = new TableColumn<>("Lastname");
-                TableColumn<Specialiste, String> dateNais = new TableColumn<>("DateNais");
-                TableColumn<Specialiste, String> tel = new TableColumn<>("Tel");
-                TableColumn<Specialiste, String> email = new TableColumn<>("Email");
-
-                // Define how to get values from the object for each column
-                name.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomSpecialiste()));
-                lastname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomSpecialiste()));
-                dateNais.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateNaisSpecialiste().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
-                tel.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getTelSpecialiste()));
-                email.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getEmailSpecialiste()));
-
-                DoubleBinding tableWidth = thisTableParam.widthProperty().subtract(23);
-                name.prefWidthProperty().bind(tableWidth.multiply(0.17));
-                lastname.prefWidthProperty().bind(tableWidth.multiply(0.17));
-                dateNais.prefWidthProperty().bind(tableWidth.multiply(0.155));
-                tel.prefWidthProperty().bind(tableWidth.multiply(0.155));
-                email.prefWidthProperty().bind(tableWidth.multiply(0.35));
-
-                thisTable.getColumns().clear();
-                // Add columns to the TableView
-
-                thisTable.getColumns().addAll(name, lastname, dateNais, tel, email);
-
-            }
-            default -> {}
+    }
+    
+    private void tableAmOverlaySpecialistes(TableView<Specialiste> thisTableParam, List<BigDecimal> specialisteWithCompetence) {
+        
+        // Add data to the TableView
+        TableView<Specialiste> thisTable = thisTableParam;
+        
+        // Transform the list of BigDecimal to a list of Integer
+        List<Integer> integerList = new ArrayList<>();
+        for (BigDecimal item : specialisteWithCompetence) {
+            integerList.add(item.intValue());
         }
+        
+     
 
+        // Filter the list based on provided IDs and set it to the table
+        thisTable.getItems().setAll(specialistesList.filtered(specialiste -> integerList.contains(specialiste.getSpecialisteId())));
+
+       //System.out.println("Specialiste IDs: " + specialisteWithCompetence);
+       //System.out.println(specialistesList.filtered(specialiste -> integerList.contains(specialiste.getSpecialisteId())));
+        
+        //thisTable.setItems(specialistesList);
+        
+        // Create columns
+        TableColumn<Specialiste, String> firstname = new TableColumn<>("FirstName");
+        TableColumn<Specialiste, String> name = new TableColumn<>("Name");
+        TableColumn<Specialiste, String> dateNais = new TableColumn<>("DateNais");
+        TableColumn<Specialiste, String> tel = new TableColumn<>("Tel");
+        TableColumn<Specialiste, String> email = new TableColumn<>("Email");
+        
+        // Define how to get values from the object for each column
+        firstname.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomSpecialiste()));
+        name.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomSpecialiste()));
+        dateNais.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateNaisSpecialiste().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+        tel.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getTelSpecialiste()));
+        email.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getEmailSpecialiste()));
+        
+        DoubleBinding tableWidth = thisTableParam.widthProperty().subtract(23);
+        firstname.prefWidthProperty().bind(tableWidth.multiply(0.17));
+        name.prefWidthProperty().bind(tableWidth.multiply(0.17));
+        dateNais.prefWidthProperty().bind(tableWidth.multiply(0.155));
+        tel.prefWidthProperty().bind(tableWidth.multiply(0.155));
+        email.prefWidthProperty().bind(tableWidth.multiply(0.35));
+        
+        thisTable.getColumns().clear();
+        
+        thisTable.getColumns().addAll(firstname, name, dateNais, tel, email);
+
+    }
+
+    
+    private void searchTableOverlayClient(TableView<Client> tableAm, TextField amSearchField) {
+        
+        FilteredList<Client> filteredData = new FilteredList<>(clientsList, p -> true);
+        
+        // Add listener to the searchField text property
+        amSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Create a filtered list to apply the search
+
+         // Set the predicate for the filter
+            filteredData.setPredicate(client -> {
+                // If filter text is empty, display all clients
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                // Convert client information to lowercase for case-insensitive search
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                // Check if any of the client attributes contain the filter text
+                return 
+                        client.getPrenomClient().toLowerCase().contains(lowerCaseFilter)
+                        || client.getNomClient().toLowerCase().contains(lowerCaseFilter)
+                        || String.valueOf(client.getDateNaisClient().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).toLowerCase().contains(lowerCaseFilter)
+                        || client.getTelClient().toLowerCase().contains(lowerCaseFilter)
+                        || client.getEmailClient().toLowerCase().contains(lowerCaseFilter);
+            });
+
+            // Wrap the FilteredList in a SortedList
+            SortedList<Client> sortedData = new SortedList<>(filteredData);
+
+            // Bind the SortedList comparator to the TableView comparator
+            sortedData.comparatorProperty().bind(tableAm.comparatorProperty());
+
+            // Set the items in the TableView with the filtered and sorted data
+            tableAm.setItems(sortedData);
+
+            // Display a message when there are no items in the table
+            if (sortedData.isEmpty()) {
+                // Set a message in the TableView or somewhere appropriate
+                // For example, assuming you have a label to display messages:
+                tableAm.setPlaceholder(new Label("Try something else, nothing left to see here !!!"));
+            }
+        });
+        
+     // Add event handler to clear the searchField when clicked
+        amSearchField.setOnMouseClicked(event -> {
+            // Clear the searchField text
+            amSearchField.clear();
+            
+        });
+        
+    }
+    
+    private void searchTableOverlaySpecialiste(TableView<Specialiste> tableAm, TextField amSearchField) {
+        FilteredList<Specialiste> filteredData = new FilteredList<>(specialistesList, p -> true);
+        
+
+        // Add listener to the searchField text property
+        amSearchField.textProperty().addListener((observable, oldValue, newValue) -> {
+        // Create a filtered list to apply the search
+
+
+        // Set the predicate for the filter
+        filteredData.setPredicate(specialiste -> {
+            // If filter text is empty, display all specialistes
+            if (newValue == null || newValue.isEmpty()) {
+                return true;
+            }
+
+            // Convert specialiste information to lowercase for case-insensitive search
+            String lowerCaseFilter = newValue.toLowerCase();
+
+            // Check if any of the specialiste attributes contain the filter text
+            return specialiste.getPrenomSpecialiste().toLowerCase().contains(lowerCaseFilter)
+                    ||specialiste.getNomSpecialiste().toLowerCase().contains(lowerCaseFilter)
+                    || String.valueOf(specialiste.getDateNaisSpecialiste().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).toLowerCase().contains(lowerCaseFilter)
+                    || specialiste.getTelSpecialiste().toLowerCase().contains(lowerCaseFilter)
+                    || specialiste.getEmailSpecialiste().toLowerCase().contains(lowerCaseFilter);
+            });
+
+            // Wrap the FilteredList in a SortedList
+            SortedList<Specialiste> sortedData = new SortedList<>(filteredData);
+
+            // Bind the SortedList comparator to the TableView comparator
+            sortedData.comparatorProperty().bind(tableAm.comparatorProperty());
+
+            // Set the items in the TableView with the filtered and sorted data
+            tableAm.setItems(sortedData);
+
+            // Display a message when there are no items in the table
+            if (sortedData.isEmpty()) {
+                // Set a message in the TableView or somewhere appropriate
+                // For example, assuming you have a label to display messages:
+                tableAm.setPlaceholder(new Label("Try something else, nothing left to see here !!!"));
+            }
+        });
+        
+     // Add event handler to clear the searchField when clicked
+        amSearchField.setOnMouseClicked(event -> {
+            // Clear the searchField text
+            amSearchField.clear();
+            
+        });
+        
     }
 }

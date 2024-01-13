@@ -466,3 +466,32 @@ BEGIN
 
 END;
 /
+create or replace TYPE NumberList IS TABLE OF NUMBER;
+/
+create or replace PROCEDURE GetSpecialisteForCompetence (
+    p_checkValue   IN INT,
+    p_resultValues OUT NumberList
+)
+IS
+    v_checkValue INT := p_checkValue;
+    sql_stmt VARCHAR2(1000);
+
+BEGIN
+    -- Log
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetSpecialisteForCompetence', 'v_checkValue', v_checkValue);
+    COMMIT;
+
+    sql_stmt := 'SELECT DISTINCT ID_Specialiste FROM Posseder WHERE ID_Competence = :checkValue';
+
+    EXECUTE IMMEDIATE sql_stmt BULK COLLECT INTO p_resultValues USING v_checkValue;
+
+    -- Log
+    FOR i IN 1..p_resultValues.COUNT LOOP
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('GetSpecialisteForCompetence', 'p_resultValues(' || i || ')', p_resultValues(i));
+    END LOOP;
+
+    COMMIT;
+END;
+/

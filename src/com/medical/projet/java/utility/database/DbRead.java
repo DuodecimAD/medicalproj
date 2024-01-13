@@ -1,5 +1,7 @@
 package com.medical.projet.java.utility.database;
 
+import java.math.BigDecimal;
+import java.sql.Array;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -117,5 +119,43 @@ public class DbRead {
 
         return -1; // Return an empty list if there's an error or no results
     }
+    
+    public static List<BigDecimal> getSpecialisteForCompetence(int checkValue) {
+        conn = DbConnect.sharedConnection();
+        List<BigDecimal> resultList = new ArrayList<>();
+
+        String call = "{call GetSpecialisteForCompetence(?, ?)}";
+
+        try (CallableStatement callableStatement = conn.prepareCall(call)) {
+            callableStatement.setInt(1, checkValue);
+
+            // Register the OUT parameter for the result set
+            callableStatement.registerOutParameter(2, Types.ARRAY, "NUMBERLIST");
+
+            // Execute the stored procedure
+            callableStatement.execute();
+
+            // Get the result from the OUT parameter
+            Array resultArray = callableStatement.getArray(2);
+            
+            if (resultArray != null) {
+                // Convert the ARRAY to Integer array
+                BigDecimal[] result = (BigDecimal[]) resultArray.getArray();
+
+                // Convert the array to List
+                for (BigDecimal value : result) {
+                    resultList.add(value);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return resultList;
+    }
+
+
+    
 
 }

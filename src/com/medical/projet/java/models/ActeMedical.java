@@ -15,6 +15,8 @@ public class ActeMedical {
     private static final String tableName = "ACTE_MED";
 
     private static final String tableNameShort = "_ACTE_MED";
+    
+    private int competenceID;
 
     private int idActeMed;
 
@@ -32,6 +34,15 @@ public class ActeMedical {
 
 
     public ActeMedical() {}
+    
+    public ActeMedical(int competenceID, LocalDate dateDebut, LocalDate dateFin, int idClient, int idLieu, int idSpecialiste) {
+        this.competenceID = competenceID;
+        this.idClient = idClient;
+        this.idSpecialiste = idSpecialiste;
+        this.idLieu = idLieu;
+        this.dateDebut = dateDebut;
+        this.dateFin = dateFin;
+    }
 
     public ActeMedical(String refActeMed, LocalDate dateDebut, LocalDate dateFin, int idClient, int idLieu, int idSpecialiste) {
         this.refActeMed = refActeMed;
