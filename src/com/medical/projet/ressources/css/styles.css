@@ -281,13 +281,8 @@
 	-fx-text-fill: -text;
 }
 
-#overlayAmTop TextField, #overlayAmTop DatePicker, #overlayAmCenter TextField, #overlayAmCenter DatePicker, #overlayAmBottom TextField, #overlayAmBottom ChoiceBox, #overlayAmBottom DatePicker {
+#overlayAmTop TextField, #overlayAmTop ChoiceBox, #overlayAmCenter TextField, #overlayAmCenter DatePicker, #overlayAmBottom TextField, #overlayAmBottom ChoiceBox, #overlayAmBottom DatePicker {
 	-fx-pref-width: 230;
-}
-
-#overlayAmBottom ChoiceBox Label{
-	
-	-fx-padding: 5 5 5 10;
 }
 
 #overlayAmTopDelete{
@@ -304,7 +299,7 @@
 	-fx-padding: 0 0 30 0;
 }
 
-#tableAm{
+#tableAmClient, #tableAmSpecialiste{
 	-fx-min-height: 200;
     -fx-pref-height: 200;
     -fx-max-height: 200;
@@ -377,3 +372,7 @@
 	-fx-pref-width: 100;
 }
 
+#competenceChoiceBox Label, #lieuChoiceBox Label {
+	-fx-padding: 5 5 5 10;
+	-fx-text-fill: -primary;
+}

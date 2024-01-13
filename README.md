@@ -1,4 +1,4 @@
-# myjavafxtemplate
+# medicalproj
 
-![myjavafxtemplate](./img.jpg)
-![myjavafxtemplate](./img2.jpg)
+![medicalproj](./img.jpg)
+![medicalproj](./img2.jpg)

@@ -5,6 +5,7 @@ import java.net.URL;
 
 import com.medical.projet.java.controllers.ClientController;
 import com.medical.projet.java.controllers.SpecialisteController;
+import com.medical.projet.java.controllers.ActesMedicauxController;
 //import com.medical.projet.java.utility.AppMemory;
 //import com.medical.projet.myapp.java.utility.AppSecurity;
 //import com.medical.projet.myapp.java.utility.AppTree;
@@ -62,6 +63,7 @@ public class App extends Application {
                 DbConnect.sharedConnection();
                 ClientController.readAllClients();
                 SpecialisteController.readAllSpecialistes();
+                ActesMedicauxController.readAllActesMedicaux();
             });
         }).start();
 
@@ -87,7 +89,7 @@ public class App extends Application {
             // icon root access by Alexiuz As on IconScout
             primaryStage.getIcons().add(new Image(getClass().getResourceAsStream(AppSettings.INSTANCE.imagesPath+"icon.png")));
             primaryStage.setScene(new Scene(root));
-            primaryStage.setTitle("My JavaFX Template");
+            primaryStage.setTitle("Medical Projet Final Programmation ECI 2023-2024");
             primaryStage.setMinWidth(1026);
             primaryStage.setMinHeight(649);
             //primaryStage.initStyle(StageStyle.DECORATED);

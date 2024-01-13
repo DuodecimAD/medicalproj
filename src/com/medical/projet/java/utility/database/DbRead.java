@@ -11,6 +11,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.medical.projet.java.utility.AppSecurity;
 
@@ -55,10 +56,10 @@ public class DbRead {
             // Get the result set from the OUT parameter
             ResultSet rs = (ResultSet) callableStatement.getObject(3);
 
-            List<List<Object>> resultList = new ArrayList<>();
-
             ResultSetMetaData metaData = rs.getMetaData();
             int columnCount = metaData.getColumnCount();
+            
+            List<List<Object>> resultList = new ArrayList<>();
 
             while (rs.next()) {
                 // creating row of client data
@@ -72,8 +73,7 @@ public class DbRead {
                     resultList.add(row);
                 }
             }
-
-
+            
             if (!resultList.isEmpty()) {
                 return resultList;
             } else {
@@ -120,9 +120,10 @@ public class DbRead {
         return -1; // Return an empty list if there's an error or no results
     }
     
-    public static List<BigDecimal> getSpecialisteForCompetence(int checkValue) {
+    public static List<Integer> getSpecialisteForCompetence(int checkValue) {
         conn = DbConnect.sharedConnection();
         List<BigDecimal> resultList = new ArrayList<>();
+        List<Integer> finalList= null;
 
         String call = "{call GetSpecialisteForCompetence(?, ?)}";
 
@@ -147,15 +148,61 @@ public class DbRead {
                     resultList.add(value);
                 }
             }
+            
+            finalList = resultList.stream().map(BigDecimal::intValue).collect(Collectors.toList());
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
 
-        return resultList;
+        return finalList;
     }
 
 
-    
+    public static List<List<Object>> readTest() {
+
+
+        conn = DbConnect.sharedConnection();
+
+        String call = "{call test(?)}";
+
+        try (CallableStatement callableStatement = conn.prepareCall(call)) {
+
+
+            // Register the OUT parameter for the result set
+            callableStatement.registerOutParameter(1, OracleTypes.CURSOR);
+
+            // Execute the stored procedure
+            callableStatement.execute();
+
+            // Get the result set from the OUT parameter
+            ResultSet rs = (ResultSet) callableStatement.getObject(1);
+
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            List<List<Object>> resultList = new ArrayList<>();
+
+            while (rs.next()) {
+                // creating row of client data
+                List<Object> row = new ArrayList<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    row.add(rs.getObject(i));
+                    
+                }
+                resultList.add(row);
+            }
+            
+            if (!resultList.isEmpty()) {
+                return resultList;
+            } else {
+                System.out.println("No records found in the table.");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return Collections.emptyList(); // Return an empty list if there's an error or no results
+    }
 
 }

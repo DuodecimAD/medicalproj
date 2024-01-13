@@ -16,27 +16,38 @@ public class ActeMedical {
 
     private static final String tableNameShort = "_ACTE_MED";
     
-    private int competenceID;
-
     private int idActeMed;
 
     private String refActeMed;
 
     private int idClient;
+    
+    private String prenomClient;
+    
+    private String nomClient;
 
     private int idSpecialiste;
+    
+    private String prenomSpecialiste;
+    
+    private String nomSpecialiste;
 
     private int idLieu;
+    
+    private String nomLieu;
 
     private LocalDate dateDebut;
 
     private LocalDate dateFin;
+    
+    private int idCompetence;
+    
+    private String nomCompetence;
 
 
     public ActeMedical() {}
     
-    public ActeMedical(int competenceID, LocalDate dateDebut, LocalDate dateFin, int idClient, int idLieu, int idSpecialiste) {
-        this.competenceID = competenceID;
+    public ActeMedical(LocalDate dateDebut, LocalDate dateFin, int idClient, int idLieu, int idSpecialiste) {
         this.idClient = idClient;
         this.idSpecialiste = idSpecialiste;
         this.idLieu = idLieu;
@@ -53,14 +64,23 @@ public class ActeMedical {
         this.dateFin = dateFin;
     }
 
-    public ActeMedical(int idActeMed, String refActeMed, LocalDate dateDebut, LocalDate dateFin, int idClient, int idLieu, int idSpecialiste) {
+    public ActeMedical(int idActeMed, String refActeMed, int idClient, String prenomClient, String nomClient, int idSpecialiste, 
+                        String prenomSpecialiste, String nomSpecialiste, int idLieu, String nomLieu, LocalDate dateDebut, 
+                        LocalDate dateFin, int idCompetence, String nomCompetence) {
         this.idActeMed = idActeMed;
         this.refActeMed = refActeMed;
         this.idClient = idClient;
+        this.prenomClient = prenomClient;
+        this.nomClient = nomClient;
         this.idSpecialiste = idSpecialiste;
+        this.prenomSpecialiste = prenomSpecialiste;
+        this.nomSpecialiste = nomSpecialiste;
         this.idLieu = idLieu;
+        this.nomLieu = nomLieu;
         this.dateDebut = dateDebut;
         this.dateFin = dateFin;
+        this.idCompetence = idCompetence;
+        this.nomCompetence = nomCompetence;
     }
 
     public String getTableName() {
@@ -95,6 +115,62 @@ public class ActeMedical {
         return idSpecialiste;
     }
 
+    public String getPrenomClient() {
+        return prenomClient;
+    }
+
+    public void setPrenomClient(String prenomClient) {
+        this.prenomClient = prenomClient;
+    }
+
+    public String getNomClient() {
+        return nomClient;
+    }
+
+    public void setNomClient(String nomClient) {
+        this.nomClient = nomClient;
+    }
+
+    public String getPrenomSpecialiste() {
+        return prenomSpecialiste;
+    }
+
+    public void setPrenomSpecialiste(String prenomSpecialiste) {
+        this.prenomSpecialiste = prenomSpecialiste;
+    }
+
+    public String getNomSpecialiste() {
+        return nomSpecialiste;
+    }
+
+    public void setNomSpecialiste(String nomSpecialiste) {
+        this.nomSpecialiste = nomSpecialiste;
+    }
+
+    public String getNomLieu() {
+        return nomLieu;
+    }
+
+    public void setNomLieu(String nomLieu) {
+        this.nomLieu = nomLieu;
+    }
+
+    public int getIdCompetence() {
+        return idCompetence;
+    }
+
+    public void setIdCompetence(int idCompetence) {
+        this.idCompetence = idCompetence;
+    }
+
+    public String getNomCompetence() {
+        return nomCompetence;
+    }
+
+    public void setNomCompetence(String nomCompetence) {
+        this.nomCompetence = nomCompetence;
+    }
+
     public void setIdSpecialiste(int idSpecialiste) {
         this.idSpecialiste = idSpecialiste;
     }
@@ -126,7 +202,7 @@ public class ActeMedical {
     public static List<List<Object>> getAllActesMedicauxData() {
         // Fetch data from the database (using DbRead or any other method)
         // Return raw data as a List<List<?>>
-        return DbRead.readTable(tableName, "DATE_DEBUT");
+        return DbRead.readTable(tableName, "REF_ACTE_MED");
     }
 
     public void insertActeMedicalDB(ActeMedical acteMedical) throws SQLException {

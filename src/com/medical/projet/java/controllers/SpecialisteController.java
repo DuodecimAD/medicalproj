@@ -82,7 +82,7 @@ public class SpecialisteController {
 
         new Thread(() -> {
             Platform.runLater(() -> {
-                readAllSpecialistes();
+                //readAllSpecialistes();
                 updateTableView();
                 searchTable();
             });

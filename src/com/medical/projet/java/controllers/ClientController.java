@@ -82,7 +82,7 @@ public class ClientController {
 
         new Thread(() -> {
             Platform.runLater(() -> {
-                readAllClients();
+                //readAllClients();
                 updateTableView();
                 searchTable();
             });

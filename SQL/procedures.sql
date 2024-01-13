@@ -337,7 +337,6 @@ BEGIN
     COMMIT;
 END;
 /
-
 create or replace PROCEDURE GetTableData (
     p_tableName    IN VARCHAR2,
     p_orderBy      IN VARCHAR2,
@@ -354,8 +353,23 @@ BEGIN
     VALUES ('GetTableData', 'Entering Procedure', 'beginning getting table ' || v_tableName);
     COMMIT;
 
-     sql_stmt := 'SELECT * FROM ' || v_tableName || ' ORDER BY ' || v_orderBy;
-     
+    IF v_tablename = 'ACTE_MED' THEN
+        
+        sql_stmt := 'Select acte_med.ID_ACTE_MED, acte_med.REF_ACTE_MED, acte_med.ID_CLIENT, client.prenom_client, client.nom_client, 
+                    acte_med.id_specialiste, specialiste.prenom_specialiste, specialiste.nom_specialiste, acte_med.id_lieu, 
+                    lieu.nom_lieu, acte_med.date_debut, acte_med.date_fin, necessiter.id_competence, competence.nom_competence,
+                    acte_med.isdeleted_acte_med
+                    from acte_med
+                    inner join client ON acte_med.id_client = client.id_client
+                    inner join specialiste ON acte_med.id_specialiste = specialiste.id_specialiste
+                    inner join lieu ON acte_med.id_lieu = lieu.id_lieu
+                    inner join necessiter ON acte_med.id_acte_med = necessiter.id_acte_med
+                    inner join competence ON necessiter.id_competence = competence.id_competence';
+    
+    ELSE
+        sql_stmt := 'SELECT * FROM ' || v_tableName || ' ORDER BY ' || v_orderBy;
+    END IF;
+
     OPEN p_resultSet FOR sql_stmt;
     
     -- Log
@@ -493,5 +507,19 @@ BEGIN
     END LOOP;
 
     COMMIT;
+END;
+/
+create or replace PROCEDURE test (
+    p_resultSet    OUT SYS_REFCURSOR
+)
+IS
+    sql_stmt    VARCHAR2(1000);
+
+BEGIN
+
+    sql_stmt := 'Select * from necessiter';
+
+    OPEN p_resultSet FOR sql_stmt;
+
 END;
 /
