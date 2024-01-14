@@ -315,28 +315,20 @@ public class ActesMedicauxController {
         VBox refAmVbox = new VBox();
         refAmVbox.getChildren().addAll(refLabel, refField);
         
-        Label competenceLabel = new Label("Acte Medical");
-        ChoiceBox<String> competenceChoiceBox = new ChoiceBox<>();
-        competenceChoiceBox.setValue(acteMedical.getNomCompetence());
-        List<String> nomCompetenceList = new ArrayList<>();
+        Label clientLabel = new Label("Client");
+        clientLabel.setId("ID_CLIENT");
 
-        for (int i = 1; i < competenceList.size(); i += 2) {
-            Object name = competenceList.get(i);
-            if (name != null) {
-                nomCompetenceList.add(String.valueOf(name));
-            }
-        }
-        competenceChoiceBox.getItems().addAll(nomCompetenceList);
-        competenceChoiceBox.setPrefWidth(230);
-        //competenceChoiceBox.setVisibleRowCount(10); //change to combobox but less pretty
-        competenceChoiceBox.setId("competenceChoiceBox");
-        
-        VBox competenceAmVbox = new VBox();
-        competenceAmVbox.getChildren().addAll(competenceLabel, competenceChoiceBox);
+        TextField clientField = new TextField();
+        clientField.setText(acteMedical.getPrenomClient() + " " + acteMedical.getNomClient());
+        clientField.setUserData(acteMedical.getIdClient());
+        clientField.setEditable(false);
+
+        VBox clientAmVbox = new VBox();
+        clientAmVbox.getChildren().addAll(clientLabel, clientField);
         
         HBox topAmHbox = new HBox();
         topAmHbox.setId("topAmHbox");
-        topAmHbox.getChildren().addAll(refAmVbox, competenceAmVbox);
+        topAmHbox.getChildren().addAll(refAmVbox, clientAmVbox);
         
 
         Button buttonDelete = new Button("Delete");
@@ -355,17 +347,24 @@ public class ActesMedicauxController {
 
         //buttonDelete.layoutXProperty().bind(body.widthProperty().subtract(buttonDelete.widthProperty()));
 
+        Label competenceLabel = new Label("Acte Medical");
+        ChoiceBox<String> competenceChoiceBox = new ChoiceBox<>();
+        competenceChoiceBox.setValue(acteMedical.getNomCompetence());
+        List<String> nomCompetenceList = new ArrayList<>();
 
-        Label clientLabel = new Label("Client");
-        clientLabel.setId("ID_CLIENT");
-
-        TextField clientField = new TextField();
-        clientField.setText(acteMedical.getPrenomClient() + " " + acteMedical.getNomClient());
-        clientField.setUserData(acteMedical.getIdClient());
-        clientField.setEditable(false);
-
-        VBox clientAmVbox = new VBox();
-        clientAmVbox.getChildren().addAll(clientLabel, clientField);
+        for (int i = 1; i < competenceList.size(); i += 2) {
+            Object name = competenceList.get(i);
+            if (name != null) {
+                nomCompetenceList.add(String.valueOf(name));
+            }
+        }
+        competenceChoiceBox.getItems().addAll(nomCompetenceList);
+        competenceChoiceBox.setPrefWidth(230);
+        //competenceChoiceBox.setVisibleRowCount(10); //change to combobox but less pretty
+        competenceChoiceBox.setId("competenceChoiceBox");
+        
+        VBox competenceAmVbox = new VBox();
+        competenceAmVbox.getChildren().addAll(competenceLabel, competenceChoiceBox);
 
         Label specialisteLabel = new Label("Specialiste");
         specialisteLabel.setId("ID_SPECIALISTE");
@@ -380,7 +379,7 @@ public class ActesMedicauxController {
 
         HBox overlayAmCenter = new HBox();
         overlayAmCenter.setId("overlayAmCenter");
-        overlayAmCenter.getChildren().addAll(clientAmVbox, specialisteAmVbox);
+        overlayAmCenter.getChildren().addAll(competenceAmVbox, specialisteAmVbox);
 
 
         Label lieuLabel = new Label("Lieu");
@@ -686,6 +685,17 @@ public class ActesMedicauxController {
     // populating inputs in the overlay when clicking create new client
     private void populateOverlayForNewActeMedical(BorderPane contentPane) {
 
+        Label clientLabel = new Label("Client");
+        TextField clientField = new TextField();
+        clientField.setEditable(false);
+        VBox clientAmVbox = new VBox();
+        clientAmVbox.getChildren().addAll(clientLabel, clientField);
+
+        HBox overlayAmTop = new HBox();
+        overlayAmTop.setId("overlayAmTop");
+        overlayAmTop.getChildren().addAll(clientAmVbox);
+
+        
         Label competenceLabel = new Label("Acte Medical");
         ChoiceBox<String> competenceChoiceBox = new ChoiceBox<>();
         List<String> nomCompetenceList = new ArrayList<>();
@@ -705,17 +715,6 @@ public class ActesMedicauxController {
         VBox competenceAmVbox = new VBox();
         competenceAmVbox.getChildren().addAll(competenceLabel, competenceChoiceBox);
 
-        HBox overlayAmTop = new HBox();
-        overlayAmTop.setId("overlayAmTop");
-        overlayAmTop.getChildren().addAll(competenceAmVbox);
-
-
-        Label clientLabel = new Label("Client");
-        TextField clientField = new TextField();
-        clientField.setEditable(false);
-        VBox clientAmVbox = new VBox();
-        clientAmVbox.getChildren().addAll(clientLabel, clientField);
-
         Label specialisteLabel = new Label("Specialiste");
         TextField specialisteField = new TextField();
         specialisteField.setEditable(false);
@@ -724,7 +723,7 @@ public class ActesMedicauxController {
 
         HBox overlayAmCenter = new HBox();
         overlayAmCenter.setId("overlayAmCenter");
-        overlayAmCenter.getChildren().addAll(clientAmVbox, specialisteAmVbox);
+        overlayAmCenter.getChildren().addAll(competenceAmVbox, specialisteAmVbox);
 
 
         Label lieuLabel = new Label("Lieu");
