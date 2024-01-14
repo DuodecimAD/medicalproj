@@ -64,9 +64,12 @@ public class ActeMedical {
         this.dateFin = dateFin;
     }
 
-    public ActeMedical(int idActeMed, String refActeMed, int idClient, String prenomClient, String nomClient, int idSpecialiste, 
-                        String prenomSpecialiste, String nomSpecialiste, int idLieu, String nomLieu, LocalDate dateDebut, 
-                        LocalDate dateFin, int idCompetence, String nomCompetence) {
+    public ActeMedical(int idActeMed, String refActeMed, 
+                        int idClient, String prenomClient, String nomClient, 
+                        int idSpecialiste, String prenomSpecialiste, String nomSpecialiste, 
+                        int idLieu, String nomLieu, 
+                        LocalDate dateDebut, LocalDate dateFin, 
+                        int idCompetence, String nomCompetence) {
         this.idActeMed = idActeMed;
         this.refActeMed = refActeMed;
         this.idClient = idClient;
@@ -206,6 +209,7 @@ public class ActeMedical {
     }
 
     public void insertActeMedicalDB(ActeMedical acteMedical) throws SQLException {
+        
 
         List<String> columnsList = new ArrayList<>(List.of("REF" + tableNameShort, "DATE_DEBUT", "DATE_FIN", "ID_CLIENT", "ID_LIEU", "ID_SPECIALISTE"));
         List<Object> valuesList =  new ArrayList<>(

@@ -43,7 +43,7 @@ public class DbCreate {
             }
         }
 
-
+System.out.println(values);
         String call = "{call InsertIfNotExists(?, ?, ?)}";
 
 

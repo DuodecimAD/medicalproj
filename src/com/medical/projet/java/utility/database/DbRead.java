@@ -86,10 +86,10 @@ public class DbRead {
         return Collections.emptyList(); // Return an empty list if there's an error or no results
     }
 
-    public static int readId(String columnValue, String tableName, String checColumn, String checkValue) {
+    public static int readId(String columnValue, String tableName, String checkColumn, String checkValue) {
         String sanitizedcolumnValue = AppSecurity.sanitize(columnValue);
         String sanitizedTableName = AppSecurity.sanitize(tableName);
-        String sanitizedChecColumn = AppSecurity.sanitize(checColumn);
+        String sanitizedChecColumn = AppSecurity.sanitize(checkColumn);
         String sanitizedCheckValue = AppSecurity.sanitize(checkValue);
 
         conn = DbConnect.sharedConnection();
@@ -119,6 +119,41 @@ public class DbRead {
 
         return -1; // Return an empty list if there's an error or no results
     }
+    
+    public static String readString(String columnValue, String tableName, String checkColumn, String checkValue) {
+        String sanitizedcolumnValue = AppSecurity.sanitize(columnValue);
+        String sanitizedTableName = AppSecurity.sanitize(tableName);
+        String sanitizedChecColumn = AppSecurity.sanitize(checkColumn);
+        String sanitizedCheckValue = AppSecurity.sanitize(checkValue);
+
+        conn = DbConnect.sharedConnection();
+
+        String call = "{call GetStringData(?, ?, ?, ?, ?)}";
+
+        try (CallableStatement callableStatement = conn.prepareCall(call)) {
+            callableStatement.setString(1, sanitizedcolumnValue);
+            callableStatement.setString(2, sanitizedTableName);
+            callableStatement.setString(3, sanitizedChecColumn);
+            callableStatement.setString(4, sanitizedCheckValue);
+
+            // Register the OUT parameter for the result set
+            callableStatement.registerOutParameter(5, Types.VARCHAR);
+
+            // Execute the stored procedure
+            callableStatement.execute();
+
+            // Get the result from the OUT parameter
+            String result = callableStatement.getString(5);
+
+            return result;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return "error"; // Return an empty list if there's an error or no results
+    }
+    
     
     public static List<Integer> getSpecialisteForCompetence(int checkValue) {
         conn = DbConnect.sharedConnection();
@@ -203,6 +238,38 @@ public class DbRead {
         }
 
         return Collections.emptyList(); // Return an empty list if there's an error or no results
+    }
+    
+    public static int readLastId(String columnValue, String tableName) {
+        String sanitizedcolumnValue = AppSecurity.sanitize(columnValue);
+        String sanitizedTableName = AppSecurity.sanitize(tableName);
+
+
+        conn = DbConnect.sharedConnection();
+
+        String call = "{call lastIdAm(?, ?, ?)}";
+
+        try (CallableStatement callableStatement = conn.prepareCall(call)) {
+            callableStatement.setString(1, sanitizedcolumnValue);
+            callableStatement.setString(2, sanitizedTableName);
+
+
+            // Register the OUT parameter for the result set
+            callableStatement.registerOutParameter(3, Types.INTEGER);
+
+            // Execute the stored procedure
+            callableStatement.execute();
+
+            // Get the result from the OUT parameter
+            int result = callableStatement.getInt(3);
+
+            return result;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return -1; // Return an empty list if there's an error or no results
     }
 
 }

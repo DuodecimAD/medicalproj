@@ -77,7 +77,7 @@ BEGIN
     VALUES ('InsertRecord', 'InsertRecord Procedure', 'insert started');
     COMMIT;
     
-    sql_stmt := 'INSERT INTO ' || p_tableName || ' (' || v_columns || ') ' ||
+    sql_stmt := 'INSERT INTO ' || v_tableName || ' (' || v_columns || ') ' ||
                 'VALUES (:1, :2, :3, :4, :5)';
 
     EXECUTE IMMEDIATE sql_stmt USING v_value1, v_value2, v_value3, v_value4, v_value5;
@@ -88,7 +88,6 @@ BEGIN
     COMMIT;
 END;
 /
-
 create or replace PROCEDURE InsertIfNotExists (
     p_tableName     IN VARCHAR2,
     p_columns       IN VARCHAR2,
@@ -244,10 +243,7 @@ BEGIN
     INSERT INTO debug_log (procedure_name, variable_name, variable_value)
     VALUES ('InsertIfNotExists', 'column 2 in array', c_values(2));
     COMMIT;
-    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-    VALUES ('InsertIfNotExists', 'column 3 in array', c_values(3));
-    COMMIT; 
-    
+   
     
     
     -- Split the values into an array
@@ -263,9 +259,7 @@ BEGIN
     INSERT INTO debug_log (procedure_name, variable_name, variable_value)
     VALUES ('InsertIfNotExists', 'value 2 in array', s_values(2));
     COMMIT;
-    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-    VALUES ('InsertIfNotExists', 'value 3 in array', s_values(3));
-    COMMIT; 
+
     
     IF tableName = 'CLIENT' OR tableName = 'SPECIALISTE' THEN
     
@@ -287,6 +281,16 @@ BEGIN
 
         EXECUTE IMMEDIATE sql_stmt USING s_values(1), s_values(2), d_value1, s_values(4), s_values(5);
         
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('InsertIfNotExists', 'ACTE_MED insert : table name : ', tableName);
+        COMMIT;
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('InsertIfNotExists', 'ACTE_MED insert : columns : ', inputColumns);
+        COMMIT;
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('InsertIfNotExists', 'ACTE_MED insert : values : ', s_values(1) || ',' || s_values(2) || ',' || d_value1 || ',' || s_values(4) || ',' || s_values(5));
+        COMMIT;
+        
         -- Record does not exist, proceed with the insert
         --InsertRecord(tableName, inputColumns, s_values(1), s_values(2), d_value1, s_values(4), s_values(5));
         
@@ -301,20 +305,20 @@ BEGIN
     
         -- Log
         INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 'd_value1', d_value1);
+        VALUES ('InsertIfNotExists', 'ACTE_MED d_value1', d_value1);
         COMMIT;
         INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 'd_value2', d_value2);
+        VALUES ('InsertIfNotExists', 'ACTE_MED d_value2', d_value2);
         COMMIT;
         
         INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 'insert : table name : ', tableName);
+        VALUES ('InsertIfNotExists', 'ACTE_MED insert : table name : ', tableName);
         COMMIT;
         INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 'insert : columns : ', inputColumns);
+        VALUES ('InsertIfNotExists', 'ACTE_MED insert : columns : ', inputColumns);
         COMMIT;
         INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 'insert : values : ', s_values(1) || ',' || d_value1 || ',' || d_value2 || ',' || s_values(4) || ',' || s_values(5) || ',' || s_values(6));
+        VALUES ('InsertIfNotExists', 'ACTE_MED insert : values : ', s_values(1) || ',' || d_value1 || ',' || d_value2 || ',' || s_values(4) || ',' || s_values(5) || ',' || s_values(6));
         COMMIT;
         
         sql_stmt := 'INSERT INTO ' || tableName || ' (' || inputColumns || ') ' ||
@@ -322,12 +326,27 @@ BEGIN
 
         EXECUTE IMMEDIATE sql_stmt USING s_values(1), d_value1, d_value2, s_values(4), s_values(5), s_values(6);
         
-        -- Record does not exist, proceed with the insert
-        --InsertRecord(tableName, inputColumns, s_values(1), d_value1, d_value2, s_values(4), s_values(5), s_values(6));
+    ELSIF tableName = 'Necessiter' THEN
+        
         INSERT INTO debug_log (procedure_name, variable_name, variable_value)
-        VALUES ('InsertIfNotExists', 'insert done', 'finished the inserts');
+        VALUES ('InsertIfNotExists', 'Necessiter insert : table name : ', tableName);
+        COMMIT;
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('InsertIfNotExists', 'Necessiter insert : columns : ', inputColumns);
+        COMMIT;
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('InsertIfNotExists', 'Necessiter insert : values : ', s_values(1) || ',' || s_values(2));
         COMMIT;
         
+         sql_stmt := 'INSERT INTO ' || tableName || ' (' || inputColumns || ') ' ||
+                'VALUES (:1, :2)';
+
+        EXECUTE IMMEDIATE sql_stmt USING s_values(1), s_values(2);
+        
+        -- Record does not exist, proceed with the insert
+        --InsertRecord(tableName, inputColumns, s_values(1), d_value1, d_value2, s_values(4), s_values(5), s_values(6));
+       
+
     END IF;
     
 
@@ -509,6 +528,44 @@ BEGIN
     COMMIT;
 END;
 /
+create or replace PROCEDURE GetStringData (
+    p_columnValue  IN VARCHAR2,
+    p_tableName    IN VARCHAR2,
+    p_checkColumn  IN VARCHAR2,
+    p_checkValue   IN VARCHAR2,
+    p_resultValue  OUT NUMBER
+)
+IS
+    v_columnValue   VARCHAR2(255)   := p_columnValue;
+    v_tableName     VARCHAR2(255)   := p_tableName;
+    v_checkColumn   VARCHAR2(255)   := p_checkColumn;
+    v_checkValue    VARCHAR2(255)   := p_checkValue;
+    sql_stmt        VARCHAR2(1000)  ;
+
+BEGIN
+    -- Log
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'Entering Procedure', 'beginning getting table ' || v_columnValue);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'v_columnValue', v_columnValue);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'v_tableName', v_tableName);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'v_checkColumn', v_checkColumn);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'v_checkValue', v_checkValue);
+    COMMIT;
+
+    sql_stmt := 'SELECT ' || v_columnValue || ' FROM ' || v_tableName || ' WHERE ' || v_checkColumn || ' = ''' || v_checkValue || '''';
+
+    EXECUTE IMMEDIATE sql_stmt INTO p_resultValue;
+    
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'p_resultValue', p_resultValue);
+    COMMIT;
+
+END;
+/
 create or replace PROCEDURE test (
     p_resultSet    OUT SYS_REFCURSOR
 )
@@ -520,6 +577,63 @@ BEGIN
     sql_stmt := 'Select * from necessiter';
 
     OPEN p_resultSet FOR sql_stmt;
+
+END;
+/
+create or replace PROCEDURE InsertNecessiter (
+    p_tableName IN VARCHAR2,
+    p_columns   IN VARCHAR2,
+    p_value     IN INT
+)
+IS
+    v_tableName VARCHAR2(255)   := p_tableName;
+    v_columns   VARCHAR2(255)   := p_columns;
+    v_value     INT             := p_value;
+    sql_stmt VARCHAR2(1000);
+BEGIN
+    -- Logging
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertRecord', 'InsertNecessiter Procedure', 'insert started');
+    COMMIT;
+
+    sql_stmt := 'INSERT INTO ' || v_tableName || ' (' || v_columns || ') ' ||
+                'VALUES (:1)';
+
+    EXECUTE IMMEDIATE sql_stmt USING v_value;
+
+    -- Logging
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('InsertRecord', 'InsertNecessiter Procedure', 'insert finished');
+    COMMIT;
+END;
+/
+create or replace PROCEDURE lastIdAm (
+    p_columnValue  IN VARCHAR2,
+    p_tableName    IN VARCHAR2,
+    p_resultValue OUT INT
+)
+IS
+    v_columnValue   VARCHAR2(255)   := p_columnValue;
+    v_tableName     VARCHAR2(255)   := p_tableName;
+    sql_stmt        VARCHAR2(1000)  ;
+
+BEGIN
+    -- Log
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'Entering Procedure', 'beginning getting table ' || v_columnValue);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'v_columnValue', v_columnValue);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'v_tableName', v_tableName);
+    COMMIT;
+
+    sql_stmt := 'SELECT MAX(' || v_columnValue || ') FROM ' || v_tableName;
+
+    EXECUTE IMMEDIATE sql_stmt INTO p_resultValue;
+
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('GetIntData', 'p_resultValue', p_resultValue);
+    COMMIT;
 
 END;
 /

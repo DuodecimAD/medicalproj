@@ -103,7 +103,7 @@ public class Client {
     public static List<List<Object>> getAllClientsData() {
         // Fetch data from the database (using DbRead or any other method)
         // Return raw data as a List<List<?>>
-        return DbRead.readTable(tableName, "NOM" + tableNameAffix);
+        return DbRead.readTable(tableName, "ID" + tableNameAffix);
     }
 
     public void setClientIdFromDb(Client client) {
