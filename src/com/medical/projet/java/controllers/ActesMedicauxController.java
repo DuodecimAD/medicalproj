@@ -942,15 +942,12 @@ public class ActesMedicauxController {
                 // Convert client information to lowercase for case-insensitive search
                 String lowerCaseFilter = newValue.toLowerCase();
 
-                String idClient = Integer.toString(acteMedical.getIdClient());
-                String idSpecialiste = Integer.toString(acteMedical.getIdSpecialiste());
-                String idLieu = Integer.toString(acteMedical.getIdLieu());
-
                 // Check if any of the client attributes contain the filter text
                 return acteMedical.getRefActeMed().toLowerCase().contains(lowerCaseFilter)
-                        || idClient.toLowerCase().contains(lowerCaseFilter)
-                        || idSpecialiste.toLowerCase().contains(lowerCaseFilter)
-                        || idLieu.toLowerCase().contains(lowerCaseFilter)
+                        || (acteMedical.getPrenomClient() + " " + acteMedical.getNomClient()).toLowerCase().contains(lowerCaseFilter)
+                        || (acteMedical.getPrenomSpecialiste() + " " + acteMedical.getNomSpecialiste()).toLowerCase().contains(lowerCaseFilter)
+                        || acteMedical.getNomLieu().toLowerCase().contains(lowerCaseFilter)
+                        || acteMedical.getNomCompetence().toLowerCase().contains(lowerCaseFilter)
                         || String.valueOf(acteMedical.getDateDebut().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).toLowerCase().contains(lowerCaseFilter)
                         || String.valueOf(acteMedical.getDateFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))).toLowerCase().contains(lowerCaseFilter);
             });
@@ -1017,22 +1014,18 @@ public class ActesMedicauxController {
     
     private void tableAmOverlaySpecialistes(TableView<Specialiste> thisTableParam, List<Integer> specialisteWithCompetence) {
         
-        // Add data to the TableView
-        TableView<Specialiste> thisTable = thisTableParam;
-        
-        // Transform the list of BigDecimal to a list of Integer
-      /*  List<Integer> integerList = new ArrayList<>();
-        for (BigDecimal item : specialisteWithCompetence) {
-            integerList.add(item.intValue());
-        }
-        */
-     
+        // Filter the list based on provided IDs
+        List<Specialiste> filteredList = specialistesList.filtered(specialiste -> specialisteWithCompetence.contains(specialiste.getSpecialisteId()));
+
+        // Create a new ObservableList and set it to the table
+        ObservableList<Specialiste> observableList = FXCollections.observableArrayList(filteredList);
+        thisTableParam.setItems(observableList);
 
         // Filter the list based on provided IDs and set it to the table
-        thisTable.getItems().setAll(specialistesList.filtered(specialiste -> specialisteWithCompetence.contains(specialiste.getSpecialisteId())));
+        //thisTableParam.getItems().setAll(specialistesList.filtered(specialiste -> specialisteWithCompetence.contains(specialiste.getSpecialisteId())));
 
-       //System.out.println("Specialiste IDs: " + specialisteWithCompetence);
-       //System.out.println(specialistesList.filtered(specialiste -> integerList.contains(specialiste.getSpecialisteId())));
+        //System.out.println("Specialiste IDs: " + specialisteWithCompetence);
+        //System.out.println(specialistesList.filtered(specialiste -> integerList.contains(specialiste.getSpecialisteId())));
         
         //thisTable.setItems(specialistesList);
         
@@ -1057,9 +1050,9 @@ public class ActesMedicauxController {
         tel.prefWidthProperty().bind(tableWidth.multiply(0.155));
         email.prefWidthProperty().bind(tableWidth.multiply(0.35));
         
-        thisTable.getColumns().clear();
+        thisTableParam.getColumns().clear();
         
-        thisTable.getColumns().addAll(firstname, name, dateNais, tel, email);
+        thisTableParam.getColumns().addAll(firstname, name, dateNais, tel, email);
 
     }
 
@@ -1118,7 +1111,7 @@ public class ActesMedicauxController {
     }
     
     private void searchTableOverlaySpecialiste(TableView<Specialiste> tableAm, TextField amSearchField) {
-        FilteredList<Specialiste> filteredData = new FilteredList<>(specialistesList, p -> true);
+        FilteredList<Specialiste> filteredData = new FilteredList<>(tableAm.getItems(), p -> true);
         
 
         // Add listener to the searchField text property
