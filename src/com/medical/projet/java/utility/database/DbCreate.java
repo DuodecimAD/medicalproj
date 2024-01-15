@@ -22,14 +22,12 @@ public class DbCreate {
     // Private constructor to prevent instantiation
     private DbCreate() {}
 
-
     public static void insert(String tableName, List<String> columnsList, List<Object> valuesList) throws SQLException {
         String sanitizedTableName = AppSecurity.sanitize(tableName);
         List<String> sanitizedColumnsList = AppSecurity.sanitize(columnsList);
 
         String columns = "";
         String values = "";
-
 
         for (int i = 0; i < sanitizedColumnsList.size(); i++) {
 
@@ -43,23 +41,20 @@ public class DbCreate {
             }
         }
 
-System.out.println(values);
         String call = "{call InsertIfNotExists(?, ?, ?)}";
 
 
         try (CallableStatement callableStatement = conn.prepareCall(call)) {
-
 
             // Set parameter values
             callableStatement.setString(1, sanitizedTableName);
             callableStatement.setString(2, columns);
             callableStatement.setString(3, values);
 
-
             // Execute the stored procedure
             callableStatement.execute();
 
-            System.out.println(valuesList + " has been inserted successfully!");
+            System.out.println("DbCreate -> " + valuesList + " has been inserted successfully!");
 
         } catch (SQLException e) {
 

@@ -18,10 +18,10 @@ import com.medical.projet.java.utility.AppSecurity;
 import com.medical.projet.java.utility.AppSettings;
 import com.medical.projet.java.utility.database.DbCreate;
 import com.medical.projet.java.utility.database.DbRead;
+import com.medical.projet.java.utility.database.DbUpdate;
 
 import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,7 +31,6 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -152,7 +151,7 @@ public class ActesMedicauxController {
 
         try {
             rawActeMedicalData = ActeMedical.getAllActesMedicauxData();
-            //System.out.println(rawActeMedicalData);
+            //System.out.println(currentLine() + rawActeMedicalData);
         } catch (Exception e) {
             final int[] seconds = {10}; // Initial countdown value
 
@@ -229,10 +228,11 @@ public class ActesMedicauxController {
         //client.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdClient()).asObject());
         client.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomClient() + " " + param.getValue().getNomClient()));
         
+        competence.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomCompetence()));
+        
         //specialiste.setCellValueFactory(param -> new SimpleIntegerProperty(param.getValue().getIdSpecialiste()).asObject());
         specialiste.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getPrenomSpecialiste() + " " + param.getValue().getNomSpecialiste()));
-        
-        competence.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomCompetence()));
+
         lieu.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getNomLieu()));
         date_debut.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateDebut().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
         date_fin.setCellValueFactory(param -> new SimpleStringProperty(param.getValue().getDateFin().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
@@ -248,7 +248,7 @@ public class ActesMedicauxController {
                 if (event.getClickCount() == 1 && !row.isEmpty()) {
                     ActeMedical rowData = row.getItem();
                     openOverlayWithActeMedicalData(rowData);
-                    //System.out.println(DbRead.readLastId("id_acte_med", "acte_med"));
+                    //System.out.println(currentLine() + DbRead.readLastId("id_acte_med", "acte_med"));
                 }
             });
             return row;
@@ -345,7 +345,6 @@ public class ActesMedicauxController {
         overlayAmTop.setId("overlayAmTop");
         overlayAmTop.getChildren().addAll(topAmHbox, overlayTopDelete);
 
-        //buttonDelete.layoutXProperty().bind(body.widthProperty().subtract(buttonDelete.widthProperty()));
 
         Label competenceLabel = new Label("Acte Medical");
         ChoiceBox<String> competenceChoiceBox = new ChoiceBox<>();
@@ -361,7 +360,9 @@ public class ActesMedicauxController {
         competenceChoiceBox.getItems().addAll(nomCompetenceList);
         competenceChoiceBox.setPrefWidth(230);
         //competenceChoiceBox.setVisibleRowCount(10); //change to combobox but less pretty
-        competenceChoiceBox.setId("competenceChoiceBox");
+        competenceChoiceBox.setId("ID_COMPETENCE");
+        competenceChoiceBox.setUserData(acteMedical.getIdCompetence());
+        
         
         VBox competenceAmVbox = new VBox();
         competenceAmVbox.getChildren().addAll(competenceLabel, competenceChoiceBox);
@@ -489,41 +490,42 @@ public class ActesMedicauxController {
         });
 
         buttonOk.setOnAction(e -> {
-            
-            String lieuString = lieuChoiceBox.getValue();
-            int lieuID = -1; // Default value if not found
-            
-            for (int i = 1; i < lieuList.size(); i+=2) {
-                if(lieuString.equals(lieuList.get(i))) {
-                    lieuID = (int) lieuList.get(i-1);
-                }
-            }
-            
-            Object[] lieuArray = {lieuID, lieuString};
-            
+
+            Object[] lieuArray = {lieuChoiceBox.getUserData(), lieuChoiceBox.getValue()};
+
+            Object[] competenceArray = {competenceChoiceBox.getUserData(), competenceChoiceBox.getValue()};
             
             updateActeMedical(acteMedical, clientLabel.getId(),         acteMedical.getIdClient(),        clientField.getUserData(),        refLabel.getId(),   acteMedical.getRefActeMed() );
             updateActeMedical(acteMedical, specialisteLabel.getId(),    acteMedical.getIdSpecialiste(),   specialisteField.getUserData(),   refLabel.getId(),   acteMedical.getRefActeMed() );
             updateActeMedical(acteMedical, lieuLabel.getId(),           acteMedical.getIdLieu(),          lieuArray,                        refLabel.getId(),   acteMedical.getRefActeMed() );
             updateActeMedical(acteMedical, date_debutLabel.getId(),     acteMedical.getDateDebut(),       date_debutField.getValue(),       refLabel.getId(),   acteMedical.getRefActeMed() );
             updateActeMedical(acteMedical, date_finLabel.getId(),       acteMedical.getDateFin(),         date_finField.getValue(),         refLabel.getId(),   acteMedical.getRefActeMed() );
+            updateCompetence( acteMedical, competenceChoiceBox.getId(), acteMedical.getIdCompetence(),    competenceArray,         specialisteField.getText(),  acteMedical.getIdActeMed()  );
             closeOverlay();
+        });
+        
+        lieuChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+
+            for (int i = 1; i < lieuList.size(); i+=2) {
+                if(lieuList.get(i).equals(newValue)) {
+                    lieuChoiceBox.setUserData(lieuList.get(i-1));
+                    System.out.println(currentLine() + "lieu id user data : " + lieuChoiceBox.getUserData());
+                }
+            }
         });
 
         competenceChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            // Perform your action here
-            //System.out.println("Selected: " + newValue);
             
-            int competenceID = -1;         
+            specialisteField.setText("");
             
             for (int i = 1; i < competenceList.size(); i += 2) {
-                Object name = competenceList.get(i);
-                if (name.equals(newValue)) {
-                    competenceID = (int) competenceList.get(i - 1);
+                if (competenceList.get(i).equals(newValue)) {       
+                    competenceChoiceBox.setUserData(competenceList.get(i - 1));
+                    System.out.println(currentLine() + "competence id user data : " + competenceChoiceBox.getUserData());
                 }
             }
             
-            List<Integer> specialisteWithCompetence = DbRead.getSpecialisteForCompetence(competenceID);
+            List<Integer> specialisteWithCompetence = DbRead.getSpecialisteForCompetence((int) competenceChoiceBox.getUserData());
             
             tableAmClient.setManaged(false);
             tableAmClient.setVisible(false);
@@ -554,44 +556,68 @@ public class ActesMedicauxController {
     private void deleteActeMedical(ActeMedical acteMedical) {
         acteMedical.deleteActeMedicalDB(acteMedical.getRefActeMed());
     }
+    
+    public void updateCompetence(ActeMedical acteMedical, String columnField, Object oldValue, Object[] competenceArray, String checkSpecialiste, int checkValue) {
+        
+        if (compare(oldValue, competenceArray[0])) {
+            System.out.println(currentLine() + "competenceid : " + oldValue + " and " + competenceArray[0] + " are different");
+            if(checkSpecialiste != "") {
+                //System.out.println(currentLine() + "yes");
+                try {
+                    DbUpdate.update("Necessiter", columnField, competenceArray[0], "ID_ACTE_MED", Integer.toString(checkValue));
+                    acteMedical.setIdCompetence((int) competenceArray[0]);
+                    acteMedical.setNomCompetence((String) competenceArray[1]);
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }else {
+                //System.out.println(currentLine() + "nope");
+            }
+            
+        }else {
+            System.out.println(currentLine() + "ID_competence : "+ oldValue + " and " + competenceArray[0] + " are same");
+        }
+        Platform.runLater(() -> table.refresh());
+    }
 
-    public void updateActeMedical(ActeMedical acteMedical, String fieldName, Object oldValue, Object newValue, String checkColumn, String checkValue) {
+    public void updateActeMedical(ActeMedical acteMedical, String columnField, Object oldValue, Object newValue, String checkColumn, String checkValue) {
 
         if(newValue instanceof LocalDate) {
-            //System.out.println("this is a local date");
+            //System.out.println(currentLine() + "this is a local date");
             String newValueTemp = AppSecurity.sanitize(newValue.toString());
             newValue = LocalDate.parse(newValueTemp, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         }else if(newValue instanceof Integer){
-            //System.out.println("this is an integer");
+            //System.out.println(currentLine() + "this is an integer");
             String newValueTemp = AppSecurity.sanitize(newValue.toString());
             newValue = Integer.parseInt(newValueTemp);
         }else if(newValue instanceof Object[]) {
-            System.out.println("this an object[]");
+            //System.out.println(currentLine() + "this an object[]");
         }
         else {
-            //System.out.println("fuck this");
+            //System.out.println(currentLine() + "fuck this");
             newValue = AppSecurity.sanitize(newValue.toString());
         }
 
-        switch (fieldName) {
+        switch (columnField) {
             case "REF_ACTE_MED" -> {
                 if (compare(oldValue, newValue)) {
 
                     try {
-                        acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
+                        acteMedical.updateActeMedicalDB(columnField, newValue, checkColumn, checkValue);
                         acteMedical.setRefActeMed(checkValue);
-                        System.out.println("ref has been changed");
+                        System.out.println(currentLine() + "ref has been changed");
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 }else {
-                    System.out.println(oldValue + " and " + newValue + " are same");
+                    System.out.println(currentLine() + "REF_ACTE_MED : "+ oldValue + " and " + newValue + " are same");
                 }
             }
             case "ID_CLIENT" -> {
                 if (compare(oldValue, newValue)) {
                     try {
-                        acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
+                        acteMedical.updateActeMedicalDB(columnField, newValue, checkColumn, checkValue);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -600,15 +626,15 @@ public class ActesMedicauxController {
                     Client foundClient = clientsList.filtered(client -> client.getClientId() == checkVal).stream().findFirst().orElse(null);
                     acteMedical.setPrenomClient(foundClient.getPrenomClient());
                     acteMedical.setNomClient(foundClient.getNomClient());
-                    System.out.println("client has been changed");
+                    System.out.println(currentLine() + "client has been changed");
                 }else {
-                    System.out.println(oldValue + " and " + newValue + " are same");
+                    System.out.println(currentLine() + "ID_CLIENT : "+ oldValue + " and " + newValue + " are same");
                 }
             }
             case "ID_SPECIALISTE" -> {
                 if (compare(oldValue, newValue)) {
                     try {
-                        acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
+                        acteMedical.updateActeMedicalDB(columnField, newValue, checkColumn, checkValue);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -617,9 +643,9 @@ public class ActesMedicauxController {
                     Specialiste foundSpecialiste = specialistesList.filtered(specialiste -> specialiste.getSpecialisteId() == checkVal).stream().findFirst().orElse(null);
                     acteMedical.setPrenomSpecialiste(foundSpecialiste.getPrenomSpecialiste());
                     acteMedical.setNomSpecialiste(foundSpecialiste.getNomSpecialiste());
-                    System.out.println("specialiste has been changed");
+                    System.out.println(currentLine() + "specialiste has been changed");
                 }else {
-                    System.out.println(oldValue + " and " + newValue + " are same");
+                    System.out.println(currentLine() + "ID_SPECIALISTE : "+ oldValue + " and " + newValue + " are same");
                 }
             }
             case "ID_LIEU" -> {
@@ -633,43 +659,43 @@ public class ActesMedicauxController {
 
                 if (compare(oldValue, lieuID)) {
                     try {
-                        acteMedical.updateActeMedicalDB(fieldName, lieuID, checkColumn, checkValue);
+                        acteMedical.updateActeMedicalDB(columnField, lieuID, checkColumn, checkValue);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
                     acteMedical.setIdLieu(lieuID);
                     acteMedical.setNomLieu(lieuName);
-                    System.out.println("lieu has been changed");
+                    System.out.println(currentLine() + "lieu has been changed");
                 }else {
-                    System.out.println(oldValue + " and " + newValue + " are same");
+                    System.out.println(currentLine() + "ID_LIEU : "+ oldValue + " and " + lieuID + " are same");
                 }
             }
             case "DATE_DEBUT" -> {
                 if (compare(oldValue, newValue)) {
                     try {
-                        acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
+                        acteMedical.updateActeMedicalDB(columnField, newValue, checkColumn, checkValue);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
                     LocalDate newDate = LocalDate.parse(newValue.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                     acteMedical.setDateDebut(newDate);
-                    System.out.println("date_debut has been changed");
+                    System.out.println(currentLine() + "date_debut has been changed");
                 }else {
-                    System.out.println(oldValue + " and " + newValue + " are same");
+                    System.out.println(currentLine() + "DATE_DEBUT : "+ oldValue + " and " + newValue + " are same");
                 }
             }
             case "DATE_FIN" -> {
                 if (compare(oldValue, newValue)) {
                     try {
-                        acteMedical.updateActeMedicalDB(fieldName, newValue, checkColumn, checkValue);
+                        acteMedical.updateActeMedicalDB(columnField, newValue, checkColumn, checkValue);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
                     LocalDate newDate = LocalDate.parse(newValue.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                     acteMedical.setDateFin(newDate);
-                    System.out.println("date_fin has been changed");
+                    System.out.println(currentLine() + "date_fin has been changed");
                 }else {
-                    System.out.println(oldValue + " and " + newValue + " are same");
+                    System.out.println(currentLine() + "DATE_FIN : "+ oldValue + " and " + newValue + " are same");
                 }
             }
             default -> {}
@@ -699,7 +725,7 @@ public class ActesMedicauxController {
         Label competenceLabel = new Label("Acte Medical");
         ChoiceBox<String> competenceChoiceBox = new ChoiceBox<>();
         List<String> nomCompetenceList = new ArrayList<>();
-
+        
         for (int i = 1; i < competenceList.size(); i += 2) {
             Object name = competenceList.get(i);
             if (name != null) {
@@ -709,7 +735,7 @@ public class ActesMedicauxController {
         competenceChoiceBox.getItems().addAll(nomCompetenceList);
         competenceChoiceBox.setPrefWidth(230);
         //competenceChoiceBox.setVisibleRowCount(10); works with ComboBox
-        competenceChoiceBox.setId("competenceChoiceBox");
+        competenceChoiceBox.setId("ID_COMPETENCE");
         
         //refField.setDisable(true);
         VBox competenceAmVbox = new VBox();
@@ -815,30 +841,10 @@ public class ActesMedicauxController {
 
         buttonOk.setOnAction(e -> {
             
-            String lieuString = lieuChoiceBox.getValue();
-            int lieuID = -1; // Default value if not found
+            Object[] lieuArray = {lieuChoiceBox.getUserData(), lieuChoiceBox.getValue()};
 
-            for (int i = 1; i < lieuList.size(); i+=2) {
-                if(lieuString.equals(lieuList.get(i))) {
-                    lieuID = (int) lieuList.get(i-1);
-                }
-            }
+            Object[] competenceArray = {competenceChoiceBox.getUserData(), competenceChoiceBox.getValue()};
             
-            Object[] lieuArray = {lieuID, lieuString};
-            
-            
-            String competenceString = competenceChoiceBox.getValue();
-            int competenceID = -1;         
-            
-            for (int i = 1; i < competenceList.size(); i += 2) {
-                if (competenceString.equals(competenceString)) {
-                    competenceID = (int) competenceList.get(i - 1);
-                }
-            }
-            
-            Object[] competenceArray = {competenceID, competenceString};
-            
-
             String newActeMedicalOK = createNewActeMedical( 
                                                             date_debutField.getValue(),
                                                             date_finField.getValue(),
@@ -856,20 +862,28 @@ public class ActesMedicauxController {
             }
         });
         
-        competenceChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            // Perform your action here
-            //System.out.println("Selected: " + newValue);
+        lieuChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
 
-            int competenceID = -1;         
+            for (int i = 1; i < lieuList.size(); i+=2) {
+                if(lieuList.get(i).equals(newValue)) {
+                    lieuChoiceBox.setUserData(lieuList.get(i-1));
+                    System.out.println(currentLine() + "lieu id user data : " + lieuChoiceBox.getUserData());
+                }
+            }
+        });
+
+        competenceChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            
+            specialisteField.setText("");
             
             for (int i = 1; i < competenceList.size(); i += 2) {
-                Object name = competenceList.get(i);
-                if (name.equals(newValue)) {
-                    competenceID = (int) competenceList.get(i - 1);
+                if (competenceList.get(i).equals(newValue)) {       
+                    competenceChoiceBox.setUserData(competenceList.get(i - 1));
+                    System.out.println(currentLine() + "competence id user data : " + competenceChoiceBox.getUserData());
                 }
             }
 
-            List<Integer> specialisteWithCompetence = DbRead.getSpecialisteForCompetence(competenceID);
+            List<Integer> specialisteWithCompetence = DbRead.getSpecialisteForCompetence((int) competenceChoiceBox.getUserData());
             
             tableAmClient.setManaged(false);
             tableAmClient.setVisible(false);
@@ -937,7 +951,7 @@ public class ActesMedicauxController {
     private String createNewActeMedical(LocalDate date_debutField, LocalDate date_finField, int clientField, Object[] lieuArray, int specialisteField, Object[] competenceArray) {
         
         int AmNewId = DbRead.readLastId("id_acte_med", "acte_med")+1;
-        System.out.println(AmNewId);
+        System.out.println(currentLine() + AmNewId);
         int idAM = AmNewId;
         String refAm = "REF" + (AmNewId);
         
@@ -961,7 +975,7 @@ public class ActesMedicauxController {
 
         try {
             newActeMedical.insertActeMedicalDB(newActeMedical);
-            System.out.println(newActeMedical.toString() + " added to database without problem");
+            //System.out.println(currentLine() + newActeMedical.toString() + " added to database without problem");
             
             List<String> columnsList = new ArrayList<>(List.of("ID_COMPETENCE","ID_ACTE_MED"));
             List<Object> valuesList =  new ArrayList<>(List.of(competenceID, AmNewId));
@@ -972,7 +986,6 @@ public class ActesMedicauxController {
                 throw e;
             }
             
-            
             ActeMedical newActeMedicalObs = new ActeMedical(idAM, refAm, 
                                                             clientField, clientPrenom, clientNom, 
                                                             specialisteField, specialistePrenom, specialisteNom, 
@@ -981,7 +994,7 @@ public class ActesMedicauxController {
             getActeMedicalsObsList().add(newActeMedicalObs);
         } catch (SQLException e) {
             String errorMessage = e.getMessage();
-            System.out.println(errorMessage);
+            System.out.println(currentLine() + errorMessage);
             /*
             int startIndex = errorMessage.indexOf("ORA-20001: ");
             if (startIndex != -1) {
@@ -990,15 +1003,15 @@ public class ActesMedicauxController {
                 String cleanErrorMessage;
                 if (endIndex != -1) {
                     cleanErrorMessage = errorMessage.substring(startIndex + "ORA-20001: ".length(), endIndex).trim();
-                    System.out.println(cleanErrorMessage);
+                    System.out.println(currentLine() + cleanErrorMessage);
                     return cleanErrorMessage;
                 } else {
                     cleanErrorMessage = errorMessage.substring(startIndex + "ORA-20001: ".length()).trim();
-                    System.out.println(cleanErrorMessage);
+                    System.out.println(currentLine() + cleanErrorMessage);
                     return cleanErrorMessage;
                 }
             } else {
-                System.out.println(errorMessage);
+                System.out.println(currentLine() + errorMessage);
                 return errorMessage;
             }
              */
@@ -1123,8 +1136,8 @@ public class ActesMedicauxController {
         // Filter the list based on provided IDs and set it to the table
         //thisTableParam.getItems().setAll(specialistesList.filtered(specialiste -> specialisteWithCompetence.contains(specialiste.getSpecialisteId())));
 
-        //System.out.println("Specialiste IDs: " + specialisteWithCompetence);
-        //System.out.println(specialistesList.filtered(specialiste -> integerList.contains(specialiste.getSpecialisteId())));
+        //System.out.println(currentLine() + "Specialiste IDs: " + specialisteWithCompetence);
+        //System.out.println(currentLine() + specialistesList.filtered(specialiste -> integerList.contains(specialiste.getSpecialisteId())));
         
         //thisTable.setItems(specialistesList);
         
@@ -1284,7 +1297,7 @@ public class ActesMedicauxController {
         return lieuList;
     }
     
-private ObservableList<Object> getCompetenceList() {
+    private ObservableList<Object> getCompetenceList() {
         
         List<List<Object>> competenceListDB;
         
@@ -1305,12 +1318,10 @@ private ObservableList<Object> getCompetenceList() {
         }
         return competenceList;
     }
-    /*
-    private List<List<Object>> getCompetencesList() {
-        List<List<Object>> competences = DbRead.readTest();
-        //System.out.println(competences);
-        return competences;
-    }
-    */
     
+    private String currentLine() {
+        return "line " + Thread.currentThread().getStackTrace()[2].getLineNumber() + " -> ";
+    }
+
+
 }

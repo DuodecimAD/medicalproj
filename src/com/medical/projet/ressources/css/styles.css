@@ -372,7 +372,7 @@
 	-fx-pref-width: 100;
 }
 
-#competenceChoiceBox Label, #lieuChoiceBox Label {
+#ID_COMPETENCE Label, #lieuChoiceBox Label {
 	-fx-padding: 5 5 5 10;
 	-fx-text-fill: -primary;
 }
