@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -13,9 +14,12 @@ import java.util.function.Consumer;
 import com.medical.projet.java.models.Specialiste;
 import com.medical.projet.java.utility.AppSecurity;
 import com.medical.projet.java.utility.AppSettings;
+import com.medical.projet.java.utility.database.DbRead;
 
 import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,12 +28,16 @@ import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -41,6 +49,8 @@ import javafx.scene.layout.VBox;
 public class SpecialisteController {
 
     private static ObservableList<Specialiste> specialistesObsList = FXCollections.observableArrayList();
+    
+    private ObservableList<List<Object>> competencesList = FXCollections.observableArrayList();
 
     private static final String tableNameSuffix = "_SPECIALISTE";
 
@@ -150,12 +160,20 @@ public class SpecialisteController {
 
 
         if (rawSpecialisteData != null) {
+                        
             for (List<Object> row : rawSpecialisteData) {
-                BigDecimal id = (BigDecimal) row.get(0);
+                BigDecimal idDB = (BigDecimal) row.get(0);
+                int id = idDB.intValue();
 
-                // Check if the client with the same id already exists in clientsObsList
+                // Check if the specialiste with the same id already exists in clientsObsList
                 boolean specialisteExists = specialistesObsList.stream()
-                        .anyMatch(specialiste -> specialiste.getSpecialisteId() == id.intValue());
+                        .anyMatch(specialiste -> specialiste.getSpecialisteId() == id);
+                
+                BigDecimal competencesSpecialisteDB = (BigDecimal) row.get(6);
+                int competencesSpecialiste = competencesSpecialisteDB.intValue();
+                List<Integer> competencesSpecialisteList = new ArrayList<Integer>();
+                competencesSpecialisteList.add(competencesSpecialiste);
+
 
                 if (!specialisteExists) {
                     String nom = (String) row.get(1);
@@ -165,11 +183,18 @@ public class SpecialisteController {
                     LocalDate date_nais = timestamp.toLocalDateTime().toLocalDate();
                     String tel = (String) row.get(4);
                     String email = (String) row.get(5);
+                    
                     // Create a Specialiste object and add to the list
-                    specialistesObsList.add(new Specialiste(id.intValue(), nom, prenom, date_nais, tel, email));
+                    specialistesObsList.add(new Specialiste(id, nom, prenom, date_nais, tel, email, competencesSpecialisteList));
+                }else {
+                    // Target the last element
+                    Specialiste lastElement = specialistesObsList.get(specialistesObsList.size() - 1);
+                    
+                    lastElement.addToCompetencesSpecialiste(competencesSpecialiste);
                 }
             }
         }
+        //System.out.println(specialistesObsList);
         return specialistesObsList;
     }
 
@@ -293,11 +318,65 @@ public class SpecialisteController {
         HBox overlayTopDelete = new HBox();
         overlayTopDelete.setId("overlayTopDelete");
         overlayTopDelete.getChildren().addAll(buttonDelete);
+        
+
+        Label competenceLabel = new Label("");
+        //competenceLabel.setStyle("-fx-text-fill: rgb(221,230,237)");
+        TableView<List<Object>> competencesTable = new TableView<>();
+        competencesTable.setPrefWidth(200);
+        //competencesTable.setMaxWidth(100);
+        competencesTable.setId("competencesTable");
+        Label competenceTableError = new Label("No competences found, error");
+        competencesTable.setPlaceholder(competenceTableError);
+        competencesTable.getItems().clear();
+        
+        
+        // Ensure that competencesList is populated before using it
+        if (competencesList == null || competencesList.isEmpty()) {
+            competencesList = getCompetenceList();
+        }
+
+        competencesTable.setItems(competencesList);
+        
+        TableColumn<List<Object>, Boolean> checkBoxColumn = new TableColumn<>("");
+        
+        //System.out.println(competencesList);
+        
+        checkBoxColumn.setCellValueFactory(param -> {
+            for (int i = 0; i < specialiste.getCompetencesSpecialiste().size(); i++) {
+                if(param.getValue().get(0).equals(specialiste.getCompetencesSpecialiste().get(i))) {
+                    return new SimpleBooleanProperty(true);
+                }
+            }
+            return new SimpleBooleanProperty(false);
+        });
+        checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
+        
+        TableColumn<List<Object>, String> competenceNameColumn = new TableColumn<>("Competences");
+        competenceNameColumn.setCellValueFactory(param -> new SimpleStringProperty((String) param.getValue().get(1)));
+        
+
+        competencesTable.getColumns().addAll(checkBoxColumn, competenceNameColumn);
+        
+        VBox competencesCheckboxes = new VBox();
+        competencesCheckboxes.getChildren().addAll(competenceLabel, competencesTable);    
+        
+        DoubleBinding tableWidth = competencesTable.widthProperty().subtract(20);
+        checkBoxColumn.prefWidthProperty().bind(tableWidth.multiply(0.15));
+        competenceNameColumn.prefWidthProperty().bind(tableWidth.multiply(0.85));
+        
+        competencesTable.setEditable(true);
+        //System.out.println(competencesList);
 
         contentPane.setTop(overlayTopDelete);
         contentPane.setCenter(overLayContent);
         contentPane.setBottom(overlayBottomButtons);
+        contentPane.setRight(competencesCheckboxes);
 
+        overlayTopDelete.setStyle("-fx-padding: 20 0 0 540");
+        overlayBottomButtons.setStyle("-fx-padding: 20 0 20 440");
+        overLayContent.setStyle("-fx-padding: 0 20 0 0");
+        
         // buttons event logic
         buttonCancel.setOnAction(e -> {
             closeOverlay();
@@ -421,6 +500,50 @@ public class SpecialisteController {
         VBox overLayContent = new VBox();
         overLayContent.setId("overLayContent");
         overLayContent.getChildren().addAll(nameLabel, nameField, firstnameLabel, firstnameField, date_naisLabel, date_naisField, telLabel, telField, emailLabel, emailField, errorLabel);
+        
+        
+        Label competenceLabel = new Label("");
+        //competenceLabel.setStyle("-fx-text-fill: rgb(221,230,237)");
+        TableView<List<Object>> competencesTable = new TableView<>();
+        competencesTable.setPrefWidth(200);
+        //competencesTable.setMaxWidth(100);
+        competencesTable.setId("competencesTable");
+        Label competenceTableError = new Label("No competences found, error");
+        competencesTable.setPlaceholder(competenceTableError);
+        competencesTable.getItems().clear();
+        
+        
+        // Ensure that competencesList is populated before using it
+        if (competencesList == null || competencesList.isEmpty()) {
+            competencesList = getCompetenceList();
+        }
+
+        competencesTable.setItems(competencesList);
+        
+        TableColumn<List<Object>, Boolean> checkBoxColumn = new TableColumn<>("");
+        
+        //System.out.println(competencesList);
+        
+        checkBoxColumn.setCellValueFactory(param -> new SimpleBooleanProperty(false));
+        checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
+        
+        TableColumn<List<Object>, String> competenceNameColumn = new TableColumn<>("Competences");
+        competenceNameColumn.setCellValueFactory(param -> new SimpleStringProperty((String) param.getValue().get(1)));
+        
+
+        competencesTable.getColumns().addAll(checkBoxColumn, competenceNameColumn);
+        
+        VBox competencesCheckboxes = new VBox();
+        competencesCheckboxes.getChildren().addAll(competenceLabel, competencesTable);    
+        
+        DoubleBinding tableWidth = competencesTable.widthProperty().subtract(20);
+        checkBoxColumn.prefWidthProperty().bind(tableWidth.multiply(0.15));
+        competenceNameColumn.prefWidthProperty().bind(tableWidth.multiply(0.85));
+        
+        competencesTable.setEditable(true);
+        //System.out.println(competencesList);
+        
+        
 
         Button buttonOk = new Button("ok");
         Button buttonCancel = new Button("Cancel");
@@ -431,6 +554,11 @@ public class SpecialisteController {
 
         contentPane.setCenter(overLayContent);
         contentPane.setBottom(overlayBottomButtons);
+        contentPane.setRight(competencesCheckboxes);
+
+        overlayBottomButtons.setStyle("-fx-padding: 20 0 20 440");
+        overLayContent.setStyle("-fx-padding: 50 20 0 0");
+        
 
         // buttons event logic
         buttonCancel.setOnAction(e -> {
@@ -449,8 +577,10 @@ public class SpecialisteController {
     }
 
     private String createNewSpecialiste(String nameField, String firsnameField, LocalDate date_naisField, String telField, String emailField) {
+        
+        List<Integer> competencesSpecialisteToFix = List.of(1, 2, 3);
 
-        Specialiste newSpecialiste = new Specialiste(nameField, firsnameField, date_naisField, telField, emailField);
+        Specialiste newSpecialiste = new Specialiste(nameField, firsnameField, date_naisField, telField, emailField, competencesSpecialisteToFix);
 
         try {
             newSpecialiste.insertSpecialisteDB(newSpecialiste);
@@ -547,5 +677,31 @@ public class SpecialisteController {
             // Clear the searchField text
             searchField.clear();
         });
+    }
+    
+    private ObservableList<List<Object>> getCompetenceList() {
+        
+        List<List<Object>> competenceListDB;
+        
+        competenceListDB = DbRead.readTable("COMPETENCE", "NOM_COMPETENCE");
+        
+        if(competenceListDB != null) {
+            for (List<Object> row : competenceListDB) {
+            
+                BigDecimal idCompetenceDB = (BigDecimal) row.get(0);
+                int idCompetence = idCompetenceDB.intValue();
+                
+                String nomCompetence = (String) row.get(1);
+                
+
+                List<Object> rowData = new ArrayList<>();
+                rowData.add(idCompetence);
+                rowData.add(nomCompetence);
+
+                competencesList.add(rowData);
+            }
+
+        }
+        return competencesList;
     }
 }

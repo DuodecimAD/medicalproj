@@ -1,5 +1,6 @@
 package com.medical.projet.java.models;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,6 +10,8 @@ import com.medical.projet.java.utility.database.DbCreate;
 import com.medical.projet.java.utility.database.DbDelete;
 import com.medical.projet.java.utility.database.DbRead;
 import com.medical.projet.java.utility.database.DbUpdate;
+
+import javafx.collections.ObservableList;
 
 public class Specialiste {
 
@@ -27,25 +30,29 @@ public class Specialiste {
     private String telephone;
 
     private String email;
+    
+    private List<Integer> competences;
 
 
     public Specialiste() {}
 
-    public Specialiste(String nom, String prenom, LocalDate dateNais, String telephone, String email) {
+    public Specialiste(String nom, String prenom, LocalDate dateNais, String telephone, String email, List<Integer> competences) {
         this.nom = nom;
         this.prenom = prenom;
         this.dateNais = dateNais;
         this.telephone = telephone;
         this.email = email;
+        this.competences = competences;
     }
 
-    public Specialiste(int id, String nom, String prenom, LocalDate dateNais, String telephone, String email) {
+    public Specialiste(int id, String nom, String prenom, LocalDate dateNais, String telephone, String email, List<Integer> competences) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
         this.dateNais = dateNais;
         this.telephone = telephone;
         this.email = email;
+        this.competences = competences;
     }
 
     public String getTableName() {
@@ -99,6 +106,20 @@ public class Specialiste {
     public void setEmailSpecialiste(String newEmail) {
         email = newEmail;
     }
+    
+    public List<Integer> getCompetencesSpecialiste() {
+        return competences;
+    }
+
+    public void setCompetencesSpecialiste(List<Integer> competences) {
+        this.competences = competences;
+    }
+    
+    public void addToCompetencesSpecialiste(int value) {
+        List<Integer> tempList = getCompetencesSpecialiste();
+        tempList.add(value);
+        setCompetencesSpecialiste(tempList);
+    }
 
     public static List<List<Object>> getAllSpecialistesData() {
         // Fetch data from the database (using DbRead or any other method)
@@ -149,7 +170,10 @@ public class Specialiste {
                 "dateNais : "    + getDateNaisSpecialiste() + "\r"  +
                 "telephone : "   + getTelSpecialiste()      + "\r"  +
                 "email : "       + getEmailSpecialiste()    + "\r"  +
+                "competence : "  + getCompetencesSpecialiste()   + "\r"  +
                 "--------------"                            + "\r"  ;
     }
+    
+
 
 }

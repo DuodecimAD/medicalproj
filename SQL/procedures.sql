@@ -371,9 +371,18 @@ BEGIN
     INSERT INTO debug_log (procedure_name, variable_name, variable_value)
     VALUES ('GetTableData', 'Entering Procedure', 'beginning getting table ' || v_tableName);
     COMMIT;
+    
+    IF v_tablename = 'SPECIALISTE' THEN
+    
+        sql_stmt := 'SELECT specialiste.id_specialiste, specialiste.nom_specialiste, specialiste.prenom_specialiste, 
+                            specialiste.date_nais_specialiste, specialiste.tel_specialiste, specialiste.email_specialiste, 
+                            posseder.id_competence, specialiste.isdeleted_specialiste
+                    FROM '  || v_tableName || 
+                    ' inner join posseder ON specialiste.id_specialiste = posseder.id_specialiste 
+                    ORDER BY ' || v_orderBy;
 
-    IF v_tablename = 'ACTE_MED' THEN
-        
+    ELSIF v_tablename = 'ACTE_MED' THEN
+
         sql_stmt := 'Select acte_med.ID_ACTE_MED, acte_med.REF_ACTE_MED, acte_med.ID_CLIENT, client.prenom_client, client.nom_client, 
                     acte_med.id_specialiste, specialiste.prenom_specialiste, specialiste.nom_specialiste, acte_med.id_lieu, 
                     lieu.nom_lieu, acte_med.date_debut, acte_med.date_fin, necessiter.id_competence, competence.nom_competence,
@@ -384,13 +393,13 @@ BEGIN
                     inner join lieu ON acte_med.id_lieu = lieu.id_lieu
                     inner join necessiter ON acte_med.id_acte_med = necessiter.id_acte_med
                     inner join competence ON necessiter.id_competence = competence.id_competence';
-    
+
     ELSE
         sql_stmt := 'SELECT * FROM ' || v_tableName || ' ORDER BY ' || v_orderBy;
     END IF;
 
     OPEN p_resultSet FOR sql_stmt;
-    
+
     -- Log
     INSERT INTO debug_log (procedure_name, variable_name, variable_value)
     VALUES ('GetTableData', 'Closing Procedure', 'got table ' || v_tableName || ' data' );
