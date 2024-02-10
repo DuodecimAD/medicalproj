@@ -17,9 +17,10 @@ import com.medical.projet.java.utility.AppSettings;
 import com.medical.projet.java.utility.database.DbRead;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -27,19 +28,21 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -51,6 +54,8 @@ public class SpecialisteController {
     private static ObservableList<Specialiste> specialistesObsList = FXCollections.observableArrayList();
     
     private ObservableList<List<Object>> competencesList = FXCollections.observableArrayList();
+    
+    private ObservableList<List<Object>> checkedBoxes = FXCollections.observableArrayList();
 
     private static final String tableNameSuffix = "_SPECIALISTE";
 
@@ -103,7 +108,7 @@ public class SpecialisteController {
 
         // Create a new Specialiste
         openOverlayNewSpecialiste();
-
+        
     }
 
     private void dynamicCssStuff() {
@@ -259,7 +264,7 @@ public class SpecialisteController {
         //contentPane.setLayoutX((stackPane.getWidth() - contentPane.getPrefWidth()) / 2);
         //contentPane.setLayoutY(((stackPane.getHeight() - contentPane.getPrefHeight()) / 2));
         overlayPane.setAlignment(Pos.CENTER);
-
+        
     }
 
     // overlay with specialiste data
@@ -329,7 +334,7 @@ public class SpecialisteController {
         Label competenceTableError = new Label("No competences found, error");
         competencesTable.setPlaceholder(competenceTableError);
         competencesTable.getItems().clear();
-        
+
         
         // Ensure that competencesList is populated before using it
         if (competencesList == null || competencesList.isEmpty()) {
@@ -338,23 +343,97 @@ public class SpecialisteController {
 
         competencesTable.setItems(competencesList);
         
+
         TableColumn<List<Object>, Boolean> checkBoxColumn = new TableColumn<>("");
-        
-        //System.out.println(competencesList);
+
+   
+        //checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
+
+        checkedBoxes = getCheckedBoxes(specialiste);
         
         checkBoxColumn.setCellValueFactory(param -> {
+            
             for (int i = 0; i < specialiste.getCompetencesSpecialiste().size(); i++) {
+                
                 if(param.getValue().get(0).equals(specialiste.getCompetencesSpecialiste().get(i))) {
                     return new SimpleBooleanProperty(true);
                 }
             }
             return new SimpleBooleanProperty(false);
+
         });
-        checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
+        
+        
+        SimpleBooleanProperty checkBoxValue = new SimpleBooleanProperty();
+        
+        checkBoxColumn.setCellFactory(column -> {
+            CheckBoxTableCell<List<Object>, Boolean> cell = new CheckBoxTableCell<>();
+            
+            // Add a listener to the graphic property of the cell
+            cell.graphicProperty().addListener((obs, oldGraphic, newGraphic) -> {
+                if (newGraphic instanceof CheckBox) {
+                    CheckBox checkBox = (CheckBox) newGraphic;
+                    // Add the onMouseClicked event handler to the checkbox
+                    checkBox.setOnMouseClicked(event -> {
+                        // Handle the mouse click event on the CheckBox here
+                        int index = cell.getIndex();
+                        Boolean isChecked = checkBox.isSelected();
+                        
+                        // Update the BooleanProperty when the checkbox is clicked
+                        checkBoxValue.set(checkBox.isSelected());
+                        //int compIndex = (int) competencesList.get(index).get(0);
+                        checkedBoxes.get(index).set(1, isChecked);
+                    });
+                }
+            });
+            
+            cell.setSelectedStateCallback(index -> {
+                // Retrieve the state of the checkbox from the checkedBoxes list
+                boolean checked = (boolean) checkedBoxes.get(index).get(1);
+                return new SimpleBooleanProperty(checked);
+            });
+            
+            // Add a listener to the CheckBox to update the checkedBoxes list when clicked
+            cell.selectedProperty().addListener((obs, oldValue, newValue) -> {
+                int index = cell.getIndex();
+                if (index >= 0 && index < checkedBoxes.size()) {
+                    checkedBoxes.get(index).set(1, newValue);
+                }
+            });
+            
+            return cell;
+        });
+
+
+
+        
+        // keep this code to re-use, can check the node clicked and chilren
+        /*
+        competencesTable.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 1) {
+                
+                Node source = event.getPickResult().getIntersectedNode();
+                if(source instanceof CheckBoxTableCell) {
+                    Parent parent = (Parent) source;
+                    
+                    for (Node child : parent.getChildrenUnmodifiable()) {
+                        System.out.println(child);
+                        
+                        // Recursively print children of children
+                        //printAllChildren(child);
+                    }
+                }
+            }
+        });
+        */
+        
         
         TableColumn<List<Object>, String> competenceNameColumn = new TableColumn<>("Competences");
         competenceNameColumn.setCellValueFactory(param -> new SimpleStringProperty((String) param.getValue().get(1)));
         
+        // Assuming you have TableColumn instances named column1, column2, etc.
+        checkBoxColumn.setSortable(false);
+        competenceNameColumn.setSortable(false);
 
         competencesTable.getColumns().addAll(checkBoxColumn, competenceNameColumn);
         
@@ -389,18 +468,65 @@ public class SpecialisteController {
         });
 
         buttonOk.setOnAction(e -> {
+            
+            
+            List<Integer> checkItems = new ArrayList<>();
+                    
+            for (int i = 0; i < checkedBoxes.size(); i++) {
+                if((boolean) checkedBoxes.get(i).get(1) == true) {
+                    checkItems.add((int) checkedBoxes.get(i).get(0));
+                }
+                
+            }
+
+            System.out.println(competencesList);
+            System.out.println(checkedBoxes);
+            
+            
             updateSpecialiste(specialiste, nameLabel.getId(),         specialiste.getNomSpecialiste(),      nameField.getText(),        emailLabel.getId(),     specialiste.getEmailSpecialiste() );
-            updateSpecialiste(specialiste, firstnameLabel.getId(),      specialiste.getPrenomSpecialiste(),   firstnameField.getText(),     emailLabel.getId(),     specialiste.getEmailSpecialiste() );
+            updateSpecialiste(specialiste, firstnameLabel.getId(),    specialiste.getPrenomSpecialiste(),   firstnameField.getText(),   emailLabel.getId(),     specialiste.getEmailSpecialiste() );
             updateSpecialiste(specialiste, date_naisLabel.getId(),    specialiste.getDateNaisSpecialiste(), date_naisField.getValue(),  emailLabel.getId(),     specialiste.getEmailSpecialiste() );
             updateSpecialiste(specialiste, telLabel.getId(),          specialiste.getTelSpecialiste(),      telField.getText(),         emailLabel.getId(),     specialiste.getEmailSpecialiste() );
             updateSpecialiste(specialiste, emailLabel.getId(),        specialiste.getEmailSpecialiste(),    emailField.getText(),       emailLabel.getId(),     specialiste.getEmailSpecialiste() );
+
+            updateCompetences(specialiste, competencesTable.getId(),  specialiste.getCompetencesSpecialiste(),    checkItems);
             closeOverlay();
         });
+        
+        
     }
+    
 
     private void deleteSpecialiste(Specialiste specialiste) {
         specialiste.deleteSpecialisteDB(specialiste.getTelSpecialiste());
     }
+    
+    
+    public void updateCompetences(Specialiste specialiste, String fieldName, List<Integer> oldValue, List<Integer> newValue) {
+        
+
+        List<Integer> commonElements = new ArrayList<>(oldValue);
+        commonElements.retainAll(newValue); // Retain only the common elements
+
+        List<Integer> toDeleteDB = new ArrayList<>(oldValue);
+        toDeleteDB.removeAll(commonElements); // Remove common elements from list1
+
+        List<Integer> toAddDB = new ArrayList<>(newValue);
+        toAddDB.removeAll(commonElements); 
+        
+        System.out.println(currentLine() + " oldValue : " + oldValue);
+        System.out.println(currentLine() + " newValue : " + newValue);
+        System.out.println(currentLine() + " difference1 : " + toDeleteDB);
+        System.out.println(currentLine() + " difference1 : " + toAddDB);
+        
+     // Remove each element individually
+        for (Integer element : toDeleteDB) {
+            specialiste.getCompetencesSpecialiste().remove(element);
+        }
+        specialiste.getCompetencesSpecialiste().addAll(toAddDB);
+        
+    }
+    
 
     public void updateSpecialiste(Specialiste specialiste, String fieldName, Object oldValue, Object newValue, String checkColumn, String checkValue) {
 
@@ -524,12 +650,59 @@ public class SpecialisteController {
         
         //System.out.println(competencesList);
         
+        getCheckedBoxes();
+        
+        SimpleBooleanProperty checkBoxValue = new SimpleBooleanProperty();
+        
+        checkBoxColumn.setCellFactory(column -> {
+            CheckBoxTableCell<List<Object>, Boolean> cell = new CheckBoxTableCell<>();
+            
+            // Add a listener to the graphic property of the cell
+            cell.graphicProperty().addListener((obs, oldGraphic, newGraphic) -> {
+
+                if (newGraphic instanceof CheckBox) {
+                    CheckBox checkBox = (CheckBox) newGraphic;
+                    // Add the onMouseClicked event handler to the checkbox
+                    checkBox.setOnMouseClicked(event -> {
+                        // Handle the mouse click event on the CheckBox here
+                        int index = cell.getIndex();
+                        Boolean isChecked = checkBox.isSelected();
+                        
+                        // Update the BooleanProperty when the checkbox is clicked
+                        checkBoxValue.set(checkBox.isSelected());
+                        //int compIndex = (int) competencesList.get(index).get(0);
+                        checkedBoxes.get(index).set(1, isChecked);
+                        
+                    });
+                }
+            });
+            
+            cell.setSelectedStateCallback(index -> {
+                // Retrieve the state of the checkbox from the checkedBoxes list
+                boolean checked = (boolean) checkedBoxes.get(index).get(1);
+                return new SimpleBooleanProperty(checked);
+            });
+            
+            // Add a listener to the CheckBox to update the checkedBoxes list when clicked
+            cell.selectedProperty().addListener((obs, oldValue, newValue) -> {
+                int index = cell.getIndex();
+                if (index >= 0 && index < checkedBoxes.size()) {
+                    checkedBoxes.get(index).set(1, newValue);
+                }
+            });
+            
+            return cell;
+        });
+        
         checkBoxColumn.setCellValueFactory(param -> new SimpleBooleanProperty(false));
-        checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
+        //checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
         
         TableColumn<List<Object>, String> competenceNameColumn = new TableColumn<>("Competences");
         competenceNameColumn.setCellValueFactory(param -> new SimpleStringProperty((String) param.getValue().get(1)));
         
+        // Assuming you have TableColumn instances named column1, column2, etc.
+        checkBoxColumn.setSortable(false);
+        competenceNameColumn.setSortable(false);
 
         competencesTable.getColumns().addAll(checkBoxColumn, competenceNameColumn);
         
@@ -562,6 +735,7 @@ public class SpecialisteController {
 
         // buttons event logic
         buttonCancel.setOnAction(e -> {
+            //System.out.println(currentLine() + checkedBoxes);
             closeOverlay();
         });
 
@@ -703,5 +877,57 @@ public class SpecialisteController {
 
         }
         return competencesList;
+    }
+    
+    private ObservableList<List<Object>> getCheckedBoxes(Specialiste specialiste) {
+        
+        checkedBoxes.clear();
+     
+        for (int i = 0; i < competencesList.size(); i++) {
+            
+            List<Object> rowData = new ArrayList<>();
+            
+            int competenceID = (int) competencesList.get(i).get(0);
+
+            boolean checked = false;
+            
+            for (int j = 0; j < specialiste.getCompetencesSpecialiste().size(); j++) {
+                
+                int specialisteComps = specialiste.getCompetencesSpecialiste().get(j);
+
+                if(competenceID == specialisteComps) {
+
+                    checked = true;
+                    break;
+                }
+            }
+            rowData.add(competenceID);
+            rowData.add(checked); 
+            checkedBoxes.add(rowData);
+        }
+
+        return checkedBoxes;
+    }
+    
+    private ObservableList<List<Object>> getCheckedBoxes() {
+        
+        checkedBoxes.clear();
+     
+        for (int i = 0; i < competencesList.size(); i++) {
+            
+            List<Object> rowData = new ArrayList<>();
+            
+            int competenceID = (int) competencesList.get(i).get(0);
+
+            rowData.add(competenceID);
+            rowData.add(false); 
+            checkedBoxes.add(rowData);
+        }
+
+        return checkedBoxes;
+    }
+    
+    private String currentLine() {
+        return "line " + Thread.currentThread().getStackTrace()[2].getLineNumber() + " -> ";
     }
 }
