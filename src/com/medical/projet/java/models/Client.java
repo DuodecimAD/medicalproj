@@ -109,7 +109,7 @@ public class Client {
     public void setClientIdFromDb(Client client) {
 
         int newId = DbRead.readId("ID" + tableNameAffix, tableName, "EMAIL" + tableNameAffix, email.toLowerCase());
-        //System.out.println("id from db is : " + newId);
+
         client.setClientId(newId);
     }
 

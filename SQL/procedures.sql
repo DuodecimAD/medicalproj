@@ -646,3 +646,82 @@ BEGIN
 
 END;
 /
+create or replace PROCEDURE updateCompetences (
+    p_tableName     IN VARCHAR2,
+    p_action        IN VARCHAR2,
+    p_specialisteID IN INT,
+    p_values        IN VARCHAR2
+)
+IS 
+    tableName       VARCHAR2(255)   := p_tableName;
+    action          VARCHAR2(255)   := p_action;
+    inputValues     VARCHAR2(255)   := p_values;
+    separator       VARCHAR2(1)     := ',';
+    specialisteID   INT             := p_specialisteID;
+    array_values    SYS.ODCIVARCHAR2LIST := SYS.ODCIVARCHAR2LIST();
+    sql_stmt    VARCHAR2(1000);
+BEGIN
+
+     -- Log
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('updateCompetences', 'Entering Procedure', 'start ');
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('updateCompetences', 'tablename', tablename);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('updateCompetences', 'action', action);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('updateCompetences', 'inputValues', inputValues);
+    INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+    VALUES ('updateCompetences', 'specialisteID', specialisteID);
+    COMMIT; 
+
+    -- Split the values into an array
+    SELECT TRIM(BOTH ' ' FROM REGEXP_SUBSTR(inputValues, '[^' || separator || ']+', 1, LEVEL))
+    BULK COLLECT INTO array_values
+    FROM dual
+    CONNECT BY REGEXP_SUBSTR(inputValues, '[^' || separator || ']+', 1, LEVEL) IS NOT NULL;
+    
+    IF action = 'INSERT' THEN
+
+        -- Log
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('updateCompetences', 'starting competence insert', 'starting competence insert');
+
+        COMMIT;
+
+        FOR i IN 1..array_values.COUNT LOOP
+            sql_stmt := 'INSERT INTO ' || tableName || ' (ID_COMPETENCE,ID_SPECIALISTE) VALUES (:1,:2)';
+
+            -- Execute the SQL statement for each element
+            EXECUTE IMMEDIATE sql_stmt USING array_values(i),specialisteID;
+            
+            -- Log
+            INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+            VALUES ('updateCompetences', 'inserted competence : ' || array_values(i), 'for specialisteID : ' || specialisteID);
+            COMMIT;
+        END LOOP;
+
+    ELSIF action = 'DELETE' THEN
+        
+        -- Log
+        INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+        VALUES ('updateCompetences', 'starting competence delete', 'starting competence delete');
+        COMMIT;
+
+        FOR i IN 1..array_values.COUNT LOOP
+            sql_stmt := 'DELETE FROM ' || tableName || ' WHERE ID_SPECIALISTE = :1 AND ID_COMPETENCE = :2';
+
+            -- Execute the SQL statement for each element
+            EXECUTE IMMEDIATE sql_stmt USING specialisteID, array_values(i);
+            
+            -- Log
+            INSERT INTO debug_log (procedure_name, variable_name, variable_value)
+            VALUES ('updateCompetences', 'deleted competence : ' || array_values(i), 'for specialisteID : ' || specialisteID);
+            COMMIT;
+            
+        END LOOP;
+
+    END IF;
+
+END;
+/

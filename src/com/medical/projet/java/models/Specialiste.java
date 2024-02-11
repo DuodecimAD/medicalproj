@@ -130,7 +130,7 @@ public class Specialiste {
     public void setSpecialisteIdFromDb(Specialiste specialiste) {
 
         int newId = DbRead.readId("ID" + tableNameAffix, tableName, "EMAIL" + tableNameAffix, email.toLowerCase());
-        //System.out.println("id from db is : " + newId);
+        
         specialiste.setSpecialisteId(newId);
     }
 
@@ -158,6 +158,15 @@ public class Specialiste {
             throw e;
         }
     }
+    
+    public void updateCompetencesSpecialisteDB(String action, int specialisteID, List<Integer> values) throws SQLException {
+
+        try {
+            DbUpdate.update("POSSEDER", action, specialisteID, values);
+        } catch (SQLException e) {
+            throw e;
+        }
+    }
 
     @Override
     public String toString() {
@@ -174,6 +183,4 @@ public class Specialiste {
                 "--------------"                            + "\r"  ;
     }
     
-
-
 }

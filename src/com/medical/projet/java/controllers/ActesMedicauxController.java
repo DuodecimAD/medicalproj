@@ -951,7 +951,7 @@ public class ActesMedicauxController {
     private String createNewActeMedical(LocalDate date_debutField, LocalDate date_finField, int clientField, Object[] lieuArray, int specialisteField, Object[] competenceArray) {
         
         int AmNewId = DbRead.readLastId("id_acte_med", "acte_med")+1;
-        System.out.println(currentLine() + AmNewId);
+        //System.out.println(currentLine() + AmNewId);
         int idAM = AmNewId;
         String refAm = "REF" + (AmNewId);
         
@@ -977,8 +977,9 @@ public class ActesMedicauxController {
             newActeMedical.insertActeMedicalDB(newActeMedical);
             //System.out.println(currentLine() + newActeMedical.toString() + " added to database without problem");
             
+            int thisAmID = DbRead.readLastId("id_acte_med", "acte_med");
             List<String> columnsList = new ArrayList<>(List.of("ID_COMPETENCE","ID_ACTE_MED"));
-            List<Object> valuesList =  new ArrayList<>(List.of(competenceID, AmNewId));
+            List<Object> valuesList =  new ArrayList<>(List.of(competenceID, thisAmID));
 
             try {
                 DbCreate.insert("Necessiter", columnsList, valuesList);
@@ -995,26 +996,7 @@ public class ActesMedicauxController {
         } catch (SQLException e) {
             String errorMessage = e.getMessage();
             System.out.println(currentLine() + errorMessage);
-            /*
-            int startIndex = errorMessage.indexOf("ORA-20001: ");
-            if (startIndex != -1) {
-                // Extract the substring from the index to the end of the line
-                int endIndex = errorMessage.indexOf('\n', startIndex);
-                String cleanErrorMessage;
-                if (endIndex != -1) {
-                    cleanErrorMessage = errorMessage.substring(startIndex + "ORA-20001: ".length(), endIndex).trim();
-                    System.out.println(currentLine() + cleanErrorMessage);
-                    return cleanErrorMessage;
-                } else {
-                    cleanErrorMessage = errorMessage.substring(startIndex + "ORA-20001: ".length()).trim();
-                    System.out.println(currentLine() + cleanErrorMessage);
-                    return cleanErrorMessage;
-                }
-            } else {
-                System.out.println(currentLine() + errorMessage);
-                return errorMessage;
-            }
-             */
+            
         }
         return "";
     }
@@ -1320,8 +1302,7 @@ public class ActesMedicauxController {
     }
     
     private String currentLine() {
-        return "line " + Thread.currentThread().getStackTrace()[2].getLineNumber() + " -> ";
+        return "Class ActesMedicauxController @ line " + Thread.currentThread().getStackTrace()[2].getLineNumber() + " -> ";
     }
-
 
 }

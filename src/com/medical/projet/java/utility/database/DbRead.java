@@ -77,10 +77,10 @@ public class DbRead {
             if (!resultList.isEmpty()) {
                 return resultList;
             } else {
-                System.out.println("No records found in the table.");
+                System.out.println("DdRead -> No records found in the table.");
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("DdRead -> " + e.getMessage());
         }
 
         return Collections.emptyList(); // Return an empty list if there's an error or no results
@@ -114,7 +114,7 @@ public class DbRead {
             return result;
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("DdRead -> " + e.getMessage());
         }
 
         return -1; // Return an empty list if there's an error or no results
@@ -148,7 +148,7 @@ public class DbRead {
             return result;
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("DdRead -> " + e.getMessage());
         }
 
         return "error"; // Return an empty list if there's an error or no results
@@ -187,7 +187,7 @@ public class DbRead {
             finalList = resultList.stream().map(BigDecimal::intValue).collect(Collectors.toList());
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("DdRead ->  " + e.getMessage());
         }
 
         return finalList;
@@ -231,10 +231,10 @@ public class DbRead {
             if (!resultList.isEmpty()) {
                 return resultList;
             } else {
-                System.out.println("No records found in the table.");
+                System.out.println("DdRead -> No records found in the table.");
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("DdRead -> " + e.getMessage());
         }
 
         return Collections.emptyList(); // Return an empty list if there's an error or no results
@@ -266,7 +266,7 @@ public class DbRead {
             return result;
 
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            System.out.println("DdRead -> " + e.getMessage());
         }
 
         return -1; // Return an empty list if there's an error or no results

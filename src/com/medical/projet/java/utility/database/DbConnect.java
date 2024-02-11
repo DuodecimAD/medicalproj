@@ -36,12 +36,12 @@ public class DbConnect {
 
             // Establish the database connection
             conn = DriverManager.getConnection(url, username, password);
-            System.out.println("Connection to Oracle Database has been established.");
+            System.out.println("DdConnect -> Connection to Oracle Database has been established.");
         } catch (SQLException e) {
-            System.out.println("SQL Exception: " + e.getMessage());
+            System.out.println("DdConnect -> SQL Exception: " + e.getMessage());
             handleConnectionError();
         } catch (ClassNotFoundException e) {
-            System.out.println("Class Not Found Exception: " + e.getMessage());
+            System.out.println("DdConnect -> Class Not Found Exception: " + e.getMessage());
         }
 
     }
@@ -55,7 +55,7 @@ public class DbConnect {
             @Override
             public void run() {
                 Platform.runLater(() -> {
-                    System.out.println("Connection to database failed. Trying again in " + seconds[0] + " sec.");
+                    System.out.println("DdConnect -> Connection to database failed. Trying again in " + seconds[0] + " sec.");
                     seconds[0]--;
 
                     if (seconds[0] < 0) {
@@ -97,10 +97,10 @@ public class DbConnect {
             Connection connection = sharedConnection();
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                System.out.println("Connection to Oracle Database has been closed.");
+                System.out.println("DdConnect -> Connection to Oracle Database has been closed.");
                 conn = null; // Set the connection variable to null after closing
             } else {
-                System.out.println("Connection is already closed or null.");
+                System.out.println("DdConnect -> Connection is already closed or null.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

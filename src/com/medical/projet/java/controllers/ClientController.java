@@ -262,7 +262,7 @@ public class ClientController {
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
     private void populateOverlayContent(BorderPane contentPane, Client client) {
 
-        //System.out.println(client.toString());
+        //System.out.println(currentLine() + client.toString());
 
         Label nameLabel = new Label("Name");
         nameLabel.setId("NOM" + tableNameSuffix);
@@ -350,7 +350,7 @@ public class ClientController {
                 try {
                     client.updateClientDB(fieldName, newValue, checkColumn, checkValue);
                     client.setNomClient(newValue.toString());
-                    System.out.println("name has been changed");
+                    System.out.println(currentLine() + "name has been changed");
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -364,7 +364,7 @@ public class ClientController {
                     e.printStackTrace();
                 }
                 client.setPrenomClient(newValue.toString());
-                System.out.println("firstname has been changed");
+                System.out.println(currentLine() + "firstname has been changed");
             }
         }
         case "DATE_NAIS_CLIENT" -> {
@@ -376,7 +376,7 @@ public class ClientController {
                 }
                 LocalDate newDate = LocalDate.parse(newValue.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                 client.setDateNaisClient(newDate);
-                System.out.println("date_nais has been changed");
+                System.out.println(currentLine() + "date_nais has been changed");
             }
         }
         case "TEL_CLIENT" -> {
@@ -387,7 +387,7 @@ public class ClientController {
                     e.printStackTrace();
                 }
                 client.setTelClient(newValue.toString());
-                System.out.println("tel has been changed");
+                System.out.println(currentLine() + "tel has been changed");
             }
         }
         case "EMAIL_CLIENT" -> {
@@ -398,7 +398,7 @@ public class ClientController {
                     e.printStackTrace();
                 }
                 client.setEmailClient(newValue.toString());
-                System.out.println("email has been changed");
+                System.out.println(currentLine() + "email has been changed");
             }
         }
         default -> {}
@@ -469,7 +469,7 @@ public class ClientController {
 
         try {
             newClient.insertClientDB(newClient);
-            System.out.println("insert done");
+            System.out.println(currentLine() + "insert done");
             newClient.setClientIdFromDb(newClient);
             getClientsObsList().add(newClient);
         } catch (SQLException e) {
@@ -481,15 +481,15 @@ public class ClientController {
                 String cleanErrorMessage;
                 if (endIndex != -1) {
                     cleanErrorMessage = errorMessage.substring(startIndex + "ORA-20001: ".length(), endIndex).trim();
-                    System.out.println(cleanErrorMessage);
+                    System.out.println(currentLine() + cleanErrorMessage);
                     return cleanErrorMessage;
                 } else {
                     cleanErrorMessage = errorMessage.substring(startIndex + "ORA-20001: ".length()).trim();
-                    System.out.println(cleanErrorMessage);
+                    System.out.println(currentLine() + cleanErrorMessage);
                     return cleanErrorMessage;
                 }
             } else {
-                System.out.println(errorMessage);
+                System.out.println(currentLine() + errorMessage);
                 return errorMessage;
             }
 
@@ -562,5 +562,9 @@ public class ClientController {
             // Clear the searchField text
             searchField.clear();
         });
+    }
+    
+    private String currentLine() {
+        return "Class ClientController @ line " + Thread.currentThread().getStackTrace()[2].getLineNumber() + " -> ";
     }
 }

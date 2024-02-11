@@ -40,11 +40,11 @@ public class DbDelete {
             callableStatement.execute();
 
 
-            System.out.println("Based on value : " + sanitizedValue + ", the row has been set to isDeleted");
+            System.out.println("DdDelete -> Based on value : " + sanitizedValue + ", the row has been set to isDeleted");
 
         } catch (SQLException e) {
             e.getMessage();
-            System.out.println("no row has been found in table : " + sanitizedTableName + " with value : " + sanitizedValue + " in column : " + sanitizedColumn);
+            System.out.println("DdDelete -> no row has been found in table : " + sanitizedTableName + " with value : " + sanitizedValue + " in column : " + sanitizedColumn);
         }
 
 

@@ -18,7 +18,7 @@ public class AppSecurity {
      */
     public static String sanitize(String input) {
         // Keep only letters (a-z, A-Z) and numbers (0-9)
-        return input.replaceAll("[^a-zA-Z0-9_./@-]", "");
+        return input.replaceAll("[^a-zA-Z0-9_.,/@-]", "");
     }
 
     /**
@@ -32,7 +32,7 @@ public class AppSecurity {
 
         // Remove non-alphanumeric characters from each string
         for (String str : input) {
-            String sanitizedString = str.replaceAll("[^a-zA-Z0-9_./@-]", "");
+            String sanitizedString = str.replaceAll("[^a-zA-Z0-9_.,/@-]", "");
             sanitizedInput.add(sanitizedString);
         }
 

@@ -199,7 +199,7 @@ public class SpecialisteController {
                 }
             }
         }
-        //System.out.println(specialistesObsList);
+        //System.out.println(currentLine() + specialistesObsList);
         return specialistesObsList;
     }
 
@@ -280,7 +280,7 @@ public class SpecialisteController {
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
     private void populateOverlayContent(BorderPane contentPane, Specialiste specialiste) {
 
-        //System.out.println(specialiste.toString());
+        //System.out.println(currentLine() + specialiste.toString());
 
         Label nameLabel = new Label("Name");
         nameLabel.setId("NOM" + tableNameSuffix);
@@ -417,7 +417,7 @@ public class SpecialisteController {
                     Parent parent = (Parent) source;
                     
                     for (Node child : parent.getChildrenUnmodifiable()) {
-                        System.out.println(child);
+                        System.out.println(currentLine() + child);
                         
                         // Recursively print children of children
                         //printAllChildren(child);
@@ -445,7 +445,7 @@ public class SpecialisteController {
         competenceNameColumn.prefWidthProperty().bind(tableWidth.multiply(0.85));
         
         competencesTable.setEditable(true);
-        //System.out.println(competencesList);
+        //System.out.println(currentLine() + competencesList);
 
         contentPane.setTop(overlayTopDelete);
         contentPane.setCenter(overLayContent);
@@ -458,6 +458,7 @@ public class SpecialisteController {
         
         // buttons event logic
         buttonCancel.setOnAction(e -> {
+            //System.out.println(currentLine() + specialiste.getCompetencesSpecialiste());
             closeOverlay();
         });
 
@@ -478,9 +479,9 @@ public class SpecialisteController {
                 }
                 
             }
-
-            System.out.println(competencesList);
-            System.out.println(checkedBoxes);
+            
+            //System.out.println(currentLine() + competencesList);
+            //System.out.println(currentLine() + checkedBoxes);
             
             
             updateSpecialiste(specialiste, nameLabel.getId(),         specialiste.getNomSpecialiste(),      nameField.getText(),        emailLabel.getId(),     specialiste.getEmailSpecialiste() );
@@ -513,18 +514,35 @@ public class SpecialisteController {
 
         List<Integer> toAddDB = new ArrayList<>(newValue);
         toAddDB.removeAll(commonElements); 
-        
+        /*
         System.out.println(currentLine() + " oldValue : " + oldValue);
         System.out.println(currentLine() + " newValue : " + newValue);
         System.out.println(currentLine() + " difference1 : " + toDeleteDB);
         System.out.println(currentLine() + " difference1 : " + toAddDB);
+        */
         
-     // Remove each element individually
-        for (Integer element : toDeleteDB) {
-            specialiste.getCompetencesSpecialiste().remove(element);
+        // db logic
+        try {
+            
+            if(!toAddDB.isEmpty()) {
+                specialiste.updateCompetencesSpecialisteDB("INSERT", specialiste.getSpecialisteId(), toAddDB);
+            }
+            
+            if(!toDeleteDB.isEmpty()) {
+                specialiste.updateCompetencesSpecialisteDB("DELETE", specialiste.getSpecialisteId(), toDeleteDB);
+            }
+            
+            // update specialiste obs
+            for (Integer element : toDeleteDB) {
+                specialiste.getCompetencesSpecialiste().remove(element);
+            }
+            specialiste.getCompetencesSpecialiste().addAll(toAddDB);
+            
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        specialiste.getCompetencesSpecialiste().addAll(toAddDB);
-        
+
     }
     
 
@@ -535,64 +553,64 @@ public class SpecialisteController {
         }
 
         switch (fieldName) {
-        case "NOM_SPECIALISTE" -> {
-            if (compare(oldValue, newValue)) {
-
-                try {
-                    specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
-                    specialiste.setNomSpecialiste(newValue.toString());
-                    System.out.println("name has been changed");
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            case "NOM_SPECIALISTE" -> {
+                if (compare(oldValue, newValue)) {
+    
+                    try {
+                        specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
+                        specialiste.setNomSpecialiste(newValue.toString());
+                        System.out.println(currentLine() + "name has been changed");
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-        }
-        case "PRENOM_SPECIALISTE" -> {
-            if (compare(oldValue, newValue)) {
-                try {
-                    specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            case "PRENOM_SPECIALISTE" -> {
+                if (compare(oldValue, newValue)) {
+                    try {
+                        specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    specialiste.setPrenomSpecialiste(newValue.toString());
+                    System.out.println(currentLine() + "firstname has been changed");
                 }
-                specialiste.setPrenomSpecialiste(newValue.toString());
-                System.out.println("firstname has been changed");
             }
-        }
-        case "DATE_NAIS_SPECIALISTE" -> {
-            if (compare(oldValue, newValue)) {
-                try {
-                    specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            case "DATE_NAIS_SPECIALISTE" -> {
+                if (compare(oldValue, newValue)) {
+                    try {
+                        specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    LocalDate newDate = LocalDate.parse(newValue.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    specialiste.setDateNaisSpecialiste(newDate);
+                    System.out.println(currentLine() + "date_nais has been changed");
                 }
-                LocalDate newDate = LocalDate.parse(newValue.toString(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                specialiste.setDateNaisSpecialiste(newDate);
-                System.out.println("date_nais has been changed");
             }
-        }
-        case "TEL_SPECIALISTE" -> {
-            if (compare(oldValue, newValue)) {
-                try {
-                    specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            case "TEL_SPECIALISTE" -> {
+                if (compare(oldValue, newValue)) {
+                    try {
+                        specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    specialiste.setTelSpecialiste(newValue.toString());
+                    System.out.println(currentLine() + "tel has been changed");
                 }
-                specialiste.setTelSpecialiste(newValue.toString());
-                System.out.println("tel has been changed");
             }
-        }
-        case "EMAIL_SPECIALISTE" -> {
-            if (compare(oldValue, newValue)) {
-                try {
-                    specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
-                } catch (SQLException e) {
-                    e.printStackTrace();
+            case "EMAIL_SPECIALISTE" -> {
+                if (compare(oldValue, newValue)) {
+                    try {
+                        specialiste.updateSpecialisteDB(fieldName, newValue, checkColumn, checkValue);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    specialiste.setEmailSpecialiste(newValue.toString());
+                    System.out.println(currentLine() + "email has been changed");
                 }
-                specialiste.setEmailSpecialiste(newValue.toString());
-                System.out.println("email has been changed");
             }
-        }
-        default -> {}
+            default -> {}
         }
         table.refresh();
     }
@@ -648,7 +666,7 @@ public class SpecialisteController {
         
         TableColumn<List<Object>, Boolean> checkBoxColumn = new TableColumn<>("");
         
-        //System.out.println(competencesList);
+        //System.out.println(currentLine() + competencesList);
         
         getCheckedBoxes();
         
@@ -695,7 +713,7 @@ public class SpecialisteController {
         });
         
         checkBoxColumn.setCellValueFactory(param -> new SimpleBooleanProperty(false));
-        //checkBoxColumn.setCellFactory(CheckBoxTableCell.forTableColumn(checkBoxColumn));
+        
         
         TableColumn<List<Object>, String> competenceNameColumn = new TableColumn<>("Competences");
         competenceNameColumn.setCellValueFactory(param -> new SimpleStringProperty((String) param.getValue().get(1)));
@@ -714,10 +732,8 @@ public class SpecialisteController {
         competenceNameColumn.prefWidthProperty().bind(tableWidth.multiply(0.85));
         
         competencesTable.setEditable(true);
-        //System.out.println(competencesList);
-        
-        
 
+        
         Button buttonOk = new Button("ok");
         Button buttonCancel = new Button("Cancel");
 
@@ -741,24 +757,61 @@ public class SpecialisteController {
 
         buttonOk.setOnAction(e -> {
             String newSpecialisteOK = createNewSpecialiste(nameField.getText(), firstnameField.getText(), date_naisField.getValue(), telField.getText(), emailField.getText());
-
+            
+            
             if(newSpecialisteOK.equals("")) {
+                
+                // Get the specialiste just created
+                int lastIndex = specialistesObsList.size() - 1;
+                Specialiste specialiste = specialistesObsList.get(lastIndex);
+                //System.out.println(currentLine() + " specialiste ID : " + specialiste.getSpecialisteId());
+                
+                List<Integer> checkedItems = new ArrayList<>();
+                for (int i = 0; i < checkedBoxes.size(); i++) {
+                    if((boolean) checkedBoxes.get(i).get(1) == true) {
+                        checkedItems.add((int) checkedBoxes.get(i).get(0));
+                    }
+                    
+                }
+                insertCompetences(specialiste, competencesTable.getId(),  checkedItems);
+                
                 closeOverlay();
             }else {
                 errorLabel.setText(newSpecialisteOK);
             }
         });
     }
+    
+    private void insertCompetences(Specialiste specialiste, String fieldName, List<Integer> values) {
+        
+        //System.out.println(currentLine() + " values : " + values);
+
+        // db logic
+        try {
+
+            specialiste.updateCompetencesSpecialisteDB("INSERT", specialiste.getSpecialisteId(), values);
+            
+            
+            //System.out.println(currentLine() + "before adding competences : " + specialiste.getSpecialisteId() + specialiste.getCompetencesSpecialiste());
+            specialiste.getCompetencesSpecialiste().addAll(values);
+            //System.out.println(currentLine() + "after adding competences : " + specialiste.getSpecialisteId() + specialiste.getCompetencesSpecialiste());
+            
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
 
     private String createNewSpecialiste(String nameField, String firsnameField, LocalDate date_naisField, String telField, String emailField) {
         
-        List<Integer> competencesSpecialisteToFix = List.of(1, 2, 3);
+        List<Integer> competencesSpecialisteToFix = new ArrayList<>();
 
         Specialiste newSpecialiste = new Specialiste(nameField, firsnameField, date_naisField, telField, emailField, competencesSpecialisteToFix);
 
         try {
             newSpecialiste.insertSpecialisteDB(newSpecialiste);
-            System.out.println("insert done");
+            System.out.println(currentLine() + "insert done");
             newSpecialiste.setSpecialisteIdFromDb(newSpecialiste);
             getSpecialistesObsList().add(newSpecialiste);
         } catch (SQLException e) {
@@ -770,15 +823,15 @@ public class SpecialisteController {
                 String cleanErrorMessage;
                 if (endIndex != -1) {
                     cleanErrorMessage = errorMessage.substring(startIndex + "ORA-20001: ".length(), endIndex).trim();
-                    System.out.println(cleanErrorMessage);
+                    System.out.println(currentLine() + cleanErrorMessage);
                     return cleanErrorMessage;
                 } else {
                     cleanErrorMessage = errorMessage.substring(startIndex + "ORA-20001: ".length()).trim();
-                    System.out.println(cleanErrorMessage);
+                    System.out.println(currentLine() + cleanErrorMessage);
                     return cleanErrorMessage;
                 }
             } else {
-                System.out.println(errorMessage);
+                System.out.println(currentLine() + errorMessage);
                 return errorMessage;
             }
 
@@ -928,6 +981,6 @@ public class SpecialisteController {
     }
     
     private String currentLine() {
-        return "line " + Thread.currentThread().getStackTrace()[2].getLineNumber() + " -> ";
+        return "Class SpecialisteController @ line " + Thread.currentThread().getStackTrace()[2].getLineNumber() + " -> ";
     }
 }
