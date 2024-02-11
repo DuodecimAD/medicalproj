@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.medical.projet;
 
 import java.io.IOException;
@@ -22,6 +25,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class App.
  */

@@ -1,10 +1,12 @@
+/*
+ * 
+ */
 package com.medical.projet.java.utility.database;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.medical.projet.java.utility.AppSecurity;
 
@@ -23,6 +25,16 @@ public class DbUpdate {
     // Private constructor to prevent instantiation
     private DbUpdate() {}
 
+    /**
+     * Update.
+     *
+     * @param tableName the table name
+     * @param column the column
+     * @param value the value
+     * @param checkColumn the check column
+     * @param checkValue the check value
+     * @throws SQLException the SQL exception
+     */
     public static void update(String tableName, String column, Object value, String checkColumn, String checkValue) throws SQLException {
         String sanitizedTableName = AppSecurity.sanitize(tableName);
         String sanitizedColumn = AppSecurity.sanitize(column);
@@ -55,6 +67,15 @@ public class DbUpdate {
 
     }
     
+    /**
+     * Update.
+     *
+     * @param tableName the table name
+     * @param action the action
+     * @param specialisteID the specialiste ID
+     * @param values the values
+     * @throws SQLException the SQL exception
+     */
     public static void update(String tableName, String action, int specialisteID, List<Integer> values) throws SQLException {
         
         //String ValuesToString = values.stream().map(Object::toString).collect(Collectors.joining(", "));
@@ -89,6 +110,11 @@ public class DbUpdate {
 
     }
     
+    /**
+     * Current line.
+     *
+     * @return the string
+     */
     private static String currentLine() {
         return "line " + Thread.currentThread().getStackTrace()[2].getLineNumber() + " -> ";
     }

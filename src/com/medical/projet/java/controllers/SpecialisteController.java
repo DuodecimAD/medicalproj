@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.medical.projet.java.controllers;
 
 import java.math.BigDecimal;
@@ -17,8 +20,6 @@ import com.medical.projet.java.utility.AppSettings;
 import com.medical.projet.java.utility.database.DbRead;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -28,13 +29,10 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -42,21 +40,28 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SpecialisteController.
+ */
 public class SpecialisteController {
 
+    /** The specialistes obs list. */
     private static ObservableList<Specialiste> specialistesObsList = FXCollections.observableArrayList();
     
+    /** The competences list. */
     private ObservableList<List<Object>> competencesList = FXCollections.observableArrayList();
     
+    /** The checked boxes. */
     private ObservableList<List<Object>> checkedBoxes = FXCollections.observableArrayList();
 
+    /** The Constant tableNameSuffix. */
     private static final String tableNameSuffix = "_SPECIALISTE";
 
     /** The body. **/
@@ -64,31 +69,42 @@ public class SpecialisteController {
     @FXML
     private StackPane body;
 
+    /** The table. */
     @FXML
     private TableView<Specialiste> table;
 
+    /** The name. */
     @FXML
     private TableColumn<Specialiste, String> name;
 
+    /** The firstname. */
     @FXML
     private TableColumn<Specialiste, String> firstname;
 
+    /** The date nais. */
     @FXML
     private TableColumn<Specialiste, String> dateNais;
 
+    /** The tel. */
     @FXML
     private TableColumn<Specialiste, String> tel;
 
+    /** The email. */
     @FXML
     private TableColumn<Specialiste, String> email;
 
+    /** The create button. */
     @FXML
     private Button createButton;
 
+    /** The search field. */
     @FXML
     private TextField searchField;
 
 
+    /**
+     * Initialize.
+     */
     public void initialize() {
 
         dynamicCssStuff();
@@ -111,6 +127,9 @@ public class SpecialisteController {
         
     }
 
+    /**
+     * Dynamic css stuff.
+     */
     private void dynamicCssStuff() {
 
         // absolute position of the create button on the right side
@@ -125,6 +144,9 @@ public class SpecialisteController {
         email.prefWidthProperty().bind(tableWidth.multiply(0.35));
     }
 
+    /**
+     * Loading table icon.
+     */
     private void loadingTableIcon() {
         // Load the loading GIF
         Image loadingImage = new Image(getClass().getResourceAsStream(AppSettings.INSTANCE.imagesPath+"loading.gif"));
@@ -134,6 +156,11 @@ public class SpecialisteController {
         table.setPlaceholder(loadingImageView);
     }
 
+    /**
+     * Read all specialistes.
+     *
+     * @return the observable list
+     */
     public static ObservableList<Specialiste> readAllSpecialistes() {
 
         // Get raw data from the Specialiste model
@@ -204,6 +231,9 @@ public class SpecialisteController {
     }
 
 
+    /**
+     * Update table view.
+     */
     private void updateTableView() {
 
         // Set the items with the correct data type
@@ -218,6 +248,9 @@ public class SpecialisteController {
 
     }
 
+    /**
+     * Open overlay populate data.
+     */
     private void openOverlayPopulateData() {
         table.setRowFactory(tv -> {
             TableRow<Specialiste> row = new TableRow<>();
@@ -231,12 +264,21 @@ public class SpecialisteController {
         });
     }
 
+    /**
+     * Open overlay new specialiste.
+     */
     private void openOverlayNewSpecialiste() {
         createButton.setOnMouseClicked(event -> {
             openOverlayForNewSpecialiste();
         });
     }
 
+    /**
+     * Creates the overlay.
+     *
+     * @param stackPane the stack pane
+     * @param contentPopulationCallback the content population callback
+     */
     private void createOverlay(StackPane stackPane, Consumer<BorderPane> contentPopulationCallback) {
         // Create a darkened overlay pane
         VBox overlayPane = new VBox();
@@ -267,16 +309,30 @@ public class SpecialisteController {
         
     }
 
+    /**
+     * Open overlay with specialiste data.
+     *
+     * @param specialiste the specialiste
+     */
     // overlay with specialiste data
     private void openOverlayWithSpecialisteData(Specialiste specialiste) {
         createOverlay(body, contentPane -> populateOverlayContent(contentPane, specialiste));
     }
 
+    /**
+     * Open overlay for new specialiste.
+     */
     // overlay for a new specialiste
     private void openOverlayForNewSpecialiste() {
         createOverlay(body, contentPane -> populateOverlayForNewSpecialiste(contentPane));
     }
 
+    /**
+     * Populate overlay content.
+     *
+     * @param contentPane the content pane
+     * @param specialiste the specialiste
+     */
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
     private void populateOverlayContent(BorderPane contentPane, Specialiste specialiste) {
 
@@ -498,11 +554,24 @@ public class SpecialisteController {
     }
     
 
+    /**
+     * Delete specialiste.
+     *
+     * @param specialiste the specialiste
+     */
     private void deleteSpecialiste(Specialiste specialiste) {
         specialiste.deleteSpecialisteDB(specialiste.getTelSpecialiste());
     }
     
     
+    /**
+     * Update competences.
+     *
+     * @param specialiste the specialiste
+     * @param fieldName the field name
+     * @param oldValue the old value
+     * @param newValue the new value
+     */
     public void updateCompetences(Specialiste specialiste, String fieldName, List<Integer> oldValue, List<Integer> newValue) {
         
 
@@ -546,6 +615,16 @@ public class SpecialisteController {
     }
     
 
+    /**
+     * Update specialiste.
+     *
+     * @param specialiste the specialiste
+     * @param fieldName the field name
+     * @param oldValue the old value
+     * @param newValue the new value
+     * @param checkColumn the check column
+     * @param checkValue the check value
+     */
     public void updateSpecialiste(Specialiste specialiste, String fieldName, Object oldValue, Object newValue, String checkColumn, String checkValue) {
 
         if(!(newValue instanceof LocalDate)) {
@@ -615,11 +694,23 @@ public class SpecialisteController {
         table.refresh();
     }
 
+    /**
+     * Compare.
+     *
+     * @param oldValue the old value
+     * @param newValue the new value
+     * @return true, if successful
+     */
     private boolean compare(Object oldValue, Object newValue) {
         return !Objects.equals(oldValue, newValue);
     }
 
 
+    /**
+     * Populate overlay for new specialiste.
+     *
+     * @param contentPane the content pane
+     */
     // populating inputs in the overlay when clicking create new specialiste
     private void populateOverlayForNewSpecialiste(BorderPane contentPane) {
 
@@ -773,7 +864,7 @@ public class SpecialisteController {
                     }
                     
                 }
-                insertCompetences(specialiste, competencesTable.getId(),  checkedItems);
+                insertCompetences(specialiste, checkedItems);
                 
                 closeOverlay();
             }else {
@@ -782,7 +873,13 @@ public class SpecialisteController {
         });
     }
     
-    private void insertCompetences(Specialiste specialiste, String fieldName, List<Integer> values) {
+    /**
+     * Insert competences.
+     *
+     * @param specialiste the specialiste
+     * @param values the values
+     */
+    private void insertCompetences(Specialiste specialiste, List<Integer> values) {
         
         //System.out.println(currentLine() + " values : " + values);
 
@@ -790,7 +887,6 @@ public class SpecialisteController {
         try {
 
             specialiste.updateCompetencesSpecialisteDB("INSERT", specialiste.getSpecialisteId(), values);
-            
             
             //System.out.println(currentLine() + "before adding competences : " + specialiste.getSpecialisteId() + specialiste.getCompetencesSpecialiste());
             specialiste.getCompetencesSpecialiste().addAll(values);
@@ -803,6 +899,16 @@ public class SpecialisteController {
 
     }
 
+    /**
+     * Creates the new specialiste.
+     *
+     * @param nameField the name field
+     * @param firsnameField the firsname field
+     * @param date_naisField the date nais field
+     * @param telField the tel field
+     * @param emailField the email field
+     * @return the string
+     */
     private String createNewSpecialiste(String nameField, String firsnameField, LocalDate date_naisField, String telField, String emailField) {
         
         List<Integer> competencesSpecialisteToFix = new ArrayList<>();
@@ -839,11 +945,19 @@ public class SpecialisteController {
         return "";
     }
 
+    /**
+     * Gets the specialistes obs list.
+     *
+     * @return the specialistes obs list
+     */
     public static ObservableList<Specialiste> getSpecialistesObsList() {
         return specialistesObsList;
     }
 
 
+    /**
+     * Close overlay.
+     */
     private void closeOverlay() {
         // Remove the last added overlay pane
         int lastIndex = body.getChildren().size() - 1;
@@ -857,6 +971,9 @@ public class SpecialisteController {
      * Works out of the box, thanks chatGPT
      */
 
+    /**
+     * Search table.
+     */
     private void searchTable() {
         FilteredList<Specialiste> filteredData = new FilteredList<>(specialistesObsList, p -> true);
 
@@ -906,6 +1023,11 @@ public class SpecialisteController {
         });
     }
     
+    /**
+     * Gets the competence list.
+     *
+     * @return the competence list
+     */
     private ObservableList<List<Object>> getCompetenceList() {
         
         List<List<Object>> competenceListDB;
@@ -932,6 +1054,12 @@ public class SpecialisteController {
         return competencesList;
     }
     
+    /**
+     * Gets the checked boxes.
+     *
+     * @param specialiste the specialiste
+     * @return the checked boxes
+     */
     private ObservableList<List<Object>> getCheckedBoxes(Specialiste specialiste) {
         
         checkedBoxes.clear();
@@ -962,6 +1090,11 @@ public class SpecialisteController {
         return checkedBoxes;
     }
     
+    /**
+     * Gets the checked boxes.
+     *
+     * @return the checked boxes
+     */
     private ObservableList<List<Object>> getCheckedBoxes() {
         
         checkedBoxes.clear();
@@ -980,6 +1113,11 @@ public class SpecialisteController {
         return checkedBoxes;
     }
     
+    /**
+     * Current line.
+     *
+     * @return the string
+     */
     private String currentLine() {
         return "Class SpecialisteController @ line " + Thread.currentThread().getStackTrace()[2].getLineNumber() + " -> ";
     }

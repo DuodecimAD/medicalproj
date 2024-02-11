@@ -1,7 +1,11 @@
+/*
+ * 
+ */
 package com.medical.projet.java.utility;
 
 import java.net.URL;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Enum AppSettings.
  */

@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.medical.projet.java.utility;
 
 // TODO: Auto-generated Javadoc

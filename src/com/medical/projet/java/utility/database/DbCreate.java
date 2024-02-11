@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.medical.projet.java.utility.database;
 
 import java.sql.CallableStatement;
@@ -22,6 +25,14 @@ public class DbCreate {
     // Private constructor to prevent instantiation
     private DbCreate() {}
 
+    /**
+     * Insert.
+     *
+     * @param tableName the table name
+     * @param columnsList the columns list
+     * @param valuesList the values list
+     * @throws SQLException the SQL exception
+     */
     public static void insert(String tableName, List<String> columnsList, List<Object> valuesList) throws SQLException {
         String sanitizedTableName = AppSecurity.sanitize(tableName);
         List<String> sanitizedColumnsList = AppSecurity.sanitize(columnsList);

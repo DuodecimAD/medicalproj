@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.medical.projet.java.utility.database;
 
 import java.math.BigDecimal;
@@ -34,6 +37,13 @@ public class DbRead {
 
     }
 
+    /**
+     * Read table.
+     *
+     * @param tableName the table name
+     * @param sortBy the sort by
+     * @return the list
+     */
     public static List<List<Object>> readTable(String tableName, String sortBy) {
         String sanitizedTableName = AppSecurity.sanitize(tableName);
         String sanitizedSortBy = AppSecurity.sanitize(sortBy);
@@ -86,6 +96,15 @@ public class DbRead {
         return Collections.emptyList(); // Return an empty list if there's an error or no results
     }
 
+    /**
+     * Read id.
+     *
+     * @param columnValue the column value
+     * @param tableName the table name
+     * @param checkColumn the check column
+     * @param checkValue the check value
+     * @return the int
+     */
     public static int readId(String columnValue, String tableName, String checkColumn, String checkValue) {
         String sanitizedcolumnValue = AppSecurity.sanitize(columnValue);
         String sanitizedTableName = AppSecurity.sanitize(tableName);
@@ -120,6 +139,15 @@ public class DbRead {
         return -1; // Return an empty list if there's an error or no results
     }
     
+    /**
+     * Read string.
+     *
+     * @param columnValue the column value
+     * @param tableName the table name
+     * @param checkColumn the check column
+     * @param checkValue the check value
+     * @return the string
+     */
     public static String readString(String columnValue, String tableName, String checkColumn, String checkValue) {
         String sanitizedcolumnValue = AppSecurity.sanitize(columnValue);
         String sanitizedTableName = AppSecurity.sanitize(tableName);
@@ -155,6 +183,12 @@ public class DbRead {
     }
     
     
+    /**
+     * Gets the specialiste for competence.
+     *
+     * @param checkValue the check value
+     * @return the specialiste for competence
+     */
     public static List<Integer> getSpecialisteForCompetence(int checkValue) {
         conn = DbConnect.sharedConnection();
         List<BigDecimal> resultList = new ArrayList<>();
@@ -194,6 +228,11 @@ public class DbRead {
     }
 
 
+    /**
+     * Read test.
+     *
+     * @return the list
+     */
     public static List<List<Object>> readTest() {
 
 
@@ -240,6 +279,13 @@ public class DbRead {
         return Collections.emptyList(); // Return an empty list if there's an error or no results
     }
     
+    /**
+     * Read last id.
+     *
+     * @param columnValue the column value
+     * @param tableName the table name
+     * @return the int
+     */
     public static int readLastId(String columnValue, String tableName) {
         String sanitizedcolumnValue = AppSecurity.sanitize(columnValue);
         String sanitizedTableName = AppSecurity.sanitize(tableName);

@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.medical.projet.java.utility.database;
 
 import java.sql.CallableStatement;
@@ -21,6 +24,13 @@ public class DbDelete {
     // Private constructor to prevent instantiation
     private DbDelete() {}
 
+    /**
+     * Delete.
+     *
+     * @param tableName the table name
+     * @param column the column
+     * @param value the value
+     */
     public static void delete(String tableName, String column, String value) {
         String sanitizedTableName = AppSecurity.sanitize(tableName);
         String sanitizedColumn = AppSecurity.sanitize(column);

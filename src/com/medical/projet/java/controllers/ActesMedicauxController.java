@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.medical.projet.java.controllers;
 
 import java.math.BigDecimal;
@@ -45,55 +48,79 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ActesMedicauxController.
+ */
 public class ActesMedicauxController {
 
+    /** The actes medicaux obs list. */
     private static ObservableList<ActeMedical> actesMedicauxObsList = FXCollections.observableArrayList();
     
+    /** The clients list. */
     private ObservableList<Client> clientsList = ClientController.getClientsObsList();
     
+    /** The specialistes list. */
     private ObservableList<Specialiste> specialistesList = SpecialisteController.getSpecialistesObsList();
     
+    /** The lieu list. */
     private ObservableList<Object> lieuList = FXCollections.observableArrayList();
     
+    /** The competence list. */
     private ObservableList<Object> competenceList = FXCollections.observableArrayList();
 
+    /** The Constant tableNameSuffix. */
     private static final String tableNameSuffix = "_ACTE_MED";
 
 
+    /** The body. */
     @FXML
     private StackPane body;
 
+    /** The table. */
     @FXML
     private TableView<ActeMedical> table;
 
+    /** The ref acte med. */
     @FXML
     private TableColumn<ActeMedical, String> ref_acte_med;
 
+    /** The client. */
     @FXML
     private TableColumn<ActeMedical, String> client;
 
+    /** The specialiste. */
     @FXML
     private TableColumn<ActeMedical, String> specialiste;
     
+    /** The competence. */
     @FXML
     private TableColumn<ActeMedical, String> competence;
 
+    /** The lieu. */
     @FXML
     private TableColumn<ActeMedical, String> lieu;
 
+    /** The date debut. */
     @FXML
     private TableColumn<ActeMedical, String> date_debut;
 
+    /** The date fin. */
     @FXML
     private TableColumn<ActeMedical, String> date_fin;
 
+    /** The create button. */
     @FXML
     private Button createButton;
 
+    /** The search field. */
     @FXML
     private TextField searchField;
 
 
+    /**
+     * Initialize.
+     */
     public void initialize() {
 
         dynamicCssStuff();
@@ -118,6 +145,9 @@ public class ActesMedicauxController {
 
     }
 
+    /**
+     * Dynamic css stuff.
+     */
     private void dynamicCssStuff() {
 
         // absolute position of the create button on the right side
@@ -134,6 +164,9 @@ public class ActesMedicauxController {
         date_fin.prefWidthProperty().bind(tableWidth.multiply(0.15));
     }
 
+    /**
+     * Loading table icon.
+     */
     private void loadingTableIcon() {
         // Load the loading GIF n TableView
         Image loadingImage = new Image(getClass().getResourceAsStream(AppSettings.INSTANCE.imagesPath+"loading.gif"));
@@ -143,6 +176,11 @@ public class ActesMedicauxController {
         table.setPlaceholder(loadingImageView);
     }
 
+    /**
+     * Read all actes medicaux.
+     *
+     * @return the observable list
+     */
     public static ObservableList<ActeMedical> readAllActesMedicaux() {
 
         // Get raw data from the ActeMedical model
@@ -217,6 +255,9 @@ public class ActesMedicauxController {
     }
 
 
+    /**
+     * Update table view.
+     */
     private void updateTableView() {
 
         // Set the items with the correct data type
@@ -241,6 +282,9 @@ public class ActesMedicauxController {
 
 
 
+    /**
+     * Open overlay populate data.
+     */
     private void openOverlayPopulateData() {
         table.setRowFactory(tv -> {
             TableRow<ActeMedical> row = new TableRow<>();
@@ -255,12 +299,21 @@ public class ActesMedicauxController {
         });
     }
 
+    /**
+     * Open overlay new acte medical.
+     */
     private void openOverlayNewActeMedical() {
         createButton.setOnMouseClicked(event -> {
             openOverlayForNewActeMedical();
         });
     }
 
+    /**
+     * Creates the overlay.
+     *
+     * @param stackPane the stack pane
+     * @param contentPopulationCallback the content population callback
+     */
     private void createOverlay(StackPane stackPane, Consumer<BorderPane> contentPopulationCallback) {
         // Create a darkened overlay pane
         VBox overlayPane = new VBox();
@@ -290,16 +343,30 @@ public class ActesMedicauxController {
         overlayPane.setAlignment(Pos.CENTER);
     }
 
+    /**
+     * Open overlay with acte medical data.
+     *
+     * @param acteMedical the acte medical
+     */
     // overlay with client data
     private void openOverlayWithActeMedicalData(ActeMedical acteMedical) {
         createOverlay(body, contentPane -> populateOverlayContent(contentPane, acteMedical));
     }
 
+    /**
+     * Open overlay for new acte medical.
+     */
     // overlay for a new client
     private void openOverlayForNewActeMedical() {
         createOverlay(body, contentPane -> populateOverlayForNewActeMedical(contentPane));
     }
 
+    /**
+     * Populate overlay content.
+     *
+     * @param contentPane the content pane
+     * @param acteMedical the acte medical
+     */
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
     private void populateOverlayContent(BorderPane contentPane, ActeMedical acteMedical) {
 
@@ -553,10 +620,25 @@ public class ActesMedicauxController {
 
     }
 
+    /**
+     * Delete acte medical.
+     *
+     * @param acteMedical the acte medical
+     */
     private void deleteActeMedical(ActeMedical acteMedical) {
         acteMedical.deleteActeMedicalDB(acteMedical.getRefActeMed());
     }
     
+    /**
+     * Update competence.
+     *
+     * @param acteMedical the acte medical
+     * @param columnField the column field
+     * @param oldValue the old value
+     * @param competenceArray the competence array
+     * @param checkSpecialiste the check specialiste
+     * @param checkValue the check value
+     */
     public void updateCompetence(ActeMedical acteMedical, String columnField, Object oldValue, Object[] competenceArray, String checkSpecialiste, int checkValue) {
         
         if (compare(oldValue, competenceArray[0])) {
@@ -581,6 +663,16 @@ public class ActesMedicauxController {
         Platform.runLater(() -> table.refresh());
     }
 
+    /**
+     * Update acte medical.
+     *
+     * @param acteMedical the acte medical
+     * @param columnField the column field
+     * @param oldValue the old value
+     * @param newValue the new value
+     * @param checkColumn the check column
+     * @param checkValue the check value
+     */
     public void updateActeMedical(ActeMedical acteMedical, String columnField, Object oldValue, Object newValue, String checkColumn, String checkValue) {
 
         if(newValue instanceof LocalDate) {
@@ -703,11 +795,23 @@ public class ActesMedicauxController {
         table.refresh();
     }
 
+    /**
+     * Compare.
+     *
+     * @param oldValue the old value
+     * @param newValue the new value
+     * @return true, if successful
+     */
     private boolean compare(Object oldValue, Object newValue) {
         return !Objects.equals(oldValue, newValue);
     }
 
 
+    /**
+     * Populate overlay for new acte medical.
+     *
+     * @param contentPane the content pane
+     */
     // populating inputs in the overlay when clicking create new client
     private void populateOverlayForNewActeMedical(BorderPane contentPane) {
 
@@ -920,6 +1024,12 @@ public class ActesMedicauxController {
 
     }
 
+    /**
+     * Am row to client.
+     *
+     * @param tableAm the table am
+     * @param clientField the client field
+     */
     private void amRowToClient(TableView<Client> tableAm, TextField clientField) {
         tableAm.setRowFactory(tv -> {
             TableRow<Client> row = new TableRow<>();
@@ -934,6 +1044,12 @@ public class ActesMedicauxController {
         });
     }
     
+    /**
+     * Am row to specialiste.
+     *
+     * @param tableAm the table am
+     * @param specialisteField the specialiste field
+     */
     private void amRowToSpecialiste(TableView<Specialiste> tableAm, TextField specialisteField) {
         tableAm.setRowFactory(tv -> {
             TableRow<Specialiste> row = new TableRow<>();
@@ -948,6 +1064,17 @@ public class ActesMedicauxController {
         });
     }
 
+    /**
+     * Creates the new acte medical.
+     *
+     * @param date_debutField the date debut field
+     * @param date_finField the date fin field
+     * @param clientField the client field
+     * @param lieuArray the lieu array
+     * @param specialisteField the specialiste field
+     * @param competenceArray the competence array
+     * @return the string
+     */
     private String createNewActeMedical(LocalDate date_debutField, LocalDate date_finField, int clientField, Object[] lieuArray, int specialisteField, Object[] competenceArray) {
         
         int AmNewId = DbRead.readLastId("id_acte_med", "acte_med")+1;
@@ -1001,11 +1128,19 @@ public class ActesMedicauxController {
         return "";
     }
 
+    /**
+     * Gets the acte medicals obs list.
+     *
+     * @return the acte medicals obs list
+     */
     public ObservableList<ActeMedical> getActeMedicalsObsList() {
         return actesMedicauxObsList;
     }
 
 
+    /**
+     * Close overlay.
+     */
     private void closeOverlay() {
         // Remove the last added overlay pane
         int lastIndex = body.getChildren().size() - 1;
@@ -1019,6 +1154,9 @@ public class ActesMedicauxController {
      * Works out of the box, thanks chatGPT
      */
 
+    /**
+     * Search table.
+     */
     private void searchTable() {
         FilteredList<ActeMedical> filteredData = new FilteredList<>(actesMedicauxObsList, p -> true);
 
@@ -1071,6 +1209,11 @@ public class ActesMedicauxController {
         });
     }
 
+    /**
+     * Table am overlay clients.
+     *
+     * @param thisTableParam the this table param
+     */
     private void tableAmOverlayClients(TableView<Client> thisTableParam) {
         
         TableView<Client> thisTable = thisTableParam;
@@ -1106,6 +1249,12 @@ public class ActesMedicauxController {
 
     }
     
+    /**
+     * Table am overlay specialistes.
+     *
+     * @param thisTableParam the this table param
+     * @param specialisteWithCompetence the specialiste with competence
+     */
     private void tableAmOverlaySpecialistes(TableView<Specialiste> thisTableParam, List<Integer> specialisteWithCompetence) {
         
         // Filter the list based on provided IDs
@@ -1151,6 +1300,12 @@ public class ActesMedicauxController {
     }
 
     
+    /**
+     * Search table overlay client.
+     *
+     * @param tableAm the table am
+     * @param amSearchField the am search field
+     */
     private void searchTableOverlayClient(TableView<Client> tableAm, TextField amSearchField) {
         
         FilteredList<Client> filteredData = new FilteredList<>(clientsList, p -> true);
@@ -1204,6 +1359,12 @@ public class ActesMedicauxController {
         
     }
     
+    /**
+     * Search table overlay specialiste.
+     *
+     * @param tableAm the table am
+     * @param amSearchField the am search field
+     */
     private void searchTableOverlaySpecialiste(TableView<Specialiste> tableAm, TextField amSearchField) {
         FilteredList<Specialiste> filteredData = new FilteredList<>(tableAm.getItems(), p -> true);
         
@@ -1257,6 +1418,11 @@ public class ActesMedicauxController {
         
     }
     
+    /**
+     * Gets the lieu list.
+     *
+     * @return the lieu list
+     */
     private ObservableList<Object> getLieuList() {
         
         List<List<Object>> lieuListDB;
@@ -1279,6 +1445,11 @@ public class ActesMedicauxController {
         return lieuList;
     }
     
+    /**
+     * Gets the competence list.
+     *
+     * @return the competence list
+     */
     private ObservableList<Object> getCompetenceList() {
         
         List<List<Object>> competenceListDB;
@@ -1301,6 +1472,11 @@ public class ActesMedicauxController {
         return competenceList;
     }
     
+    /**
+     * Current line.
+     *
+     * @return the string
+     */
     private String currentLine() {
         return "Class ActesMedicauxController @ line " + Thread.currentThread().getStackTrace()[2].getLineNumber() + " -> ";
     }

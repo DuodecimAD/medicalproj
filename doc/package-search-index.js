@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.medical.projet"},{"l":"com.medical.projet.java.controllers"},{"l":"com.medical.projet.java.models"},{"l":"com.medical.projet.java.utility"},{"l":"com.medical.projet.java.utility.database"}];updateSearchResults();

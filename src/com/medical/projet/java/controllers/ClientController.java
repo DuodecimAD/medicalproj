@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.medical.projet.java.controllers;
 
 import java.math.BigDecimal;
@@ -38,10 +41,16 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ClientController.
+ */
 public class ClientController {
 
+    /** The clients obs list. */
     private static ObservableList<Client> clientsObsList = FXCollections.observableArrayList();
 
+    /** The Constant tableNameSuffix. */
     private static final String tableNameSuffix = "_CLIENT";
 
     /** The body. **/
@@ -49,31 +58,42 @@ public class ClientController {
     @FXML
     private StackPane body;
 
+    /** The table. */
     @FXML
     private TableView<Client> table;
 
+    /** The name. */
     @FXML
     private TableColumn<Client, String> name;
 
+    /** The firstname. */
     @FXML
     private TableColumn<Client, String> firstname;
 
+    /** The date nais. */
     @FXML
     private TableColumn<Client, String> dateNais;
 
+    /** The tel. */
     @FXML
     private TableColumn<Client, String> tel;
 
+    /** The email. */
     @FXML
     private TableColumn<Client, String> email;
 
+    /** The create button. */
     @FXML
     private Button createButton;
 
+    /** The search field. */
     @FXML
     private TextField searchField;
 
 
+    /**
+     * Initialize.
+     */
     public void initialize() {
 
         dynamicCssStuff();
@@ -96,6 +116,9 @@ public class ClientController {
 
     }
 
+    /**
+     * Dynamic css stuff.
+     */
     private void dynamicCssStuff() {
 
         // absolute position of the create button on the right side
@@ -110,6 +133,9 @@ public class ClientController {
         email.prefWidthProperty().bind(tableWidth.multiply(0.35));
     }
 
+    /**
+     * Loading table icon.
+     */
     private void loadingTableIcon() {
         // Load the loading GIF
         Image loadingImage = new Image(getClass().getResourceAsStream(AppSettings.INSTANCE.imagesPath+"loading.gif"));
@@ -119,6 +145,11 @@ public class ClientController {
         table.setPlaceholder(loadingImageView);
     }
 
+    /**
+     * Read all clients.
+     *
+     * @return the observable list
+     */
     public static ObservableList<Client> readAllClients() {
 
         // Get raw data from the Client model
@@ -175,6 +206,11 @@ public class ClientController {
         return clientsObsList;
     }
 
+    /**
+     * Update table view.
+     *
+     * @param <T> the generic type
+     */
     private <T> void updateTableView() {
 
         // Set the items with the correct data type
@@ -189,6 +225,9 @@ public class ClientController {
 
     }
 
+    /**
+     * Open overlay populate data.
+     */
     private void openOverlayPopulateData() {
         table.setRowFactory(tv -> {
             TableRow<Client> row = new TableRow<>();
@@ -202,12 +241,21 @@ public class ClientController {
         });
     }
 
+    /**
+     * Open overlay new client.
+     */
     private void openOverlayNewClient() {
         createButton.setOnMouseClicked(event -> {
             openOverlayForNewClient();
         });
     }
 
+    /**
+     * Creates the overlay.
+     *
+     * @param stackPane the stack pane
+     * @param contentPopulationCallback the content population callback
+     */
     private void createOverlay(StackPane stackPane, Consumer<BorderPane> contentPopulationCallback) {
         // Create a darkened overlay pane
         VBox overlayPane = new VBox();
@@ -249,16 +297,30 @@ public class ClientController {
 
     }
 
+    /**
+     * Open overlay with client data.
+     *
+     * @param client the client
+     */
     // overlay with client data
     private void openOverlayWithClientData(Client client) {
         createOverlay(body, contentPane -> populateOverlayContent(contentPane, client));
     }
 
+    /**
+     * Open overlay for new client.
+     */
     // overlay for a new client
     private void openOverlayForNewClient() {
         createOverlay(body, contentPane -> populateOverlayForNewClient(contentPane));
     }
 
+    /**
+     * Populate overlay content.
+     *
+     * @param contentPane the content pane
+     * @param client the client
+     */
     //  when clicking on a row in Tableview, populate the data of that row in the overlay
     private void populateOverlayContent(BorderPane contentPane, Client client) {
 
@@ -333,10 +395,25 @@ public class ClientController {
         });
     }
 
+    /**
+     * Delete client.
+     *
+     * @param client the client
+     */
     private void deleteClient(Client client) {
         client.deleteClientDB("TEL", client.getTelClient());
     }
 
+    /**
+     * Update client.
+     *
+     * @param client the client
+     * @param fieldName the field name
+     * @param oldValue the old value
+     * @param newValue the new value
+     * @param checkColumn the check column
+     * @param checkValue the check value
+     */
     public void updateClient(Client client, String fieldName, Object oldValue, Object newValue, String checkColumn, String checkValue) {
 
         if(!(newValue instanceof LocalDate)) {
@@ -406,11 +483,23 @@ public class ClientController {
         table.refresh();
     }
 
+    /**
+     * Compare.
+     *
+     * @param oldValue the old value
+     * @param newValue the new value
+     * @return true, if successful
+     */
     private boolean compare(Object oldValue, Object newValue) {
         return !Objects.equals(oldValue, newValue);
     }
 
 
+    /**
+     * Populate overlay for new client.
+     *
+     * @param contentPane the content pane
+     */
     // populating inputs in the overlay when clicking create new client
     private void populateOverlayForNewClient(BorderPane contentPane) {
 
@@ -463,6 +552,16 @@ public class ClientController {
         });
     }
 
+    /**
+     * Creates the new client.
+     *
+     * @param nameField the name field
+     * @param SurnameField the surname field
+     * @param date_naisField the date nais field
+     * @param telField the tel field
+     * @param emailField the email field
+     * @return the string
+     */
     private String createNewClient(String nameField, String SurnameField, LocalDate date_naisField, String telField, String emailField) {
 
         Client newClient = new Client(nameField, SurnameField, date_naisField, telField, emailField);
@@ -497,11 +596,19 @@ public class ClientController {
         return "";
     }
 
+    /**
+     * Gets the clients obs list.
+     *
+     * @return the clients obs list
+     */
     public static ObservableList<Client> getClientsObsList() {
         return clientsObsList;
     }
 
 
+    /**
+     * Close overlay.
+     */
     private void closeOverlay() {
         // Remove the last added overlay pane
         int lastIndex = body.getChildren().size() - 1;
@@ -515,6 +622,9 @@ public class ClientController {
      * Works out of the box, thanks chatGPT
      */
 
+    /**
+     * Search table.
+     */
     private void searchTable() {
         FilteredList<Client> filteredData = new FilteredList<>(clientsObsList, p -> true);
 
@@ -564,6 +674,11 @@ public class ClientController {
         });
     }
     
+    /**
+     * Current line.
+     *
+     * @return the string
+     */
     private String currentLine() {
         return "Class ClientController @ line " + Thread.currentThread().getStackTrace()[2].getLineNumber() + " -> ";
     }

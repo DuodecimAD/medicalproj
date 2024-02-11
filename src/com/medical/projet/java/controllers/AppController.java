@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.medical.projet.java.controllers;
 
 
@@ -44,11 +47,13 @@ public class AppController {
     /** The menu pane. */
     @FXML private BorderPane menuPane;
 
+    /** The content. */
     @FXML private StackPane content;
 
     /** The buttons menu. */
     static List<Button> buttonsMenu = new ArrayList<>();
 
+    /** The fxml cache. */
     private static Map<String, CachedFXML> fxmlCache = new HashMap<>();
 
     /**
@@ -69,7 +74,6 @@ public class AppController {
         LoggerUtil.getLogger().info("Initialize done");
     }
 
-    ////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Sets the menu.
@@ -110,9 +114,9 @@ public class AppController {
         }else {
             System.out.println("File isn't working, so probably within a jar : ");
 
-            // change to app/ for install
-            //try (JarFile jarFile = new JarFile("app/myjavafxtemplate.jar")) {
-            try (JarFile jarFile = new JarFile("myjavafxtemplate.jar")) {
+            // change this to app/ for install jpackage IMPORTANT
+            //try (JarFile jarFile = new JarFile("app/medicalproj.jar")) {
+            try (JarFile jarFile = new JarFile("medicalproj.jar")) {
 
                 Enumeration<JarEntry> entries = jarFile.entries();
 
@@ -154,10 +158,22 @@ public class AppController {
         }
     }
 
+    /**
+     * Update active state.
+     *
+     * @param buttons the buttons
+     * @param activeButton the active button
+     */
     private void updateActiveState(List<Button> buttons, Button activeButton) {
         buttons.forEach(button -> setActiveButtonStyle(button, button == activeButton));
     }
 
+    /**
+     * Sets the active button style.
+     *
+     * @param button the button
+     * @param isActive the is active
+     */
     private void setActiveButtonStyle(Button button, boolean isActive) {
         if (isActive) {
             button.setId("activeMenuButton");
@@ -182,6 +198,9 @@ public class AppController {
 
     }
 
+    /**
+     * Loading icon.
+     */
     private void loadingIcon() {
         // Load the loading GIF
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(AppSettings.INSTANCE.pathLocation+"ressources/images/loader.gif");
@@ -220,6 +239,11 @@ public class AppController {
         }, 0, 1000);
     }
 
+    /**
+     * Fade animation.
+     *
+     * @param thisNode the this node
+     */
     private void fadeAnimation(VBox thisNode) {
         FadeTransition fadeOut = new FadeTransition(Duration.seconds(1), thisNode.getChildren().get(0));
         fadeOut.setFromValue(1.0);
@@ -267,21 +291,42 @@ public class AppController {
 
 
 
+    /**
+     * The Class CachedFXML.
+     */
     public class CachedFXML {
 
+        /** The content. */
         private final Node content;
 
+        /** The controller. */
         private final Object controller;
 
+        /**
+         * Instantiates a new cached FXML.
+         *
+         * @param content the content
+         * @param controller the controller
+         */
         public CachedFXML(Node content, Object controller) {
             this.content = content;
             this.controller = controller;
         }
 
+        /**
+         * Gets the content.
+         *
+         * @return the content
+         */
         public Node getContent() {
             return content;
         }
 
+        /**
+         * Gets the controller.
+         *
+         * @return the controller
+         */
         public Object getController() {
             return controller;
         }

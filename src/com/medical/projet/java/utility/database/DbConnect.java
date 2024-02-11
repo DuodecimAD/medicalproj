@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package com.medical.projet.java.utility.database;
 
 import java.sql.Connection;
@@ -10,6 +13,7 @@ import com.medical.projet.java.utility.AppSettings;
 
 import javafx.application.Platform;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class DbConnect.
  */
@@ -18,6 +22,7 @@ public class DbConnect {
     /** The conn. */
     private static Connection conn;
 
+    /** The timer active. */
     private static boolean timerActive = false;
 
     /**
@@ -46,6 +51,9 @@ public class DbConnect {
 
     }
 
+    /**
+     * Handle connection error.
+     */
     private void handleConnectionError() {
         final int[] seconds = {10}; // Initial countdown value
         timerActive = true;
